@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mã Xác Thực OTP</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+        .container { max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background: white; }
+        .header { text-align: center; color: #2d89ef; font-size: 20px; font-weight: bold; }
+        .otp-code { text-align: center; font-size: 24px; font-weight: bold; padding: 10px; background: #2d89ef; color: white; border-radius: 5px; }
+        .footer { font-size: 14px; color: #777; text-align: left; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🔐 {{TITLE}}</div>
+        <p>Chào bạn,</p>
+        <p>Mã OTP của bạn là:</p>
+        <div class="otp-code">{{OTP}}</div>
+        <p>Mã này sẽ hết hạn sau <b>5 phút</b>. </p>
+        <p>Vui lòng không chia sẻ OTP với bất kỳ ai.</p>
+        <hr>
+        <div class="footer">
+            Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.<br>
+            Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi! 🚀
+        </div>
+    </div>
+</body>
+</html>
