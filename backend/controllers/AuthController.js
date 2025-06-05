@@ -1,13 +1,22 @@
+const jwt = require('jsonwebtoken')
+const dotenv = require('dotenv');
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const User = require("../models/User");
 const otpGenerator = require("otp-generator");
 const sendEmail = require("../utils/sendMail");
+const User = require('../models/User');
+const generateToken = require('../utils/generalToken');
+const verifyEmail = require('../utils/verifyMail');
+const validateUtils = require('../utils/validateInput');
+dotenv.config()
 let otpStore = {};
 
 const sendOtp = async (req, res) => {
   const { type, email } = req.body;
   try {
+    const errMsg = validateUtils.validateEmail(email);
+    if (errMsg !== null) {
+      return res.status(400).json({ message: errMsg });
+    }
     if (!["register", "reset-password"].includes(type)) {
       return res.status(400).json({ message: "Loại OTP không hợp lệ!" });
     }
@@ -30,14 +39,23 @@ const sendOtp = async (req, res) => {
     const expiresAt = Date.now() + 1 * 60 * 1000; // OTP hết hạn sau 5 phút
     if (!otpStore[email]) otpStore[email] = {};
     otpStore[email][type] = { otp, isVerified: false, expiresAt }; // Lưu OTP kèm thời gian hết hạn
-    await sendEmail(email, otp, type);
+    if (!(await verifyEmail(email))) {
+      return res.status(400).json({ message: "Email không tồn tại!" });
+    }
 
-    res.status(200).json({message: `OTP đã được gửi để ${type === "register" ? "đăng ký" : "đặt lại mật khẩu"}!`});
+    try {
+      await sendEmail(email, otp, type);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Không thể gửi email. Vui lòng thử lại!" });
+    }
+
+    res.status(200).json({ message: `OTP đã được gửi để ${type === "register" ? "đăng ký" : "đặt lại mật khẩu"}!` });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống!" });
   }
 };
-
 const verifyOtp = (req, res) => {
   const { type, email, otp } = req.body;
 
@@ -48,7 +66,7 @@ const verifyOtp = (req, res) => {
     return res.status(400).json({ message: "OTP không tồn tại hoặc đã hết hạn!" });
   const storedOtp = otpStore[email][type];
 
-  if (Date.now() > storedOtp.expiresAt){
+  if (Date.now() > storedOtp.expiresAt) {
     delete otpStore[email][type];
     return res.status(400).json({ message: "OTP đã hết hạn!" });
   }
@@ -62,16 +80,75 @@ const verifyOtp = (req, res) => {
   storedOtp.isVerified = true;
   res.status(200).json({ message: "OTP xác thực thành công!" });
 };
+const refreshToken = async (req, res) => {
+  try {
+    // const token = req.cookies.refresh_token;
+    // if (!token) {
+    //     return res.status(404).json({
+    //         status: 'ERR',
+    //         message: 'Refresh token is required'
+    //     });
+    // }
+    const { token } = req.body
+    const decoded = await new Promise((resolve, reject) => {
+      jwt.verify(token, process.env.REFRESH_TOKEN, (err, decoded) => {
+        if (err) return reject(err);
+        resolve(decoded);
+      });
+    });
+    // Đối chiếu token trong DB (bảo mật hơn)
+    const user = await User.findById(decoded.id);
+    if (!user || user.refreshToken !== token) {
+      return res.status(403).json({
+        status: 'ERR',
+        message: 'Invalid refresh token or user'
+      });
+    }
 
+    const access_token = await generateToken.genneralAccessToken({
+      id: user.id,
+      role: user.role
+    });
+
+    user.accessToken = access_token;
+    await user.save();
+
+    return res.status(200).json({
+      status: 'OK',
+      message: 'Access Token được cập nhật thành công',
+      access_token
+    });
+  } catch (e) {
+    console.log(e);
+    return res.status(401).json({
+      status: 'ERR',
+      message: 'Invalid or expired token'
+    });
+  }
+}
 const register = async (req, res) => {
   const { name, email, password, phone } = req.body;
   try {
+    const checkEmail = validateUtils.validateEmail(email);
+    if (checkEmail !== null) {
+      return res.status(400).json({ message: checkEmail });
+    }
+    const errMsg = validateUtils.validatePassword(password);
+    if (errMsg !== null) {
+      return res.status(400).json({ message: errMsg });
+    }
+    const checkPhone = validateUtils.validatePhone(phone);
+    if (checkPhone !== null) {
+      return res.status(400).json({ message: checkPhone });
+    }
     if (!otpStore[email] || !otpStore[email]["register"]?.isVerified)
       return res.status(400).json({ message: "Chưa xác thực OTP!" });
 
-    if(password.length < 6)
-      return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự!" });
-
+    // Kiểm tra OTP có hết hạn không
+    if (Date.now() > storedOtp.expiresAt) {
+      delete otpStore[email]["register"];
+      return res.status(400).json({ message: "OTP đã hết hạn!" });
+    }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -84,13 +161,16 @@ const register = async (req, res) => {
     });
     await newUser.save();
 
-    delete otpStore[email]["register"]; // Xóa OTP sau khi đăng ký thành công
+    // Xóa OTP sau khi đăng ký thành công
+    delete otpStore[email]["register"];
+
     res.status(201).json({ message: "Đăng ký thành công!" });
   } catch (error) {
+    console.error("Lỗi đăng ký:", error);
     res.status(500).json({ message: "Lỗi hệ thống!" });
+
   }
 };
-
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -101,43 +181,39 @@ const login = async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Mật khẩu không đúng!" });
 
-    if(user.isActivated === false)
+    if (user.isActivated === false)
       return res.status(400).json({ message: "Tài khoản bị khóa!" });
 
-    const token = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: process.env.JWT_EXPIRES_IN,
-      }
-    );
-    res.status(200).json({ token, role: user.role });
+    const payload = { id: user._id, role: user.role };
+
+    const accessToken = generateToken.genneralAccessToken(payload);
+    const refreshToken = generateToken.genneralRefreshToken(payload);
+
+
+    user.accessToken = accessToken;
+    user.refreshToken = refreshToken;
+    await user.save();
+
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    })
+
+    return res.status(200).json({
+      message: "Đăng nhập thành công",
+      accessToken,
+      role: user.role,
+    });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống!" });
   }
 };
-
-const resetPassword = async (req, res) => {
-    const { email, newPassword } = req.body;
-
-    if(!otpStore[email] || !otpStore[email]["reset-password"]?.isVerified)
-        return res.status(400).json({ message: "Chưa xác thực OTP!" });
-
-    // Xóa OTP sau khi sử dụng
-  delete otpStore[email]["resetPassword"];
-
-  // Cập nhật mật khẩu mới
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await User.updateOne({ email }, { password: hashedPassword });
-
-  res.status(200).json({ message: "Mật khẩu đã được cập nhật thành công!" });
-}
-const authController = {
-  sendOtp,
-  verifyOtp,
+module.exports = {
+  refreshToken,
   register,
   login,
-  resetPassword,
-};
-
-module.exports = authController;
+  sendOtp,
+  verifyOtp,
+}
