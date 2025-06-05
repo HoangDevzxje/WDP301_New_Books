@@ -1,5 +1,5 @@
-const router = require("express").Router();
-const authController = require("../controllers/AuthController");
+const router = require('express').Router();
+const authController = require('../controllers/AuthController');
 
 // Xử lý OTP
 router.post("/send-otp", authController.sendOtp);
@@ -11,7 +11,7 @@ router.post("/register", authController.register);
 // Đăng nhập
 router.post("/login", authController.login);
 
-// Rest mật khẩu
-router.post("/reset-password", authController.resetPassword);
+// Refresh token
+router.post("/refresh-token", authController.refreshToken);
 
 module.exports = router;
