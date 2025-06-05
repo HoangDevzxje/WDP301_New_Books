@@ -1,13 +1,13 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
-const checkAuthorize = (roles = []) => async(req, res, next) => {
+const checkAuthorize = (roles = []) => async (req, res, next) => {
   const token = req.header("Authorization");
   if (!token) return res.status(401).json({ message: "Không có quyền truy cập!" });
 
   try {
     // Verify token
-    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+    const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.ACCESS_TOKEN);
 
     // Kiểm tra xem id trong token có hợp lệ không (tồn tại trong DB)
     const user = await User.findById(decoded.id);
