@@ -171,6 +171,36 @@ const register = async (req, res) => {
 
   }
 };
+const resetPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  if (!otpStore[email] || !otpStore[email]["reset-password"]?.isVerified)
+    return res.status(400).json({ message: "Chưa xác thực OTP!" });
+
+
+  // // Kiểm tra OTP có hết hạn không
+  if (Date.now() > storedOtp.expiresAt) {
+    delete otpStore[email]["reset-password"];
+    return res.status(400).json({ message: "OTP đã hết hạn!" });
+  }
+
+  // // Xóa OTP sau khi sử dụng
+  delete otpStore[email]["resetPassword"];
+
+  const errMsg = validateUtils.validatePassword(newPassword);
+  if (errMsg !== null) {
+    return res.status(400).json({ message: errMsg });
+  }
+  // Cập nhật mật khẩu mới
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  try {
+    await User.updateOne({ email }, { password: hashedPassword });
+    res.status(200).json({ message: "Mật khẩu đã được cập nhật thành công!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi hệ thống!" });
+  }
+
+}
 const login = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -210,10 +240,34 @@ const login = async (req, res) => {
     res.status(500).json({ message: "Lỗi hệ thống!" });
   }
 };
+const changePassword = async (req, res) => {
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const user = req.user;
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch)
+      return res.status(400).json({ message: "Mật khẩu cũ không đúng!" });
+
+    const errMsg = validateUtils.validatePassword(newPassword);
+    if (errMsg !== null) {
+      return res.status(400).json({ message: errMsg });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi hệ thống!" });
+  }
+};
 module.exports = {
   refreshToken,
   register,
+  resetPassword,
   login,
   sendOtp,
   verifyOtp,
+  changePassword
 }
