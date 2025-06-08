@@ -5,8 +5,15 @@ const userSchema = new mongoose.Schema({
   email: { type: String, unique: true, required: true },
   password: String,
   phone: String,
-  address: String,
-  point: {type: Number, default: 0},
+  address: [
+    {
+      address: { type: String, required: true },
+      provineName: { type: String, required: true },
+      districtName: { type: String, required: true },
+      wardName: { type: String, required: true },
+    }
+  ],
+  point: { type: Number, default: 0 },
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
   role: {
     type: String,
@@ -16,7 +23,9 @@ const userSchema = new mongoose.Schema({
   isActivated: {
     type: Boolean,
     default: true
-  }
+  },
+  accessToken: { type: String, default: null },
+  refreshToken: { type: String, default: null }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
