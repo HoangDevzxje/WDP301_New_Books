@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import Header from "./components/Header";
 import Footer from "./components/Footer";
-import HomePage from "./pages/HomePage";
+import Login from "./pages/Login/Login";
+import Register from "./pages/Register/Register";
+import HomePage from "./pages/HomePage/HomePage";
+import Header from "./components/Header/Header";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
 import BookManagement from "./pages/Admin/BookManagement";
 const AdminRoute = ({ children }) => {
@@ -21,25 +23,41 @@ const AdminRoute = ({ children }) => {
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+  const [userEmail, setUserEmail] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+
+  const updateUserEmail = (email, role = null) => {
+      setUserEmail(email);
+      if (role) {
+        setUserRole(role);
+      }
+    };
 
   return (
     <>
-      {!isAdminRoute && <Header />}
-      <Routes>
-        {/* Admin Routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route path="books" element={<BookManagement />} />
-        </Route>
+      {!isAdminRoute &&
+        <Header
+          userEmail={userEmail}
+          updateUserEmail={updateUserEmail}/>
+      }
+      
 
-        <Route path="/" element={<HomePage />} />
-      </Routes>
+          <Routes>
+            <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route path="books" element={<BookManagement />} />
+          </Route>
+
+          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+          <Route path="/account/register" element={<Register />} />
+          <Route path="/" element={<HomePage/>} />
+       </Routes>
 
       {!isAdminRoute && <Footer />}
     </>
