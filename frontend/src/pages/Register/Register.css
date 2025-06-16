@@ -1,0 +1,86 @@
+.register-container {
+  min-height: 90vh;
+  background-image: url("https://www.lottecinemavn.com/LCHS/Image/Main/bg_pattern.png");
+  background-repeat: repeat;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+
+.register-form-container {
+  max-width: 500px;
+  width: 100%;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0px 3px 3px -2px rgba(0,0,0,0.2), 
+              0px 3px 4px 0px rgba(0,0,0,0.14), 
+              0px 1px 8px 0px rgba(0,0,0,0.12);
+  padding: 32px;
+}
+
+.register-title {
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.register-button {
+  margin-top: 8px !important;
+  padding-top: 12px !important;
+  padding-bottom: 12px !important;
+  background-color: #333 !important;
+}
+
+.register-button:hover {
+  background-color: #222 !important;
+}
+
+.login-link {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.social-buttons-container {
+  display: flex;
+  gap: 16px;
+}
+
+.facebook-button {
+  border-color: #1877F2 !important;
+  color: #1877F2 !important;
+}
+
+.facebook-button:hover {
+  background-color: #E7F0FF !important;
+}
+
+.google-button {
+  border-color: #DB4437 !important;
+  color: #DB4437 !important;
+}
+
+.google-button:hover {
+  background-color: #FDECEA !important;
+}
+
+.social-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.otp-dialog {
+  padding: 24px;
+}
+
+.otp-resend-button {
+  margin-top: 8px !important;
+}
