@@ -141,7 +141,9 @@ const register = async (req, res) => {
     if (checkPhone !== null) {
       return res.status(400).json({ message: checkPhone });
     }
-    if (!otpStore[email] || !otpStore[email]["register"]?.isVerified)
+    const storedOtp = otpStore[email]?.["register"];
+
+    if (!storedOtp || !storedOtp.isVerified)
       return res.status(400).json({ message: "Chưa xác thực OTP!" });
 
     // Kiểm tra OTP có hết hạn không
@@ -174,9 +176,9 @@ const register = async (req, res) => {
 const resetPassword = async (req, res) => {
   const { email, newPassword } = req.body;
 
-  if (!otpStore[email] || !otpStore[email]["reset-password"]?.isVerified)
+  const storedOtp = otpStore[email]?.["reset-password"];
+  if (!storedOtp || !storedOtp.isVerified)
     return res.status(400).json({ message: "Chưa xác thực OTP!" });
-
 
   // // Kiểm tra OTP có hết hạn không
   if (Date.now() > storedOtp.expiresAt) {
