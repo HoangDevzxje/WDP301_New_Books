@@ -7,8 +7,10 @@ const User = require('../models/User');
 const generateToken = require('../utils/generalToken');
 const verifyEmail = require('../utils/verifyMail');
 const validateUtils = require('../utils/validateInput');
+const { OAuth2Client } = require('google-auth-library');
 dotenv.config()
 let otpStore = {};
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const sendOtp = async (req, res) => {
   const { type, email } = req.body;
@@ -264,6 +266,127 @@ const changePassword = async (req, res) => {
     res.status(500).json({ message: "Lỗi hệ thống!" });
   }
 };
+
+const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ message: "Thiếu token từ Google!" });
+    }
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { email, name, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        email,
+        name,
+        googleId,
+        isActivated: true,
+        role: 'user'
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    if (user.isActivated === false) {
+      return res.status(400).json({ message: "Tài khoản bị khóa!" });
+    }
+    const tokenPayload = { id: user._id, role: user.role };
+
+    const accessToken = generateToken.genneralAccessToken(tokenPayload);
+    const refreshToken = generateToken.genneralRefreshToken(tokenPayload);
+
+    user.accessToken = accessToken;
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
+
+    res.status(200).json({
+      message: "Đăng nhập Google thành công",
+      accessToken,
+      role: user.role,
+      email: user.email
+    });
+  } catch (error) {
+    console.error("Lỗi googleLogin:", error);
+    res.status(500).json({ message: "Lỗi xác thực với Google." });
+  }
+};
+
+const facebookLogin = async (req, res) => {
+  try {
+    const { accessToken } = req.body;
+
+    const fbRes = await fetch(`https://graph.facebook.com/me?fields=id,name,email&access_token=${accessToken}`);
+    const fbData = await fbRes.json();
+
+    const { id: facebookId, email, name } = fbData;
+
+    if (!email) {
+      return res.status(400).json({ message: "Không thể lấy email từ Facebook. Vui lòng cấp quyền email." });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (!user.facebookId) {
+        user.facebookId = facebookId;
+        await user.save();
+      }
+    } else {
+      user = new User({
+        name,
+        email,
+        facebookId,
+        isActivated: true,
+        role: "user"
+      });
+      await user.save();
+    }
+    if (user.isActivated === false) {
+      return res.status(400).json({ message: "Tài khoản bị khóa!" });
+    }
+    const tokenPayload = { id: user._id, role: user.role };
+
+    const accessTokenLogin = generateToken.genneralAccessToken(tokenPayload);
+    const refreshToken = generateToken.genneralRefreshToken(tokenPayload);
+
+    user.accessToken = accessToken;
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict"
+    });
+
+    res.status(200).json({
+      message: "Đăng nhập Facebook thành công",
+      accessTokenLogin,
+      role: user.role,
+      email: user.email
+    });
+  } catch (error) {
+    console.error("Facebook login error:", error);
+    res.status(500).json({ message: "Xác thực Facebook thất bại!" });
+  }
+};
 module.exports = {
   refreshToken,
   register,
@@ -271,5 +394,7 @@ module.exports = {
   login,
   sendOtp,
   verifyOtp,
-  changePassword
+  changePassword,
+  googleLogin,
+  facebookLogin
 }

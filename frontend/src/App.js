@@ -11,7 +11,7 @@ const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
   const isAuthenticated =
-    localStorage.getItem("token") || sessionStorage.getItem("token");
+    localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
 
   if (!isAuthenticated || userRole !== "admin") {
     return <Navigate to="/account/login" replace />;
@@ -27,37 +27,37 @@ function App() {
   const [userRole, setUserRole] = useState(null);
 
   const updateUserEmail = (email, role = null) => {
-      setUserEmail(email);
-      if (role) {
-        setUserRole(role);
-      }
-    };
+    setUserEmail(email);
+    if (role) {
+      setUserRole(role);
+    }
+  };
 
   return (
     <>
       {!isAdminRoute &&
         <Header
           userEmail={userEmail}
-          updateUserEmail={updateUserEmail}/>
+          updateUserEmail={updateUserEmail} />
       }
-      
 
-          <Routes>
-            <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route path="books" element={<BookManagement />} />
-          </Route>
 
-          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
-          <Route path="/account/register" element={<Register />} />
-          <Route path="/" element={<HomePage/>} />
-       </Routes>
+      <Routes>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="books" element={<BookManagement />} />
+        </Route>
+
+        <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+        <Route path="/account/register" element={<Register />} />
+        <Route path="/" element={<HomePage />} />
+      </Routes>
 
       {!isAdminRoute && <Footer />}
     </>

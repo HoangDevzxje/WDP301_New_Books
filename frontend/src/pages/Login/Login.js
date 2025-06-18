@@ -3,10 +3,13 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import './Login.css';
+import { GoogleLogin } from "@react-oauth/google";
+import AuthService from '../../services/AuthService';
+
 
 function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -33,7 +36,7 @@ function Login({ onLoginSuccess }) {
       navigate(location.pathname, { replace: true });
     }
   }, [location.state, location.pathname, navigate]);
-  
+
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
     setFormData(prev => ({
@@ -49,24 +52,24 @@ function Login({ onLoginSuccess }) {
         email: formData.email,
         password: formData.password,
       });
-  
-      const token = response.data.token;
+
+      const token = response.data.accessToken;
       const userRole = response.data.role;
-  
+
       const storageMethod = formData.rememberMe ? localStorage : sessionStorage;
-      
-      storageMethod.setItem("token", token);
+
+      storageMethod.setItem("access_token", token);
       storageMethod.setItem("userEmail", formData.email);
       storageMethod.setItem("userRole", userRole);
-      
+
       if (onLoginSuccess) {
         onLoginSuccess(formData.email, userRole);
       }
-      
+
       handleAlert("Đăng nhập thành công!", "success");
-      
+
       setFormData({ email: "", password: "", rememberMe: false });
-      
+
       console.log("User role:", userRole);
       setTimeout(() => {
         if (userRole === "admin") {
@@ -74,14 +77,97 @@ function Login({ onLoginSuccess }) {
         } else {
           navigate("/");
         }
-      }, 1000); 
+      }, 1000);
     } catch (error) {
       console.error("Login error:", error);
       handleAlert("Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.", "error");
     }
   };
+  const handleError = (error) => {
+    alert('Login Failed');
+  }
 
-    return (
+  const handleSuccess = async (credentialResponse) => {
+    try {
+      const result = await AuthService.googleAuth(credentialResponse.credential);
+
+      if (result?.accessToken && result?.role) {
+        const storageMethod = formData.rememberMe ? localStorage : sessionStorage;
+
+        storageMethod.setItem("access_token", result.accessToken);
+        storageMethod.setItem("userEmail", result.email);  // đảm bảo backend trả về email
+        storageMethod.setItem("userRole", result.role);
+
+        if (onLoginSuccess) {
+          onLoginSuccess(result.email, result.role);
+        }
+
+        handleAlert("Đăng nhập bằng Google thành công!", "success");
+
+        // Chuyển hướng dựa theo role
+        setTimeout(() => {
+          if (result.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
+        }, 1000);
+      } else {
+        handleAlert("Không thể đăng nhập bằng Google. Dữ liệu trả về không hợp lệ.", "error");
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      handleAlert("Đăng nhập bằng Google thất bại. Vui lòng thử lại.", "error");
+    }
+  };
+
+  const handleFacebookLogin = () => {
+    if (!window.FB) {
+      handleAlert("Facebook SDK chưa tải xong.", "error");
+      return;
+    }
+
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          const accessToken = response.authResponse.accessToken;
+
+          // Gửi accessToken về server để xác thực
+          axios.post("http://localhost:9999/auth/facebook-auth", { accessToken })
+            .then(res => {
+              const { accessToken: token, email, role } = res.data;
+
+              const storageMethod = formData.rememberMe ? localStorage : sessionStorage;
+              storageMethod.setItem("access_token", token);
+              storageMethod.setItem("userEmail", email);
+              storageMethod.setItem("userRole", role);
+
+              if (onLoginSuccess) {
+                onLoginSuccess(email, role);
+              }
+
+              handleAlert("Đăng nhập bằng Facebook thành công!", "success");
+
+              setTimeout(() => {
+                if (role === "admin") {
+                  navigate("/admin/dashboard");
+                } else {
+                  navigate("/");
+                }
+              }, 1000);
+            })
+            .catch(err => {
+              console.error("Facebook auth error:", err);
+              handleAlert("Đăng nhập Facebook thất bại!", "error");
+            });
+        } else {
+          handleAlert("Bạn đã hủy đăng nhập Facebook.", "warning");
+        }
+      },
+      { scope: "email" }
+    );
+  };
+  return (
     <Box className="login-container">
       <Box className="login-form-container">
         <Typography variant="h4" className="login-title" gutterBottom>
@@ -155,6 +241,7 @@ function Login({ onLoginSuccess }) {
             <Button
               variant="outlined"
               fullWidth
+              onClick={handleFacebookLogin}
               className="facebook-button"
             >
               <img
@@ -164,18 +251,9 @@ function Login({ onLoginSuccess }) {
               />
               Facebook
             </Button>
-            <Button
-              variant="outlined"
-              fullWidth
-              className="google-button"
-            >
-              <img
-                src="https://www.google.com/favicon.ico"
-                alt="Google icon"
-                className="social-icon"
-              />
-              Google
-            </Button>
+            <GoogleLogin
+              onSuccess={handleSuccess}
+              onError={handleError} />
           </Box>
         </form>
 

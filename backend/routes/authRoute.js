@@ -295,4 +295,104 @@ router.post("/refresh-token", authController.refreshToken);
  */
 router.post("/change-password", authController.changePassword);
 
+/**
+ * @swagger
+ * /google-auth:
+ *   post:
+ *     summary: Đăng nhập bằng Google
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *                 description: Google ID Token
+ *                 example: eyJhbGciOiJSUzI1NiIsImtpZCI6Ij...
+ *     responses:
+ *       200:
+ *         description: Đăng nhập Google thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       400:
+ *         description: Thiếu token hoặc tài khoản bị khóa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Lỗi xác thực với Google
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post("/google-auth", authController.googleLogin);
+
+/**
+ * @swagger
+ * /facebook-auth:
+ *   post:
+ *     summary: Đăng nhập bằng Facebook
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - accessToken
+ *             properties:
+ *               accessToken:
+ *                 type: string
+ *                 description: Facebook Access Token
+ *                 example: EAAGm0PX4ZCpsBAKZA...
+ *     responses:
+ *       200:
+ *         description: Đăng nhập Facebook thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 accessTokenLogin:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *       400:
+ *         description: Không lấy được email hoặc tài khoản bị khóa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ *       500:
+ *         description: Xác thực Facebook thất bại
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+router.post("/facebook-auth", authController.facebookLogin);
+
 module.exports = router;
