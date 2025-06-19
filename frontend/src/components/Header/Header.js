@@ -67,8 +67,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     paddingLeft: `calc(1em + ${theme.spacing(4)})`,
     fontSize: "16px",
     borderRadius: "8px",
-    whiteSpace: "nowrap",        
-    overflowX: "auto", 
+    whiteSpace: "nowrap",
+    overflowX: "auto",
   },
 }));
 
@@ -97,7 +97,7 @@ const Header = ({
   updateCartTotal,
   updateWishlistCount,
 }) => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -235,11 +235,11 @@ const Header = ({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    localStorage.removeItem("access_token");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("userRole");
 
-    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("access_token");
     sessionStorage.removeItem("userEmail");
     sessionStorage.removeItem("userRole");
 
@@ -258,7 +258,7 @@ const Header = ({
     setUserMenuAnchorEl(null);
 
     // Navigate to login page
-      navigate("/account/login");
+    navigate("/account/login");
   };
 
   const handleCategoryMouseEnter = (event) => {
@@ -296,7 +296,7 @@ const Header = ({
 
   const displayWishlistText =
     wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
-  
+
   const open = Boolean(anchorEl);
   const userMenuOpen = Boolean(userMenuAnchorEl);
 
@@ -307,9 +307,9 @@ const Header = ({
           <div className="nav-logo">
             <img src="/NB (2).png" alt="logo" />
             <Typography
-                component={Link}
-                to="/"
-                className="logo-text"
+              component={Link}
+              to="/"
+              className="logo-text"
             >
               NewBooks
             </Typography>
@@ -399,25 +399,25 @@ const Header = ({
                 >
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={250}>
-                        <Box className="user-menu-list">
-                          <MenuItem
-                            component={Link}
-                            to="/track-order"
-                            className="user-menu-item"
-                          >
-                            Đơn hàng của tôi
-                          </MenuItem>
-                          <MenuItem
-                            component={Link}
-                            to="/user/profile"
-                            className="user-menu-item"
-                          >
-                            Tài khoản của tôi
-                          </MenuItem>
-                          <MenuItem onClick={handleLogout} className="user-menu-item">
-                            Thoát tài khoản
-                          </MenuItem>
-                        </Box>
+                      <Box className="user-menu-list">
+                        <MenuItem
+                          component={Link}
+                          to="/track-order"
+                          className="user-menu-item"
+                        >
+                          Đơn hàng của tôi
+                        </MenuItem>
+                        <MenuItem
+                          component={Link}
+                          to="/user/profile"
+                          className="user-menu-item"
+                        >
+                          Tài khoản của tôi
+                        </MenuItem>
+                        <MenuItem onClick={handleLogout} className="user-menu-item">
+                          Thoát tài khoản
+                        </MenuItem>
+                      </Box>
                     </Fade>
                   )}
                 </Popper>
@@ -439,18 +439,18 @@ const Header = ({
 
             <Button
               className="custom-icon-button"
-               component={Link} to="/cart"
+              component={Link} to="/cart"
             >
               <AddShoppingCartIcon className="custom-icon" />
               <Typography
                 variant="body2"
                 className="cart-text custom-typography"
-               
+
               >
                 Giỏ hàng
               </Typography>
             </Button>
-            
+
             <Box className="more-menu-container">
               <Button onClick={handleOpenMenu}>
                 <MoreVertIcon className="custom-icon" />
@@ -486,7 +486,7 @@ const Header = ({
 
       <Container maxWidth="lg" className="dropdown">
         <Box className="dropdown-container">
-          <Box 
+          <Box
             className="dropdown-trigger"
             onMouseLeave={handleClose}
           >
@@ -514,12 +514,11 @@ const Header = ({
                               key={category._id}
                               onClick={() => handleCategoryClick2(category._id)}
                               onMouseEnter={() => handleCategoryHover(category)}
-                              className={`category-menu-item ${
-                                activeCategory &&
+                              className={`category-menu-item ${activeCategory &&
                                 activeCategory._id === category._id
-                                  ? "active"
-                                  : ""
-                              }`}
+                                ? "active"
+                                : ""
+                                }`}
                             >
                               {category.name}
                             </MenuItem>
