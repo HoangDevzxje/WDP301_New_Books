@@ -30,6 +30,8 @@ import {
   NoEncryption,
 } from "@mui/icons-material";
 
+import BookService from "..//../service/BookService";
+
 const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [books, setBooks] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -38,26 +40,26 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [categories, setCategories] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
 
-  const bannerImages = [
-    {
-      id: 1,
-      imageUrl: "/27081.jpg",
-      link: "/",
-      alt: "Summer Reading Promotion",
-    },
-    {
-      id: 2,
-      imageUrl: "/270812.jpg",
-      link: "/",
-      alt: "New Releases",
-    },
-    {
-      id: 3,
-      imageUrl: "/270813.jpg",
-      link: "/",
-      alt: "Bestsellers Collection",
-    },
-  ];
+  // const bannerImages = [
+  //   {
+  //     id: 1,
+  //     imageUrl: "/27081.jpg",
+  //     link: "/",
+  //     alt: "Summer Reading Promotion",
+  //   },
+  //   {
+  //     id: 2,
+  //     imageUrl: "/270812.jpg",
+  //     link: "/",
+  //     alt: "New Releases",
+  //   },
+  //   {
+  //     id: 3,
+  //     imageUrl: "/270813.jpg",
+  //     link: "/",
+  //     alt: "Bestsellers Collection",
+  //   },
+  // ];
 
   const fetchBookRatings = async (bookList) => {
     try {
@@ -129,8 +131,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
     setIsLoading(true);
     fetchCategories();
     // Fetch books
-    axiosInstance
-      .get("http://localhost:9999/book/")
+    BookService.getBooks()
       .then(async (response) => {
         const bookData = response.data.map((book) => ({
           ...book,
@@ -256,7 +257,6 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
     try {
       if (wishlist.includes(bookId)) {
-        // Remove from wishlist
         await axios.delete(`http://localhost:9999/user/wishlist/${bookId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -316,52 +316,55 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const handleMouseLeave = () => {
     setHoveredId(null);
   };
-  
+
   return (
     <Box className="homepage-container">
       <Box className="banner-container">
-          <Box className="banner-content">
-            <Typography variant="h1" className="banner-title">
-              Khám phá thế giới sách đầy màu sắc
-            </Typography>
+        <Box className="banner-content">
+          <Typography variant="h1" className="banner-title">
+            Khám phá thế giới sách đầy màu sắc
+          </Typography>
 
-            <Typography variant="h5" className="banner-subtitle">
-              Hơn 10,000 đầu sách với nhiều thể loại đa dạng đang chờ bạn khám
-              phá
-            </Typography>
+          <Typography variant="h5" className="banner-subtitle">
+            Hơn 10,000 đầu sách với nhiều thể loại đa dạng đang chờ bạn khám phá
+          </Typography>
 
-            <Button
-              component={Link}
-              to="/books"
-              variant="contained"
-              size="large"
-              className="banner-button"
-            >
-              Mua sắm ngay
-            </Button>
-          </Box>
+          <Button
+            component={Link}
+            to="/books"
+            variant="contained"
+            size="large"
+            className="banner-button"
+          >
+            Mua sắm ngay
+          </Button>
+        </Box>
       </Box>
 
       <Container maxWidth="xl" className="main-container">
-        <Typography variant="h3" sx={{ mt: 2, mb: 4 }} className="bestseller-title">
+        <Typography
+          variant="h3"
+          sx={{ mt: 2, mb: 4 }}
+          className="bestseller-title"
+        >
           Best Sellers
         </Typography>
 
-        <Box className="books-grid-container" >
+        <Box className="books-grid-container">
           {isLoading ? (
             <Typography className="loading-text">Đang tải...</Typography>
           ) : (
-            <Grid container spacing={4} >
+            <Grid container spacing={4}>
               {books.slice(0, 10).map((book) => (
-                <Grid size={{xs:12, sm:6, md:4, xl:2.4}} key={book._id}>
+                <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
                   <Card
                     onMouseEnter={() => handleMouseEnter(book._id)}
                     onMouseLeave={handleMouseLeave}
                     className="book-card"
-                      sx={{
-                        boxShadow: 'none',      
-                        border: 'none',          
-                      }}  
+                    sx={{
+                      boxShadow: "none",
+                      border: "none",
+                    }}
                   >
                     <Box>
                       {book.originalPrice > book.price && (
@@ -374,31 +377,24 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
                         </Box>
                       )}
                       {book.stock === 0 && (
-                        <Box className="book-stock">
-                          Hết hàng
-                        </Box>
+                        <Box className="book-stock">Hết hàng</Box>
                       )}
 
                       {hoveredId === book._id && (
-                        <Box  className="book-wishlist-btn">
+                        <Box className="book-wishlist-btn">
                           <IconButton
                             onClick={() => toggleWishlist(book._id)}
                             color={
                               wishlist.includes(book._id) ? "error" : "default"
                             }
                             size="small"
-                           
                           >
                             <FavoriteIcon />
                           </IconButton>
                         </Box>
-                       
                       )}
 
-                      <Link
-                        to={`/book/${book._id}`}
-                        className="book-link"
-                      >
+                      <Link to={`/book/${book._id}`} className="book-link">
                         <Box className="book-imagecontainer">
                           <CardMedia
                             component="img"
@@ -408,32 +404,29 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
                                 : ""
                             }
                             alt={book.title}
-                            className="book-image"
+                            className="book-image2"
                           />
                         </Box>
                       </Link>
                     </Box>
                     <CardContent className="book-content">
-                      <Link
-                        to={`/book/${book._id}`}
-                        className="book-link"
-                      >
-                        <Typography 
-                          className="book-title2"
-                        >
+                      <Link to={`/book/${book._id}`} className="book-link">
+                        <Typography className="book-title2">
                           {book.title}
                         </Typography>
                       </Link>
                       <Box className="book-price-container">
                         {book.originalPrice > book.price && (
-                          <Typography variant="body2" className="book-original-price">
+                          <Typography
+                            variant="body2"
+                            className="book-original-price"
+                          >
                             {book.originalPrice.toLocaleString()}₫
                           </Typography>
                         )}
                         <Typography variant="h6" className="book-price">
                           {book.price.toLocaleString()}₫
                         </Typography>
-                      
                       </Box>
                     </CardContent>
                   </Card>
@@ -495,23 +488,22 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Typography>
 
         <Box className="categories-container">
-          <IconButton onClick={() => handleScroll("left")} 
-          className="icon-button">
+          <IconButton
+            onClick={() => handleScroll("left")}
+            className="icon-button"
+          >
             <ArrowBackIos />
           </IconButton>
 
-          <Box
-            ref={scrollRef}
-            className="categories-scroll"
-          >
+          <Box ref={scrollRef} className="categories-scroll">
             {categories.map((category) => (
               <Card key={category._id} className="category-card">
-                  <CardMedia
-                    component="img"
-                    height="250"
-                    image="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
-                    alt="Paella dish"
-                  />
+                <CardMedia
+                  component="img"
+                  height="250"
+                  image="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
+                  alt="Paella dish"
+                />
                 <CardContent className="category-content">
                   <Typography className="category-name">
                     {category.name}
@@ -520,14 +512,16 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
                     {category.description}
                   </Typography>
                 </CardContent>
-                 <CardActions>
-                  <Button className="category-button" variant="contained" >Learn More</Button>
+                <CardActions>
+                  <Button className="category-button" variant="contained">
+                    Learn More
+                  </Button>
                 </CardActions>
               </Card>
             ))}
           </Box>
 
-          <IconButton 
+          <IconButton
             onClick={() => handleScroll("right")}
             className="icon-button"
           >

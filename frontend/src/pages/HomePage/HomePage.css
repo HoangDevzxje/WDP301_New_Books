@@ -97,9 +97,8 @@
   margin: 0 auto;
 }
 
-.book-image {
+.book-image2 {
   object-fit: contain;
-  transition: transform 0.3s ease;
 }
 
 .book-content {

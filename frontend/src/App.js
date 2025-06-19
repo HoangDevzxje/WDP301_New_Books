@@ -4,9 +4,9 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import HomePage from "./pages/HomePage/HomePage";
-import Header from "./components/Header/Header";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
 import BookManagement from "./pages/Admin/BookManagement";
+import Header from "./components/Header/Header";
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
@@ -41,22 +41,22 @@ function App() {
           updateUserEmail={updateUserEmail} />
       }
 
-
       <Routes>
-        <Route
-          path="/admin"
-          element={
-            <AdminRoute>
-              <AdminLayout />
-            </AdminRoute>
-          }
-        >
-          <Route path="books" element={<BookManagement />} />
-        </Route>
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminLayout />
+              </AdminRoute>
+            }
+          >
+            <Route path="books" element={<BookManagement />} />
+          </Route>
 
-        <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
-        <Route path="/account/register" element={<Register />} />
-        <Route path="/" element={<HomePage />} />
+          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+          <Route path="/account/register" element={<Register />} />
+          <Route path="/" element={<HomePage/>} />
+
       </Routes>
 
       {!isAdminRoute && <Footer />}
