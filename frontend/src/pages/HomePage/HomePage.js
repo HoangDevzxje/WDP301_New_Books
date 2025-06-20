@@ -30,7 +30,7 @@ import {
   NoEncryption,
 } from "@mui/icons-material";
 
-import BookService from "..//../service/BookService";
+import BookService from "../../services/BookService";
 
 const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [books, setBooks] = useState([]);
@@ -157,12 +157,12 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
       });
 
     // Fetch wishlist
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (token) {
+    const access_token =
+      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    if (access_token) {
       axiosInstance
         .get("http://localhost:9999/user/wishlist", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${access_token}` },
         })
         .then((response) => {
           if (response.data && response.data.wishlist) {
@@ -241,9 +241,9 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   };
 
   const toggleWishlist = async (bookId) => {
-    const token =
-      localStorage.getItem("token") || sessionStorage.getItem("token");
-    if (!token) {
+    const access_token =
+      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    if (!access_token) {
       setNotifications((prev) => [
         ...prev,
         {
@@ -258,7 +258,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
     try {
       if (wishlist.includes(bookId)) {
         await axios.delete(`http://localhost:9999/user/wishlist/${bookId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${access_token}` },
         });
 
         setWishlist((prev) => prev.filter((id) => id !== bookId));
@@ -279,7 +279,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           `http://localhost:9999/user/wishlist/${bookId}`,
           {},
           {
-            headers: { Authorization: `Bearer ${token}` },
+            headers: { Authorization: `Bearer ${access_token}` },
           }
         );
 
