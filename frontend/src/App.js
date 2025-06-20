@@ -7,6 +7,7 @@ import HomePage from "./pages/HomePage/HomePage";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
 import BookManagement from "./pages/Admin/BookManagement";
 import Header from "./components/Header/Header";
+import BookDetail from "./pages/BookDetail/BookDetail.js";
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
@@ -26,6 +27,8 @@ function App() {
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
+  const storedEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+
   const updateUserEmail = (email, role = null) => {
     setUserEmail(email);
     if (role) {
@@ -37,7 +40,7 @@ function App() {
     <>
       {!isAdminRoute &&
         <Header
-          userEmail={userEmail}
+          userEmail={storedEmail}
           updateUserEmail={updateUserEmail} />
       }
 
@@ -56,6 +59,9 @@ function App() {
           <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
           <Route path="/account/register" element={<Register />} />
           <Route path="/" element={<HomePage/>} />
+
+          <Route path="/book/:id" element={<BookDetail/>} />
+
 
       </Routes>
 
