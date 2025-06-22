@@ -12,7 +12,8 @@ const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
   const isAuthenticated =
-    localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token");
 
   if (!isAuthenticated || userRole !== "admin") {
     return <Navigate to="/account/login" replace />;
@@ -27,7 +28,8 @@ function App() {
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
-  const storedEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+  const storedEmail =
+    localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
 
   const updateUserEmail = (email, role = null) => {
     setUserEmail(email);
@@ -38,31 +40,30 @@ function App() {
 
   return (
     <>
-      {!isAdminRoute &&
-        <Header
-          userEmail={storedEmail}
-          updateUserEmail={updateUserEmail} />
-      }
+      {!isAdminRoute && (
+        <Header userEmail={storedEmail} updateUserEmail={updateUserEmail} />
+      )}
 
       <Routes>
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route path="books" element={<BookManagement />} />
-          </Route>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="books" element={<BookManagement />} />
+        </Route>
 
-          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
-          <Route path="/account/register" element={<Register />} />
-          <Route path="/" element={<HomePage/>} />
+        <Route
+          path="/account/login"
+          element={<Login onLoginSuccess={updateUserEmail} />}
+        />
+        <Route path="/account/register" element={<Register />} />
+        <Route path="/" element={<HomePage />} />
 
-          <Route path="/book/:id" element={<BookDetail/>} />
-
-
+        <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
 
       {!isAdminRoute && <Footer />}
