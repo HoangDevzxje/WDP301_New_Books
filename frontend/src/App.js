@@ -7,11 +7,13 @@ import HomePage from "./pages/HomePage/HomePage";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
 import BookManagement from "./pages/Admin/BookManagement";
 import Header from "./components/Header/Header";
+import BookDetail from "./pages/BookDetail/BookDetail.js";
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
   const isAuthenticated =
-    localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token");
 
   if (!isAuthenticated || userRole !== "admin") {
     return <Navigate to="/account/login" replace />;
@@ -26,6 +28,9 @@ function App() {
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
+  const storedEmail =
+    localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+
   const updateUserEmail = (email, role = null) => {
     setUserEmail(email);
     if (role) {
@@ -35,28 +40,30 @@ function App() {
 
   return (
     <>
-      {!isAdminRoute &&
-        <Header
-          userEmail={userEmail}
-          updateUserEmail={updateUserEmail} />
-      }
+      {!isAdminRoute && (
+        <Header userEmail={storedEmail} updateUserEmail={updateUserEmail} />
+      )}
 
       <Routes>
-          <Route
-            path="/admin"
-            element={
-              <AdminRoute>
-                <AdminLayout />
-              </AdminRoute>
-            }
-          >
-            <Route path="books" element={<BookManagement />} />
-          </Route>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
+          <Route path="books" element={<BookManagement />} />
+        </Route>
 
-          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
-          <Route path="/account/register" element={<Register />} />
-          <Route path="/" element={<HomePage/>} />
+        <Route
+          path="/account/login"
+          element={<Login onLoginSuccess={updateUserEmail} />}
+        />
+        <Route path="/account/register" element={<Register />} />
+        <Route path="/" element={<HomePage />} />
 
+        <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
 
       {!isAdminRoute && <Footer />}
