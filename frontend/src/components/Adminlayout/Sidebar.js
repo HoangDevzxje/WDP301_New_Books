@@ -15,6 +15,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import RateReview from "@mui/icons-material/RateReview";
+import CategoryIcon from "@mui/icons-material/Category";
 import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -22,6 +23,11 @@ const Sidebar = ({ isSidebarOpen }) => {
     { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
     { text: "Quản lý người dùng", icon: <PeopleIcon />, link: "/admin/users" },
     { text: "Quản lý sách", icon: <MenuBookIcon />, link: "/admin/books" },
+    {
+      text: "Quản lý danh mục",
+      icon: <CategoryIcon />,
+      link: "/admin/categories",
+    },
     {
       text: "Quản lý đơn hàng",
       icon: <ReceiptLongIcon />,

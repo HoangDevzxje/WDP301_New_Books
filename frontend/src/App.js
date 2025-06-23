@@ -5,9 +5,12 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import HomePage from "./pages/HomePage/HomePage";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
-import BookManagement from "./pages/Admin/BookManagement";
 import Header from "./components/Header/Header";
 import BookDetail from "./pages/BookDetail/BookDetail.js";
+import BookList from "./pages/Admin/BookManagement/BookList.js";
+import BookFormPage from "./pages/Admin/BookManagement/BookFormPage.js";
+import CategoryManagementPage from "./pages/Admin/CategoryManagement/CategoryManagementPage.js";
+
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
@@ -53,7 +56,12 @@ function App() {
             </AdminRoute>
           }
         >
-          <Route path="books" element={<BookManagement />} />
+          <Route path="books">
+            <Route index element={<BookList />} />
+            <Route path="add" element={<BookFormPage />} />
+            <Route path=":id/edit" element={<BookFormPage />} />
+          </Route>
+          <Route path="categories" element={<CategoryManagementPage />} />
         </Route>
 
         <Route
