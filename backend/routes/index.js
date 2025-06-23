@@ -4,6 +4,7 @@ const adminRoutes = require("./adminRoute");
 const userRoutes = require("./userRoute");
 const cartRoutes = require("./cartRoute");
 const categoryRoutes = require("./categoryRoute");
+const feedbackRoutes = require("./feedbackRoute");
 
 const routes = (app) => {
   app.use("/auth", authRoutes);
@@ -12,6 +13,7 @@ const routes = (app) => {
   app.use("/user", userRoutes);
   app.use("/cart", cartRoutes);
   app.use("/category", categoryRoutes);
+  app.use("/feedback", feedbackRoutes);
 };
 
 module.exports = routes;
