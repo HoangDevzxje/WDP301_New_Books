@@ -29,7 +29,7 @@ import {
   deleteCategory,
   getCategories,
   updateCategory,
-} from "../../../services/AdminService/BookManagerService";
+} from "../../../services/AdminService/categoryService";
 
 export default function CategoryManagementPage() {
   const [categories, setCategories] = useState([]);

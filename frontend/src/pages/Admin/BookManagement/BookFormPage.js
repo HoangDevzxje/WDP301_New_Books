@@ -19,9 +19,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   createBook,
   getBookById,
-  getCategories,
   updateBook,
-} from "../../../services/AdminService/BookManagerService";
+} from "../../../services/AdminService/bookService";
+import { getCategories } from "../../../services/AdminService/categoryService";
 
 export default function BookFormPage() {
   const { id } = useParams();
@@ -252,7 +252,6 @@ export default function BookFormPage() {
             helperText={errors.price}
           />
         </Grid>
-
         <Grid>
           <TextField
             fullWidth
@@ -265,7 +264,7 @@ export default function BookFormPage() {
             helperText={errors.stock}
           />
         </Grid>
-        <Grid xs={12} sm={6} md={4}>
+        <Grid>
           <TextField
             fullWidth
             type="number"
