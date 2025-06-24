@@ -1,13 +1,15 @@
-import apiClient from "./apiClient";
+import axiosInstance from "../../utils/axiosInstance";
 
 export const fetchAllFeedbacks = () =>
-  apiClient.get("/feedbacks").then((res) => res.data);
+  axiosInstance.get("/admin/feedbacks").then((res) => res.data);
 
 export const deleteFeedback = (feedbackId) =>
-  apiClient.delete(`/feedbacks/${feedbackId}`).then((res) => res.data);
+  axiosInstance
+    .delete(`/admin/feedbacks/${feedbackId}`)
+    .then((res) => res.data);
 
 export const fetchFeedbacksByBook = (bookId) =>
-  apiClient.get(`/books/${bookId}/feedbacks`).then((res) => res.data);
+  axiosInstance.get(`/admin/books/${bookId}/feedbacks`).then((res) => res.data);
 
 export const fetchFeedbacksByUser = (userId) =>
-  apiClient.get(`/users/${userId}/feedbacks`).then((res) => res.data);
+  axiosInstance.get(`/admin/users/${userId}/feedbacks`).then((res) => res.data);

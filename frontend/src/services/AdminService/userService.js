@@ -1,10 +1,14 @@
-import apiClient from "./apiClient";
+import axiosInstance from "../../utils/axiosInstance";
 
 export const fetchAllUsers = () =>
-  apiClient.get("/users").then((res) => res.data);
+  axiosInstance.get("/admin/users").then((res) => res.data);
 
 export const changeUserStatus = (userId) =>
-  apiClient.put(`/users/${userId}/change-status`).then((res) => res.data);
+  axiosInstance
+    .put(`/admin/users/${userId}/change-status`)
+    .then((res) => res.data);
 
 export const updateUserRole = (userId, newRole) =>
-  apiClient.put(`/users/${userId}`, { role: newRole }).then((res) => res.data);
+  axiosInstance
+    .put(`/admin/users/${userId}`, { role: newRole })
+    .then((res) => res.data);

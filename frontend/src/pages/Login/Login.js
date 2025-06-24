@@ -86,7 +86,7 @@ function Login({ onLoginSuccess }) {
       console.log("User role:", userRole);
       setTimeout(() => {
         if (userRole === "admin") {
-          navigate("/admin");
+          navigate("/admin/users");
         } else {
           navigate("/");
         }

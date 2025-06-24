@@ -65,7 +65,7 @@ function App() {
           </Route>
           <Route path="categories" element={<CategoryManagementPage />} />
           <Route path="users" element={<UserManagement />} />
-          <Route path="feedbacks" element={<FeedbackManagement />} />
+          <Route path="/admin/feedbacks" element={<FeedbackManagement />} />
         </Route>
 
         <Route
