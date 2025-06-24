@@ -10,6 +10,8 @@ import BookDetail from "./pages/BookDetail/BookDetail.js";
 import BookList from "./pages/Admin/BookManagement/BookList.js";
 import BookFormPage from "./pages/Admin/BookManagement/BookFormPage.js";
 import CategoryManagementPage from "./pages/Admin/CategoryManagement/CategoryManagementPage.js";
+import UserManagement from "./pages/Admin/UserManagrment/UserManagement.js";
+import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagement.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -62,6 +64,8 @@ function App() {
             <Route path=":id/edit" element={<BookFormPage />} />
           </Route>
           <Route path="categories" element={<CategoryManagementPage />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="feedbacks" element={<FeedbackManagement />} />
         </Route>
 
         <Route

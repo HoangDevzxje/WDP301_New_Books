@@ -33,8 +33,8 @@ import "./BookList.css";
 import {
   deleteBook,
   getBooks,
-  getCategories,
-} from "../../../services/AdminService/BookManagerService";
+} from "../../../services/AdminService/bookService";
+import { getCategories } from "../../../services/AdminService/categoryService";
 
 export default function BookList() {
   const [books, setBooks] = useState([]);

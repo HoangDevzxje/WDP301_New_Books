@@ -11,12 +11,15 @@ function BreadCrumb({ items = [] }) {
             <Link
               key={index}
               to={item.link}
-                style={{ textDecoration: 'none', color: '#AAAAAA' }}
+              style={{ textDecoration: "none", color: "#AAAAAA" }}
             >
               {item.label}
             </Link>
           ) : (
-            <Typography key={index} sx={{ color: '#AAAAAA', fontWeight: 'bold'}}>
+            <Typography
+              key={index}
+              sx={{ color: "#AAAAAA", fontWeight: "bold" }}
+            >
               {item.label}
             </Typography>
           )
