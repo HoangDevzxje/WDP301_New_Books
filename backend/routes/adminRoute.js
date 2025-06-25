@@ -1,5 +1,6 @@
 const express = require("express");
 const { checkAuthorize } = require("../middleware/authMiddleware");
+const { uploadMultiple } = require("../config/cloudinary");
 const adminController = require("../controllers/AdminController");
 const adminBookController = require("../controllers/AdminBookController");
 const adminFeedbackController = require("../controllers/AdminFeedbackController");
@@ -32,11 +33,14 @@ router.get(
 router.post(
   "/books",
   checkAuthorize(["admin"]),
+  uploadMultiple, // middleware upload ảnh
   adminBookController.createBook
 );
+
 router.put(
   "/books/:id",
   checkAuthorize(["admin"]),
+  uploadMultiple, // hỗ trợ cập nhật ảnh mới
   adminBookController.updateBook
 );
 router.delete(
