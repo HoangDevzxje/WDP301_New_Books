@@ -16,21 +16,18 @@ import {
   CardActions,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import axios from "axios";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import axiosInstance from "../../utils/axiosInstance";
 import {
   ArrowBackIos,
   ArrowForwardIos,
-  NoEncryption,
 } from "@mui/icons-material";
 
-import BookService from "../../services/BookService";
+import BookCard from "../../components/BookCard/BookCard";
+import { getBooks, getBookRating } from "../../services/BookService";
+import { getWishlist, addToWishlist, deleteFromWishlist } from "../../services/WishlistService";
 
 const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [books, setBooks] = useState([]);
@@ -39,27 +36,6 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
-
-  // const bannerImages = [
-  //   {
-  //     id: 1,
-  //     imageUrl: "/27081.jpg",
-  //     link: "/",
-  //     alt: "Summer Reading Promotion",
-  //   },
-  //   {
-  //     id: 2,
-  //     imageUrl: "/270812.jpg",
-  //     link: "/",
-  //     alt: "New Releases",
-  //   },
-  //   {
-  //     id: 3,
-  //     imageUrl: "/270813.jpg",
-  //     link: "/",
-  //     alt: "Bestsellers Collection",
-  //   },
-  // ];
 
   const fetchBookRatings = async (bookList) => {
     try {
@@ -130,8 +106,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   useEffect(() => {
     setIsLoading(true);
     fetchCategories();
-    // Fetch books
-    BookService.getBooks()
+    getBooks()
       .then(async (response) => {
         const bookData = response.data.map((book) => ({
           ...book,
@@ -139,12 +114,10 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           originalPrice: book.originalPrice,
         }));
 
-        // Method 1: If the book data already includes average ratings
         if (bookData.length > 0 && bookData[0].averageRating !== undefined) {
           setBooks(bookData);
           setIsLoading(false);
         }
-        // Method 2: Fetch ratings separately for each book
         else {
           const booksWithRatings = await fetchBookRatings(bookData);
           setBooks(booksWithRatings);
@@ -156,89 +129,20 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         setIsLoading(false);
       });
 
-    // Fetch wishlist
-    const access_token =
-      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     if (access_token) {
-      axiosInstance
-        .get("http://localhost:9999/user/wishlist", {
-          headers: { Authorization: `Bearer ${access_token}` },
-        })
-        .then((response) => {
+     getWishlist().then((response) => {
           if (response.data && response.data.wishlist) {
             const wishlistIds = response.data.wishlist.map((book) => book._id);
+            console.log("Wishlist IDs:", wishlistIds);
             setWishlist(wishlistIds);
           }
         })
         .catch((error) =>
           console.error("Lỗi khi lấy danh sách yêu thích:", error)
         );
-    }
+      }
   }, []);
-
-  const NextArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <IconButton
-        onClick={onClick}
-        sx={{
-          position: "absolute",
-          right: 20,
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1,
-          bgcolor: "rgba(255, 255, 255, 0.7)",
-          "&:hover": {
-            bgcolor: "rgba(255, 255, 255, 0.9)",
-          },
-        }}
-      >
-        <NavigateNextIcon />
-      </IconButton>
-    );
-  };
-
-  const PrevArrow = (props) => {
-    const { onClick } = props;
-    return (
-      <IconButton
-        onClick={onClick}
-        sx={{
-          position: "absolute",
-          left: 20,
-          top: "50%",
-          transform: "translateY(-50%)",
-          zIndex: 1,
-          bgcolor: "rgba(255, 255, 255, 0.7)",
-          "&:hover": {
-            bgcolor: "rgba(255, 255, 255, 0.9)",
-          },
-        }}
-      >
-        <NavigateBeforeIcon />
-      </IconButton>
-    );
-  };
-
-  // Slider settings
-  const sliderSettings = {
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true,
-    autoplaySpeed: 4000,
-    nextArrow: <NextArrow />,
-    prevArrow: <PrevArrow />,
-    responsive: [
-      {
-        breakpoint: 600,
-        settings: {
-          arrows: false,
-        },
-      },
-    ],
-  };
 
   const toggleWishlist = async (bookId) => {
     const access_token =
@@ -257,9 +161,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
     try {
       if (wishlist.includes(bookId)) {
-        await axios.delete(`http://localhost:9999/user/wishlist/${bookId}`, {
-          headers: { Authorization: `Bearer ${access_token}` },
-        });
+        await deleteFromWishlist(bookId);
 
         setWishlist((prev) => prev.filter((id) => id !== bookId));
         if (typeof updateWishlistCount === "function") {
@@ -274,14 +176,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           },
         ]);
       } else {
-        // Add to wishlist
-        await axios.post(
-          `http://localhost:9999/user/wishlist/${bookId}`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${access_token}` },
-          }
-        );
+        await addToWishlist(bookId);
 
         setWishlist((prev) => [...prev, bookId]);
         if (typeof updateWishlistCount === "function") {
@@ -357,79 +252,14 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <Grid container spacing={4}>
               {books.slice(0, 10).map((book) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
-                  <Card
-                    onMouseEnter={() => handleMouseEnter(book._id)}
-                    onMouseLeave={handleMouseLeave}
-                    className="book-card"
-                    sx={{
-                      boxShadow: "none",
-                      border: "none",
-                    }}
-                  >
-                    <Box>
-                      {book.originalPrice > book.price && (
-                        <Box className="book-discount">
-                          -
-                          {Math.round(
-                            (1 - book.price / book.originalPrice) * 100
-                          )}
-                          %
-                        </Box>
-                      )}
-                      {book.stock === 0 && (
-                        <Box className="book-stock">Hết hàng</Box>
-                      )}
-
-                      {hoveredId === book._id && (
-                        <Box className="book-wishlist-btn">
-                          <IconButton
-                            onClick={() => toggleWishlist(book._id)}
-                            color={
-                              wishlist.includes(book._id) ? "error" : "default"
-                            }
-                            size="small"
-                          >
-                            <FavoriteIcon />
-                          </IconButton>
-                        </Box>
-                      )}
-
-                      <Link to={`/book/${book._id}`} className="book-link">
-                        <Box className="book-imagecontainer">
-                          <CardMedia
-                            component="img"
-                            image={
-                              book.images && book.images.length > 0
-                                ? book.images[0]
-                                : ""
-                            }
-                            alt={book.title}
-                            className="book-image2"
-                          />
-                        </Box>
-                      </Link>
-                    </Box>
-                    <CardContent className="book-content">
-                      <Link to={`/book/${book._id}`} className="book-link">
-                        <Typography className="book-title2">
-                          {book.title}
-                        </Typography>
-                      </Link>
-                      <Box className="book-price-container">
-                        {book.originalPrice > book.price && (
-                          <Typography
-                            variant="body2"
-                            className="book-original-price"
-                          >
-                            {book.originalPrice.toLocaleString()}₫
-                          </Typography>
-                        )}
-                        <Typography variant="h6" className="book-price">
-                          {book.price.toLocaleString()}₫
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
+                  <BookCard
+                    book={book}
+                    hoveredId={hoveredId}
+                    wishlist={wishlist}
+                    onHover={handleMouseEnter}
+                    onLeave={handleMouseLeave}
+                    toggleWishlist={toggleWishlist}
+                  />
                 </Grid>
               ))}
             </Grid>
@@ -437,22 +267,25 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Box>
 
         {notifications.map((notification) => (
-          <Snackbar
-            key={notification.id}
-            open
-            autoHideDuration={2000}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            onClose={() =>
-              setNotifications((prev) =>
-                prev.filter((n) => n.id !== notification.id)
-              )
-            }
-          >
-            <Alert severity={notification.severity || "info"}>
+            <Snackbar
+              key={notification.id}
+              open
+              autoHideDuration={3000}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              onClose={() => setNotifications(prev =>
+                  prev.filter(n => n.id !== notification.id)
+              )}
+            >
+            <Alert                
+                severity={notification.severity || 'info'}                
+                onClose={() => setNotifications(prev =>                
+                prev.filter(n => n.id !== notification.id)
+                )}                   
+            >
               {notification.message}
-            </Alert>
-          </Snackbar>
-        ))}
+             </Alert>
+             </Snackbar>
+          ))}
       </Container>
 
       <Box className="blog-section">
