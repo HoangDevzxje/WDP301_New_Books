@@ -583,10 +583,6 @@ return (
                     justifyContent: 'center',
                     width: 60,
                     height: 60,
-                    backgroundColor: 'white',
-                    borderRadius: '50%',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    flexShrink: 0
                   }}
                 >
                   {feature.icon}

@@ -1,9 +1,11 @@
 import axiosInstance from "../utils/axiosInstance";
 
-const BookService = {
-  getBooks: () => {
-    return axiosInstance.get("/book/");
-  },
+export const getBooks = async () => {
+  const response = await axiosInstance.get(`/book/`);
+  return response;
 };
 
-export default BookService;
+export const getBookRating = async (bookId) => {
+  const response = await axiosInstance.get(`/reviews/${bookId}`);
+  return response.data;
+};

@@ -24,7 +24,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import NoBackpackIcon from "@mui/icons-material/NoBackpack";
 import FlagIcon from "@mui/icons-material/Flag";
 import RoomIcon from "@mui/icons-material/Room";
@@ -41,6 +42,7 @@ const Search = styled("div")(({ theme }) => ({
   borderRadius: "8px",
   backgroundColor: "#ffffff",
   width: "600px",
+  border: "1px solid #ddd",
   boxShadow: "0 1px 4px rgba(0,0,0,0.1)",
   transition: "all 0.3s",
   [theme.breakpoints.down("sm")]: {
@@ -371,6 +373,7 @@ const Header = ({
           </div>
 
           <div className="nav-buttons">
+            
             {userEmail ? (
               <Box
                 className="user-menu-container"
@@ -437,19 +440,19 @@ const Header = ({
               </Button>
             )}
 
-            <Button
-              className="custom-icon-button"
-              component={Link} to="/cart"
-            >
-              <AddShoppingCartIcon className="custom-icon" />
-              <Typography
-                variant="body2"
-                className="cart-text custom-typography"
-
+             <Button
+                className="custom-icon-button"
+                component={Link} to="/user/cart"
               >
-                Giỏ hàng
-              </Typography>
-            </Button>
+                <AddShoppingCartIcon className="custom-icon" />
+              </Button>
+
+              <Button
+                className="custom-icon-button"
+                component={Link} to="/user/wishlist"
+              > 
+                <FavoriteBorderIcon className="custom-icon" />
+              </Button>   
 
             <Box className="more-menu-container">
               <Button onClick={handleOpenMenu}>

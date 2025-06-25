@@ -12,6 +12,8 @@ import BookFormPage from "./pages/Admin/BookManagement/BookFormPage.js";
 import CategoryManagementPage from "./pages/Admin/CategoryManagement/CategoryManagementPage.js";
 import UserManagement from "./pages/Admin/UserManagrment/UserManagement.js";
 import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagement.js";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import Cart from "./pages/Cart/Cart.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -27,11 +29,23 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const UserOnlyRoute = ({ children }) => {
+  const userRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+  
+  if (userRole === "admin") {
+    return <Navigate to="/forbidden" replace />;
+  }
+  
+  return children;
+};
+
+
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   const storedEmail =
     localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
@@ -68,12 +82,23 @@ function App() {
           <Route path="/admin/feedbacks" element={<FeedbackManagement />} />
         </Route>
 
-        <Route
-          path="/account/login"
-          element={<Login onLoginSuccess={updateUserEmail} />}
-        />
-        <Route path="/account/register" element={<Register />} />
-        <Route path="/" element={<HomePage />} />
+          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+          <Route path="/account/register" element={<Register />} />
+          <Route path="/" element={<HomePage/>} />
+
+          <Route path="/book/:id" element={<BookDetail/>} />
+          <Route path="/user/wishlist" element={
+            <UserOnlyRoute>
+              <Wishlist />
+            </UserOnlyRoute>
+          } />
+
+          <Route path="/user/cart" element={
+            <UserOnlyRoute>
+              <Cart />
+            </UserOnlyRoute>
+          } />
+
 
         <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
