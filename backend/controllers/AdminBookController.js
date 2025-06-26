@@ -27,7 +27,7 @@ exports.getBookById = async (req, res) => {
 // Thêm sách mới với upload ảnh
 exports.createBook = async (req, res) => {
   try {
-    const { title, author, categories } = req.body;
+    const { title, author } = req.body;
     console.log("Body:", req.body);
     console.log("Files:", req.files);
 
@@ -36,7 +36,15 @@ exports.createBook = async (req, res) => {
         .status(400)
         .json({ message: "Vui lòng nhập tiêu đề và tác giả." });
     }
-    if (!categories || !Array.isArray(categories) || categories.length === 0) {
+
+    let categories = [];
+    try {
+      categories = JSON.parse(req.body.categories);
+    } catch (err) {
+      return res.status(400).json({ message: "Danh mục không hợp lệ." });
+    }
+
+    if (!Array.isArray(categories) || categories.length === 0) {
       return res
         .status(400)
         .json({ message: "Vui lòng chọn ít nhất một danh mục." });
@@ -46,7 +54,7 @@ exports.createBook = async (req, res) => {
 
     const newBook = new Book({
       ...req.body,
-      categories: JSON.parse(req.body.categories), // nếu gửi từ form-data dạng chuỗi JSON
+      categories,
       images: imageUrls,
     });
 
@@ -60,26 +68,33 @@ exports.createBook = async (req, res) => {
 // Cập nhật sách (thay ảnh nếu có upload mới)
 exports.updateBook = async (req, res) => {
   try {
-    const { title, author, categories } = req.body;
-
-    if (
-      categories &&
-      !Array.isArray(categories) &&
-      typeof categories !== "string"
-    ) {
-      return res.status(400).json({ message: "Danh mục không hợp lệ." });
+    // Parse categories nếu có
+    let categories = undefined;
+    if (req.body.categories) {
+      try {
+        categories = JSON.parse(req.body.categories);
+        if (!Array.isArray(categories)) {
+          return res.status(400).json({ message: "Danh mục không hợp lệ." });
+        }
+      } catch (err) {
+        return res.status(400).json({ message: "Danh mục không hợp lệ." });
+      }
     }
 
+    // Lấy danh sách ảnh mới nếu có
     const imageUrls = req.files?.map((file) => file.path) || [];
 
+    // Tạo dữ liệu cập nhật
     const updateData = {
       ...req.body,
-      categories: categories ? JSON.parse(categories) : undefined,
+      categories,
     };
 
-    // Nếu có ảnh mới, thay thế ảnh cũ
+    // Nếu có ảnh mới thì ghi đè ảnh cũ
     if (imageUrls.length > 0) {
       updateData.images = imageUrls;
+    } else {
+      delete updateData.images; // tránh ghi đè images = [] nếu không có ảnh mới
     }
 
     const updatedBook = await Book.findByIdAndUpdate(
@@ -87,8 +102,10 @@ exports.updateBook = async (req, res) => {
       updateData,
       { new: true }
     );
-    if (!updatedBook)
+
+    if (!updatedBook) {
       return res.status(404).json({ message: "Không tìm thấy sách" });
+    }
 
     res.status(200).json({ message: "Sách đã được cập nhật", updatedBook });
   } catch (error) {
