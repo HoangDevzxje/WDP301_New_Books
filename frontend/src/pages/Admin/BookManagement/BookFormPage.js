@@ -132,12 +132,32 @@ export default function BookFormPage() {
   const handleSubmit = async () => {
     if (!validate()) return;
     try {
-      const payload = { ...form };
+      const formData = new FormData();
+
+      // Append các field thông thường
+      Object.entries(form).forEach(([key, value]) => {
+        if (key === "images") {
+          // Nếu là FileList hoặc mảng File
+          if (value instanceof FileList || Array.isArray(value)) {
+            Array.from(value).forEach((file) => {
+              formData.append("images", file);
+            });
+          }
+        } else if (key === "categories") {
+          // Chuyển mảng ID thành JSON string
+          formData.append("categories", JSON.stringify(value));
+        } else {
+          formData.append(key, value ?? "");
+        }
+      });
+
+      // Gọi API
       if (isEdit) {
-        await updateBook(id, payload);
+        await updateBook(id, formData);
       } else {
-        await createBook(payload);
+        await createBook(formData);
       }
+
       setAlert({ open: true, message: "Lưu thành công", severity: "success" });
       setTimeout(() => navigate("/admin/books"), 1000);
     } catch (err) {
@@ -344,15 +364,37 @@ export default function BookFormPage() {
             )}
           </FormControl>
         </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="URLs ảnh"
+        <Grid item xs={12}>
+          <Typography variant="subtitle1" gutterBottom>
+            Ảnh bìa sách
+          </Typography>
+
+          {/* Hiển thị ảnh hiện có (nếu là URL) */}
+          {Array.isArray(form.images) &&
+            typeof form.images[0] === "string" &&
+            form.images.map((imgUrl, idx) => (
+              <img
+                key={idx}
+                src={imgUrl}
+                alt={`Ảnh ${idx}`}
+                style={{ width: 100, marginRight: 8, marginBottom: 8 }}
+              />
+            ))}
+
+          {/* Upload ảnh mới */}
+          <input
+            type="file"
             name="images"
-            value={form.images.join(",")}
-            onChange={handleChange}
+            multiple
+            accept="image/*"
+            onChange={(e) => setForm((f) => ({ ...f, images: e.target.files }))}
+            style={{ marginTop: 8 }}
           />
+          <FormHelperText>
+            Bạn có thể chọn nhiều ảnh. Nếu chọn ảnh mới, ảnh cũ sẽ bị thay thế.
+          </FormHelperText>
         </Grid>
+
         <Grid>
           <Box display="flex" alignItems="center">
             <Switch
