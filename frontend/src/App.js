@@ -13,6 +13,7 @@ import CategoryManagementPage from "./pages/Admin/CategoryManagement/CategoryMan
 import UserManagement from "./pages/Admin/UserManagrment/UserManagement.js";
 import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagement.js";
 import Wishlist from "./pages/Wishlist/Wishlist";
+import Chatbot from "./components/Chatbot/Chatbot.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -30,11 +31,11 @@ const AdminRoute = ({ children }) => {
 
 const UserOnlyRoute = ({ children }) => {
   const userRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
-  
+
   if (userRole === "admin") {
     return <Navigate to="/forbidden" replace />;
   }
-  
+
   return children;
 };
 
@@ -81,21 +82,22 @@ function App() {
           <Route path="/admin/feedbacks" element={<FeedbackManagement />} />
         </Route>
 
-          <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
-          <Route path="/account/register" element={<Register />} />
-          <Route path="/" element={<HomePage/>} />
+        <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+        <Route path="/account/register" element={<Register />} />
+        <Route path="/" element={<HomePage />} />
 
-          <Route path="/book/:id" element={<BookDetail/>} />
-          <Route path="/user/wishlist" element={
-            <UserOnlyRoute>
-              <Wishlist />
-            </UserOnlyRoute>
-          } />
+        <Route path="/book/:id" element={<BookDetail />} />
+        <Route path="/user/wishlist" element={
+          <UserOnlyRoute>
+            <Wishlist />
+          </UserOnlyRoute>
+        } />
 
         <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
 
       {!isAdminRoute && <Footer />}
+      <Chatbot />
     </>
   );
 }
