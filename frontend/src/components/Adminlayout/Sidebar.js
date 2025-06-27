@@ -15,32 +15,38 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import RateReview from "@mui/icons-material/RateReview";
+import CategoryIcon from "@mui/icons-material/Category";
 import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
   const menuItems = [
-    { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
+    // { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
     { text: "Quản lý người dùng", icon: <PeopleIcon />, link: "/admin/users" },
     { text: "Quản lý sách", icon: <MenuBookIcon />, link: "/admin/books" },
     {
-      text: "Quản lý đơn hàng",
-      icon: <ReceiptLongIcon />,
-      link: "/admin/orders",
+      text: "Quản lý danh mục",
+      icon: <CategoryIcon />,
+      link: "/admin/categories",
     },
+    // {
+    //   text: "Quản lý đơn hàng",
+    //   icon: <ReceiptLongIcon />,
+    //   link: "/admin/orders",
+    // },
+    // {
+    //   text: "Quản lý mã giảm giá",
+    //   icon: <LocalOfferIcon />,
+    //   link: "/admin/discounts",
+    // },
+    // {
+    //   text: "Quản lý các báo cáo",
+    //   icon: <RateReview />,
+    //   link: "/admin/reports",
+    // },
     {
-      text: "Quản lý mã giảm giá",
-      icon: <LocalOfferIcon />,
-      link: "/admin/discounts",
-    },
-    {
-      text: "Quản lý các báo cáo",
+      text: "Quản lý đánh giá",
       icon: <FeedbackIcon />,
-      link: "/admin/reports",
-    },
-    {
-      text: "Quản lý các đánh giá",
-      icon: <RateReview />,
-      link: "/admin/review_rating",
+      link: "/admin/feedbacks",
     },
   ];
 

@@ -12,7 +12,7 @@ const bookController = require("../controllers/BookController");
 
 /**
  * @swagger
- * /books:
+ * /book/:
  *   get:
  *     summary: Lấy tất cả sách đang hoạt động
  *     tags: [Books]
@@ -32,34 +32,7 @@ router.get("/", bookController.getAllBooks);
 
 /**
  * @swagger
- * /books/{id}:
- *   get:
- *     summary: Lấy thông tin sách theo ID
- *     tags: [Books]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         description: ID của sách
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Thông tin sách
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Book'
- *       404:
- *         description: Không tìm thấy sách
- *       500:
- *         description: Lỗi server
- */
-router.get("/:id", bookController.getBookById);
-
-/**
- * @swagger
- * /books/category/{id}:
+ * /book/category/{id}:
  *   get:
  *     summary: Lấy danh sách sách theo danh mục
  *     tags: [Books]
@@ -85,5 +58,75 @@ router.get("/:id", bookController.getBookById);
  *         description: Lỗi server
  */
 router.get("/category/:id", bookController.getBookByCategory);
+
+/**
+ * @swagger
+ * /book/sales:
+ *   get:
+ *     summary: Lấy danh sách sách đang giảm giá
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: Danh sách sách đang giảm giá
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách đang giảm giá
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/sales", bookController.getDiscountedBooks);
+
+/**
+ * @swagger
+ * /book/new-book:
+ *   get:
+ *     summary: Lấy danh sách sách mới phát hành
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: Danh sách sách mới phát hành
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách mới
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/new-book", bookController.getNewBooks);
+/**
+ * @swagger
+ * /book/{id}:
+ *   get:
+ *     summary: Lấy thông tin sách theo ID
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID của sách
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Thông tin sách
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/:id", bookController.getBookById);
 
 module.exports = router;

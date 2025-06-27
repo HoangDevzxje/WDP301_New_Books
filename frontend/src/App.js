@@ -4,14 +4,24 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import HomePage from "./pages/HomePage/HomePage";
-import Header from "./components/Header/Header";
 import AdminLayout from "./components/Adminlayout/AdminLayout.js";
-import BookManagement from "./pages/Admin/BookManagement";
+import Header from "./components/Header/Header";
+import BookDetail from "./pages/BookDetail/BookDetail.js";
+import BookList from "./pages/Admin/BookManagement/BookList.js";
+import BookFormPage from "./pages/Admin/BookManagement/BookFormPage.js";
+import CategoryManagementPage from "./pages/Admin/CategoryManagement/CategoryManagementPage.js";
+import UserManagement from "./pages/Admin/UserManagrment/UserManagement.js";
+import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagement.js";
+import Wishlist from "./pages/Wishlist/Wishlist";
+import Chatbot from "./components/Chatbot/Chatbot.js";
+import Cart from "./pages/Cart/Cart.js";
+
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
   const isAuthenticated =
-    localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    localStorage.getItem("access_token") ||
+    sessionStorage.getItem("access_token");
 
   if (!isAuthenticated || userRole !== "admin") {
     return <Navigate to="/account/login" replace />;
@@ -20,11 +30,26 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+const UserOnlyRoute = ({ children }) => {
+  const userRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+
+  if (userRole === "admin") {
+    return <Navigate to="/forbidden" replace />;
+  }
+
+  return children;
+};
+
+
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  const storedEmail =
+    localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
 
   const updateUserEmail = (email, role = null) => {
     setUserEmail(email);
@@ -35,12 +60,9 @@ function App() {
 
   return (
     <>
-      {!isAdminRoute &&
-        <Header
-          userEmail={userEmail}
-          updateUserEmail={updateUserEmail} />
-      }
-
+      {!isAdminRoute && (
+        <Header userEmail={storedEmail} updateUserEmail={updateUserEmail} />
+      )}
 
       <Routes>
         <Route
@@ -51,15 +73,37 @@ function App() {
             </AdminRoute>
           }
         >
-          <Route path="books" element={<BookManagement />} />
+          <Route path="books">
+            <Route index element={<BookList />} />
+            <Route path="add" element={<BookFormPage />} />
+            <Route path=":id/edit" element={<BookFormPage />} />
+          </Route>
+          <Route path="categories" element={<CategoryManagementPage />} />
+          <Route path="users" element={<UserManagement />} />
+          <Route path="/admin/feedbacks" element={<FeedbackManagement />} />
         </Route>
 
         <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
         <Route path="/account/register" element={<Register />} />
         <Route path="/" element={<HomePage />} />
+
+        <Route path="/book/:id" element={<BookDetail />} />
+        <Route path="/user/wishlist" element={
+          <UserOnlyRoute>
+            <Wishlist />
+          </UserOnlyRoute>
+        } />
+          
+        <Route path="/user/cart" element={
+          <UserOnlyRoute>
+            <Cart />
+          </UserOnlyRoute>
+        } />
+
       </Routes>
 
       {!isAdminRoute && <Footer />}
+      <Chatbot />
     </>
   );
 }

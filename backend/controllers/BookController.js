@@ -30,9 +30,33 @@ const getBookByCategory = async (req, res) => {
     }
 };
 
+const getDiscountedBooks = async (req, res) => {
+    try {
+        const books = await Book.find({
+            isActivated: true,
+            $expr: { $lt: ["$price", "$originalPrice"] }
+        });
+        if (books.length === 0) return res.status(404).json({ message: "Không tìm thấy sách đang giảm giá" });
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server!", error: error.message });
+    }
+};
+
+const getNewBooks = async (req, res) => {
+    try {
+        const books = await Book.find({ isActivated: true, isNewRelease: true });
+        if (books.length === 0) return res.status(404).json({ message: "Không tìm thấy sách mới" });
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server!", error: error.message });
+    }
+};
 
 module.exports = {
     getAllBooks,
     getBookById,
-    getBookByCategory
+    getBookByCategory,
+    getDiscountedBooks,
+    getNewBooks
 }

@@ -1,21 +1,34 @@
-import { Button, TextField, Divider, Typography, Checkbox, FormControlLabel, Snackbar, Alert, Box } from "@mui/material";
+import {
+  Button,
+  TextField,
+  Divider,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+  Snackbar,
+  Alert,
+  Box,
+} from "@mui/material";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import axios from 'axios';
-import './Login.css';
+import axios from "axios";
+import "./Login.css";
 import { GoogleLogin } from "@react-oauth/google";
-import AuthService from '../../services/AuthService';
-
+import AuthService from "../../services/AuthService";
 
 function Login({ onLoginSuccess }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false
+    email: "",
+    password: "",
+    rememberMe: false,
   });
-  const [alert, setAlert] = useState({ open: false, message: "", severity: "info" });
+  const [alert, setAlert] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   const handleAlert = (message, severity = "info") => {
     setAlert({ open: true, message, severity });
@@ -28,10 +41,10 @@ function Login({ onLoginSuccess }) {
   useEffect(() => {
     if (location.state?.credentials) {
       const { email, password } = location.state.credentials;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         email,
-        password
+        password,
       }));
       navigate(location.pathname, { replace: true });
     }
@@ -39,9 +52,9 @@ function Login({ onLoginSuccess }) {
 
   const handleChange = (e) => {
     const { name, value, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'rememberMe' ? checked : value
+      [name]: name === "rememberMe" ? checked : value,
     }));
   };
 
@@ -73,29 +86,36 @@ function Login({ onLoginSuccess }) {
       console.log("User role:", userRole);
       setTimeout(() => {
         if (userRole === "admin") {
-          navigate("/admin/dashboard");
+          navigate("/admin/users");
         } else {
           navigate("/");
         }
       }, 1000);
     } catch (error) {
       console.error("Login error:", error);
-      handleAlert("Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.", "error");
+      handleAlert(
+        "Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.",
+        "error"
+      );
     }
   };
   const handleError = (error) => {
-    alert('Login Failed');
-  }
+    alert("Login Failed");
+  };
 
   const handleSuccess = async (credentialResponse) => {
     try {
-      const result = await AuthService.googleAuth(credentialResponse.credential);
+      const result = await AuthService.googleAuth(
+        credentialResponse.credential
+      );
 
       if (result?.accessToken && result?.role) {
-        const storageMethod = formData.rememberMe ? localStorage : sessionStorage;
+        const storageMethod = formData.rememberMe
+          ? localStorage
+          : sessionStorage;
 
         storageMethod.setItem("access_token", result.accessToken);
-        storageMethod.setItem("userEmail", result.email);  // đảm bảo backend trả về email
+        storageMethod.setItem("userEmail", result.email); // đảm bảo backend trả về email
         storageMethod.setItem("userRole", result.role);
 
         if (onLoginSuccess) {
@@ -113,7 +133,10 @@ function Login({ onLoginSuccess }) {
           }
         }, 1000);
       } else {
-        handleAlert("Không thể đăng nhập bằng Google. Dữ liệu trả về không hợp lệ.", "error");
+        handleAlert(
+          "Không thể đăng nhập bằng Google. Dữ liệu trả về không hợp lệ.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("Google login failed:", error);
@@ -133,11 +156,14 @@ function Login({ onLoginSuccess }) {
           const accessToken = response.authResponse.accessToken;
 
           // Gửi accessToken về server để xác thực
-          axios.post("http://localhost:9999/auth/facebook-auth", { accessToken })
-            .then(res => {
+          axios
+            .post("http://localhost:9999/auth/facebook-auth", { accessToken })
+            .then((res) => {
               const { accessToken: token, email, role } = res.data;
 
-              const storageMethod = formData.rememberMe ? localStorage : sessionStorage;
+              const storageMethod = formData.rememberMe
+                ? localStorage
+                : sessionStorage;
               storageMethod.setItem("access_token", token);
               storageMethod.setItem("userEmail", email);
               storageMethod.setItem("userRole", role);
@@ -156,7 +182,7 @@ function Login({ onLoginSuccess }) {
                 }
               }, 1000);
             })
-            .catch(err => {
+            .catch((err) => {
               console.error("Facebook auth error:", err);
               handleAlert("Đăng nhập Facebook thất bại!", "error");
             });
@@ -237,7 +263,7 @@ function Login({ onLoginSuccess }) {
             </Typography>
           </Divider>
 
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ display: "flex", gap: 2 }}>
             <Button
               variant="outlined"
               fullWidth
@@ -251,9 +277,7 @@ function Login({ onLoginSuccess }) {
               />
               Facebook
             </Button>
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={handleError} />
+            <GoogleLogin onSuccess={handleSuccess} onError={handleError} />
           </Box>
         </form>
 
@@ -261,7 +285,7 @@ function Login({ onLoginSuccess }) {
           open={alert.open}
           autoHideDuration={6000}
           onClose={handleCloseAlert}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <Alert onClose={handleCloseAlert} severity={alert.severity}>
             {alert.message}
@@ -271,6 +295,5 @@ function Login({ onLoginSuccess }) {
     </Box>
   );
 }
-
 
 export default Login;
