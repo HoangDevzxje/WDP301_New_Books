@@ -6,6 +6,7 @@ const cartRoutes = require("./cartRoute");
 const categoryRoutes = require("./categoryRoute");
 const feedbackRoutes = require("./feedbackRoute");
 const chatbotRoutes = require("./chatbotRoute");
+const discountRoutes = require("./discountRoute");
 
 const routes = (app) => {
   app.use("/auth", authRoutes);
@@ -16,6 +17,7 @@ const routes = (app) => {
   app.use("/category", categoryRoutes);
   app.use("/feedback", feedbackRoutes);
   app.use("/chatbot", chatbotRoutes);
+  app.use("/discount", discountRoutes);
 };
 
 module.exports = routes;
