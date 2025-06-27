@@ -11,11 +11,11 @@ export const getBookRating = async (bookId) => {
 };
 
 export const getBookById = async (id) => {
-  const response = await axiosInstance.get(`/books/${id}`);
+  const response = await axiosInstance.get(`/book/${id}`);
   return response;
 };
 
 export const getBooksByCategory = async (categoryId) => {
-  const response = await axiosInstance.get(`/books/category/${categoryId}`);
+  const response = await axiosInstance.get(`/book/category/${categoryId}`);
   return response;
 };
