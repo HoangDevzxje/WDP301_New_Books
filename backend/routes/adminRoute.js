@@ -4,6 +4,7 @@ const { uploadMultiple } = require("../config/cloudinary");
 const adminController = require("../controllers/AdminController");
 const adminBookController = require("../controllers/AdminBookController");
 const adminFeedbackController = require("../controllers/AdminFeedbackController");
+const adminDiscountController = require("../controllers/AdminDiscountController");
 const router = express.Router();
 
 //Quản lý user
@@ -92,5 +93,33 @@ router.get(
   checkAuthorize(["admin"]),
   adminFeedbackController.getFeedbacksByUser
 );
+
+//Quản lý discount
+router.get(
+  "/discounts",
+  checkAuthorize(["admin"]),
+  adminDiscountController.getAllDiscounts
+);
+router.get(
+  "/discounts/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountController.getDiscountById
+);
+router.post(
+  "/discounts",
+  checkAuthorize(["admin"]),
+  adminDiscountController.createDiscount
+);
+router.put(
+  "/discounts/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountController.updatedDiscount
+);
+router.put(
+  "/discounts/:id/change-status",
+  checkAuthorize(["admin"]),
+  adminDiscountController.changeStatusDiscount
+);
+
 
 module.exports = router;
