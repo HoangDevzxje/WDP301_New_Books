@@ -24,10 +24,25 @@ const swaggerOptions = {
             {
                 url: "http://localhost:9999"
             }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
+            }
+        },
+        security: [
+            {
+                bearerAuth: []
+            }
         ]
     },
     apis: ["./routes/*.js"]
 };
+
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.get("/swagger.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
