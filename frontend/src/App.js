@@ -14,6 +14,7 @@ import UserManagement from "./pages/Admin/UserManagrment/UserManagement.js";
 import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagement.js";
 import Wishlist from "./pages/Wishlist/Wishlist";
 import Chatbot from "./components/Chatbot/Chatbot.js";
+import Cart from "./pages/Cart/Cart.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -92,11 +93,13 @@ function App() {
             <Wishlist />
           </UserOnlyRoute>
         } />
-
           
+        <Route path="/user/cart" element={
+          <UserOnlyRoute>
+            <Cart />
+          </UserOnlyRoute>
+        } />
 
-
-        <Route path="/book/:id" element={<BookDetail />} />
       </Routes>
 
       {!isAdminRoute && <Footer />}

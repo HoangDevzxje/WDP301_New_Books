@@ -22,11 +22,16 @@ import {
 import { Link, useParams } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import AddIcon from "@mui/icons-material/Add";
+import RemoveIcon from "@mui/icons-material/Remove";
 import axios from "axios";
 import BookDetailBreadCrumb from "../../components/BreadCrumb/BookDetailBreadCrumb";
 import "./BookDetail.css";
 import { AccountBalanceWallet, LocalShipping, Security, SupportAgent } from "@mui/icons-material";
-
+import {getBookById,getBooksByCategory} from "../../services/BookService"
+import {getWishlist, addToWishlist, deleteFromWishlist} from "../../services/WishlistService";
+import {addToCart} from "../../services/CartService";
+import BookCard from "../../components/BookCard/BookCard";
 const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const { id } = useParams();
   const [book, setBook] = useState(null);
@@ -56,9 +61,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
 
   useEffect(() => {
     setLoading(true);
-    axios
-      .get(`http://localhost:9999/book/${id}`)
-      .then((response) => {
+    getBookById(id).then((response) => {
         setBook(response.data);
         setMainImg(response.data.images[0]);
         setLoading(false);
@@ -73,14 +76,8 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         console.error("Lỗi khi lấy thông tin sách:", error);
         setLoading(false);
       });
-
-    const access_token = getToken();
-    if (access_token) {
-      axios
-        .get("http://localhost:9999/user/wishlist", {
-          headers: { Authorization: `Bearer ${access_token}` },
-        })
-        .then((response) => {
+    
+      getWishlist().then((response) => {
           if (response.data && response.data.wishlist) {
             const wishlistIds = response.data.wishlist.map((book) => book._id);
             setWishlist(wishlistIds);
@@ -90,37 +87,13 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         .catch((error) =>
           console.error("Lỗi khi kiểm tra danh sách yêu thích:", error)
         );
-    }
   }, [id]);
 
-  const getToken = () => localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-
-
-  const addNotification = (message, severity = "info") => {
-    setNotifications((prev) => [
-      ...prev,
-      { id: new Date().getTime(), message, severity }
-    ]);
-  };
-
-
-  const handleMenuOpen = (event, review) => {
-    setAnchorEl(event.currentTarget);
-    setSelectedReview(review);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    setSelectedReview(null);
-  };
-
   const fetchRelatedBooks = (categoryId, currentBookId) => {
-    axios
-      .get(`http://localhost:9999/book/category/${categoryId}`)
-      .then((response) => {
+    getBooksByCategory(categoryId).then((response) => {
         const filteredBooks = response.data
           .filter(book => book._id !== currentBookId)
-          .slice(0, 4);
+          .slice(0, 5);
         setRelatedBooks(filteredBooks);
       })
       .catch((error) => {
@@ -145,8 +118,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
       return;
     }
 
-    const access_token =
-      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+    const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     if (!access_token) {
       setNotifications((prev) => [
         ...prev,
@@ -160,11 +132,10 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:9999/cart/add",
-        { bookId: id, quantity },
-        { headers: { Authorization: `Bearer ${access_token}` } }
-      );
+      await addToCart({
+        bookId: id,
+        quantity: quantity,
+      });
 
       if (typeof updateCartData === "function") {
         updateCartData();
@@ -192,7 +163,6 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   };
 
   const handleMouseEnter = (bookId) => {
-    console.log(bookId);
     setHoveredId(bookId);
   };
 
@@ -219,9 +189,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
       const targetBookId = bookId || id;
 
       if (wishlist.includes(targetBookId)) {
-        await axios.delete(`http://localhost:9999/user/wishlist/${targetBookId}`, {
-          headers: { Authorization: `Bearer ${access_token}` },
-        });
+        await deleteFromWishlist(targetBookId);
 
         setWishlist(prev => prev.filter(id => id !== targetBookId));
         if (targetBookId === id) setInWishlist(false);
@@ -239,13 +207,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
           },
         ]);
       } else {
-        await axios.post(
-          `http://localhost:9999/user/wishlist/${targetBookId}`,
-          {},
-          {
-            headers: { Authorization: `Bearer ${access_token}` },
-          }
-        );
+        await addToWishlist(targetBookId);
 
         setWishlist(prev => [...prev, targetBookId]);
         if (targetBookId === id) setInWishlist(true);
@@ -333,29 +295,6 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   }
   
   const isOutOfStock = book.stock === 0;
-
-  const features = [
-    {
-      icon: <LocalShipping sx={{ fontSize: 40, color: '#333' }} />,
-      title: 'Free Delivery',
-      subtitle: 'Orders over $500'
-    },
-    {
-      icon: <Security sx={{ fontSize: 40, color: '#333' }} />,
-      title: 'Secure Payment',
-      subtitle: '100% Secure Payment'
-    },
-    {
-      icon: <AccountBalanceWallet sx={{ fontSize: 40, color: '#333' }} />,
-      title: 'Money Back Guarantee',
-      subtitle: 'Within 30 Days'
-    },
-    {
-      icon: <SupportAgent sx={{ fontSize: 40, color: '#333' }} />,
-      title: '24/7 Support',
-      subtitle: 'Within 1 Business Day'
-    }
-  ];
 
 return (
   <>
@@ -505,28 +444,27 @@ return (
           {/* Số lượng và add to cart */}
           <Box className="quantity-container">
             <Box className="quantity-cart-container">
-              <Box className="quantity-selector">
-                <Button
-                  variant="text"
-                  onClick={() => handleQuantityChange(-1)}
-                  className="quantity-btn"
-                  disabled={isOutOfStock}
-                >
-                  -
-                </Button>
-                <Box className="quantity-display">
-                  {quantity}
-                </Box>
-                <Button
-                  variant="text"
-                  onClick={() => handleQuantityChange(1)}
-                  className="quantity-btn"
-                  disabled={isOutOfStock}
-                >
-                  +
-                </Button>
-              </Box>
-
+               <Box className="quantity-table">
+                  <IconButton 
+                    onClick={() => handleQuantityChange(-1)}
+                    disabled={quantity <= 1 || isOutOfStock}
+                    size="small"
+                    className="quantity-btn"
+                  >
+                      <RemoveIcon fontSize="small" />
+                  </IconButton>
+                    <Typography className="quantity-display">
+                      {quantity}
+                    </Typography>
+                  <IconButton 
+                    onClick={() => handleQuantityChange(1)}
+                    disabled={isOutOfStock}
+                    size="small"
+                    className="quantity-btn"
+                  >
+                    <AddIcon fontSize="small" />
+                  </IconButton>
+                </Box>              
               <Button
                 variant="contained"
                 startIcon={<ShoppingCartIcon />}
@@ -544,78 +482,9 @@ return (
                 <FavoriteIcon sx={{ color: "black" }} />
               </Button>
             </Box>
-            <Box>
-              <Button
-                variant="contained"
-                onClick={handleAddToCart}
-                className={`add-to-cart-btn2`}
-              >
-                Mua ngay
-              </Button>
-            </Box>
           </Box>
         </Grid>
       </Grid>
-{/* 
-      <Box 
-        sx={{ 
-          borderRadius: 2,
-          padding: 3,
-          border: '1px solid #e9ecef',
-          mb: 4
-        }}
-      >
-        <Grid container spacing={4} justifyContent="center" alignItems="center">
-          {features.map((feature, index) => (
-            <Grid size={{xs:12, sm:6, md:3}} key={index}>
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 2,
-                }}
-              >
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: 60,
-                    height: 60,
-                  }}
-                >
-                  {feature.icon}
-                </Box>
-                <Box>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: '1rem',
-                      color: '#333',
-                      mb: 0.5,
-                      lineHeight: 1.2
-                    }}
-                  >
-                    {feature.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: '#666',
-                      fontSize: '0.875rem',
-                      lineHeight: 1.4
-                    }}
-                  >
-                    {feature.subtitle}
-                  </Typography>
-                </Box>
-              </Box>
-            </Grid>
-          ))}
-        </Grid>
-      </Box> */}
 
       {/* mô tả và đánh giá  */}
       <Box className="tabs-container">
@@ -672,64 +541,14 @@ return (
           <Grid container spacing={3} justifyContent="flex-start">
             {relatedBooks.map((relatedBook) => (
               <Grid size={{xs:12, sm:6, md:4, xl:2.4}} key={relatedBook._id}>
-                <Card className="related-product-card"   
-                    onMouseEnter={() => handleMouseEnter(relatedBook._id)}
-                    onMouseLeave={handleMouseLeave}
-                    sx={{
-                      boxShadow: "none",
-                      border: "none",
-                    }}>
-                    {relatedBook.originalPrice > relatedBook.price && (
-                      <Box className="related-product-sale-badge">
-                        -{Math.round((1 - relatedBook.price / relatedBook.originalPrice) * 100)}%
-                      </Box>
-                    )}
-                    {relatedBook.stock === 0 && (
-                      <Box className="related-product-out-of-stock">
-                        Hết hàng
-                      </Box>
-                    )}
-                    {hoveredId === relatedBook._id && (
-                      <Box className="related-product-wishlist-btn">
-                      <IconButton
-                        onClick={() => toggleWishlist(relatedBook._id)}
-                        color={wishlist.includes(relatedBook._id) ? "error" : "default"}
-                        size="small"
-                      >
-                        <FavoriteIcon />
-                      </IconButton>
-                    </Box>
-                    )}
-                    <Link to={`/book/${relatedBook._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <Box className="related-product-image-wrapper">
-                        <CardMedia
-                          component="img"
-                          image={relatedBook.images && relatedBook.images.length > 0 ? relatedBook.images[0] : ""}
-                          alt={relatedBook.title}
-                          className="related-product-image"
-                        />
-                      </Box>
-                    </Link>
-                  <CardContent className="related-product-content">
-                    <Link to={`/book/${relatedBook._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                      <Typography
-                        className="related-product-title"
-                      >
-                        {relatedBook.title}
-                      </Typography>
-                    </Link>
-                    <Box className="related-product-price-container">
-                      <Typography variant="h6" className="related-product-price">
-                        {relatedBook.price?.toLocaleString()}₫
-                      </Typography>
-                      {relatedBook.originalPrice > relatedBook.price && (
-                        <Typography variant="body2" className="related-product-original-price">
-                          {relatedBook.originalPrice?.toLocaleString()}₫
-                        </Typography>
-                      )}
-                    </Box>
-                  </CardContent>
-                </Card>
+                <BookCard
+                  book={relatedBook}
+                  hoveredId={hoveredId}
+                  wishlist={wishlist}
+                  onHover={handleMouseEnter}
+                  onLeave={handleMouseLeave}
+                  toggleWishlist={toggleWishlist}
+                />
               </Grid>
             ))}
           </Grid>
