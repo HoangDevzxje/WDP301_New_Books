@@ -39,8 +39,8 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const [wishlist, setWishlist] = useState([]);
 
   const [reviews, setReviews] = useState([]);
-  const [userReview, setUserReview] = useState(null);  // Store the user's own review
-  const [averageRating, setAverageRating] = useState(0);  // Store average rating
+  const [userReview, setUserReview] = useState(null);  
+  const [averageRating, setAverageRating] = useState(0); 
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [rating, setRating] = useState(1);
   const [comment, setComment] = useState("");
@@ -556,7 +556,7 @@ return (
           </Box>
         </Grid>
       </Grid>
-
+{/* 
       <Box 
         sx={{ 
           borderRadius: 2,
@@ -615,7 +615,7 @@ return (
             </Grid>
           ))}
         </Grid>
-      </Box>
+      </Box> */}
 
       {/* mô tả và đánh giá  */}
       <Box className="tabs-container">
@@ -740,7 +740,6 @@ return (
         )}
       </Box>
 
-      {/* Notifications */}
       {notifications.map((notification) => (
         <Snackbar
           key={notification.id}
@@ -753,7 +752,14 @@ return (
             )
           }
         >
-          <Alert severity={notification.severity || "info"}>
+          <Alert
+            severity={notification.severity || "info"}
+            onClose={() =>
+              setNotifications((prev) =>
+                prev.filter((n) => n.id !== notification.id)
+              )
+            }
+          >
             {notification.message}
           </Alert>
         </Snackbar>
