@@ -165,11 +165,11 @@ router.post("/register", authController.register);
  *               email:
  *                 type: string
  *                 format: email
- *                 example: "test@gmail.com"
+ *                 example: "nvdong0902@gmail.com"
  *               password:
  *                 type: string
  *                 format: password
- *                 example: "Abc@123456"
+ *                 example: "Dong09022003@"
  *     responses:
  *       200:
  *         description: Đăng nhập thành công

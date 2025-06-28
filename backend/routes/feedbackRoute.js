@@ -11,7 +11,7 @@ const { checkAuthorize } = require("../middleware/authMiddleware");
 
 /**
  * @swagger
- * /user/{bookId}:
+ * /feedback/user/{bookId}:
  *   get:
  *     summary: Lấy đánh giá của người dùng cho một cuốn sách
  *     tags: [Feedback]
@@ -37,7 +37,7 @@ router.get("/user/:bookId", checkAuthorize(["user"]), feedbackController.getUser
 
 /**
  * @swagger
- * /{bookId}:
+ * /feedback/{bookId}:
  *   post:
  *     summary: Tạo đánh giá mới cho sách
  *     tags: [Feedback]
@@ -80,7 +80,7 @@ router.post("/:bookId", checkAuthorize(["user"]), feedbackController.createFeedb
 
 /**
  * @swagger
- * /{bookId}:
+ * /feedback/{bookId}:
  *   get:
  *     summary: Lấy tất cả đánh giá của một cuốn sách
  *     tags: [Feedback]
@@ -103,7 +103,7 @@ router.get("/:bookId", feedbackController.getFeedbacksByBook);
 
 /**
  * @swagger
- * /update/{feedbackId}:
+ * /feedback/update/{feedbackId}:
  *   put:
  *     summary: Cập nhật đánh giá của người dùng
  *     tags: [Feedback]
@@ -144,7 +144,7 @@ router.put("/update/:feedbackId", checkAuthorize(["user"]), feedbackController.u
 
 /**
  * @swagger
- * /delete/{feedbackId}:
+ * /feedback/delete/{feedbackId}:
  *   delete:
  *     summary: Xóa đánh giá của người dùng
  *     tags: [Feedback]
