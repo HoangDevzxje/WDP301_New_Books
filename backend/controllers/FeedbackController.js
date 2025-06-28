@@ -85,7 +85,7 @@ const getUserFeedback = async (req, res) => {
             return res.status(404).json({ message: "Không tìm thấy đánh giá của người dùng này" });
         }
 
-        return res.status(200).json(review);
+        return res.status(200).json(feedback);
     } catch (error) {
         console.error("Lỗi khi lấy đánh giá của người dùng:", error);
         return res.status(500).json({ message: "Lỗi server" });
