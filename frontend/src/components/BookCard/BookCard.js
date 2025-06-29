@@ -1,12 +1,42 @@
-import React from "react";
-import { Box, Card, CardContent, Typography, IconButton } from "@mui/material";
+import React, { useEffect, useState, useCallback } from "react";
+import { Box, Card, CardContent, Typography, IconButton, Rating, Skeleton } from "@mui/material";
 import { Link } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import CardMedia from "@mui/material/CardMedia";
+import * as FeedbackService from "../../services/FeedbackService";
 import "./BookCard.css";
 
+const ratingsResults = new Map();
+
 const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist }) => {
+  const [rating, setRating] = useState(book.averageRating || 0);
+
+  const fetchRating = useCallback(async () => {
+    try {
+      const response = await FeedbackService.getAllFeedbacksForBook(book._id);
+      const fetchedRating = response.data.averageRating || 0;
+      
+      setRating(fetchedRating);
+      ratingsResults.set(book._id, fetchedRating);
+    } catch (error) {
+      console.error(`Error fetching rating for book ${book._id}:`, error);
+      setRating(0);
+      ratingsResults.set(book._id, 0);
+    }
+  }, [book._id, book.averageRating]);
+
+  useEffect(() => {
+    console.log(`BookCard ${book._id} re-render triggered by:`, {
+      bookId: book._id,
+      hoveredId,
+      wishlistIncludes: wishlist.includes(book._id),
+      rating,
+    });
+    fetchRating();
+  }, [fetchRating]);
+  
+
   return (
     <Card
       onMouseEnter={() => onHover(book._id)}
@@ -56,6 +86,16 @@ const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist 
         <Link to={`/book/${book._id}`} className="book-link">
           <Typography className="book-title2">{book.title}</Typography>
         </Link>
+
+        <Box>
+            <Rating
+              value={rating}
+              precision={0.1}
+              readOnly
+              size="small"
+              className="book-rating"
+            />
+        </Box>
 
         <Box className="book-price-container">
           {book.originalPrice > book.price && (

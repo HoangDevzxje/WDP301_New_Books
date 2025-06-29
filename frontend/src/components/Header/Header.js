@@ -549,7 +549,7 @@ const Header = ({
                                   {categoryBooks[activeCategory._id]
                                     .slice(0, 3)
                                     .map((book) => (
-                                      <Grid item xs={4} key={book._id}>
+                                      <Grid size={4} key={book._id}>
                                         <Box
                                           component={Link}
                                           to={`/book/${book._id}`}
@@ -562,7 +562,7 @@ const Header = ({
                                                 "/placeholder.jpg"
                                               }
                                               alt={book.title}
-                                              className="book-image"
+                                              className="book-image2"
                                               onError={(e) => {
                                                 e.target.onerror = null;
                                                 e.target.src = "/placeholder.jpg";

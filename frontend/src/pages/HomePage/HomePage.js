@@ -11,24 +11,21 @@ import {
   IconButton,
   Grid,
   Container,
-  Rating,
   Button,
   CardActions,
 } from "@mui/material";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import axiosInstance from "../../utils/axiosInstance";
 import {
   ArrowBackIos,
   ArrowForwardIos,
 } from "@mui/icons-material";
 
 import BookCard from "../../components/BookCard/BookCard";
-import { getBooks, getBookRating } from "../../services/BookService";
+import { getBooks } from "../../services/BookService";
 import { getWishlist, addToWishlist, deleteFromWishlist } from "../../services/WishlistService";
-
+import * as CategoryService from "../../services/CategoryService";
 const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [books, setBooks] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -37,49 +34,10 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [categories, setCategories] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
 
-  const fetchBookRatings = async (bookList) => {
-    try {
-      const ratingPromises = bookList.map((book) =>
-        axios
-          .get(`http://localhost:9999/reviews/${book._id}`)
-          .then((response) => ({
-            bookId: book._id,
-            averageRating: response.data.averageRating || 0,
-          }))
-          .catch(() => ({
-            bookId: book._id,
-            averageRating: 0,
-          }))
-      );
-
-      const ratingsResults = await Promise.all(ratingPromises);
-
-      const ratingsMap = {};
-      ratingsResults.forEach((result) => {
-        ratingsMap[result.bookId] = result.averageRating;
-      });
-
-      const booksWithRatings = bookList.map((book) => ({
-        ...book,
-        averageRating: ratingsMap[book._id] || 0,
-      }));
-
-      return booksWithRatings;
-    } catch (error) {
-      console.error("Error fetching book ratings:", error);
-      return bookList.map((book) => ({
-        ...book,
-        averageRating: book.averageRating || 0,
-      }));
-    }
-  };
-
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.get(
-        "http://localhost:9999/category/"
-      );
+      const response = await CategoryService.getCategories();
       if (response.data && Array.isArray(response.data)) {
         setCategories(response.data);
       }
@@ -106,23 +64,14 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   useEffect(() => {
     setIsLoading(true);
     fetchCategories();
-    getBooks()
-      .then(async (response) => {
+    getBooks().then(async (response) => {
         const bookData = response.data.map((book) => ({
           ...book,
           price: book.price,
           originalPrice: book.originalPrice,
         }));
-
-        if (bookData.length > 0 && bookData[0].averageRating !== undefined) {
           setBooks(bookData);
           setIsLoading(false);
-        }
-        else {
-          const booksWithRatings = await fetchBookRatings(bookData);
-          setBooks(booksWithRatings);
-          setIsLoading(false);
-        }
       })
       .catch((error) => {
         console.error("Lỗi khi lấy danh sách sách:", error);
@@ -131,11 +80,11 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
     const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     if (access_token) {
-     getWishlist().then((response) => {
+      getWishlist().then((response) => {
           if (response.data && response.data.wishlist) {
             const wishlistIds = response.data.wishlist.map((book) => book._id);
-            console.log("Wishlist IDs:", wishlistIds);
             setWishlist(wishlistIds);
+           console.log("Wishlist IDs:", wishlistIds);
           }
         })
         .catch((error) =>
