@@ -33,11 +33,11 @@ const Sidebar = ({ isSidebarOpen }) => {
     //   icon: <ReceiptLongIcon />,
     //   link: "/admin/orders",
     // },
-    // {
-    //   text: "Quản lý mã giảm giá",
-    //   icon: <LocalOfferIcon />,
-    //   link: "/admin/discounts",
-    // },
+    {
+      text: "Quản lý mã giảm giá",
+      icon: <LocalOfferIcon />,
+      link: "/admin/discounts",
+    },
     // {
     //   text: "Quản lý các báo cáo",
     //   icon: <RateReview />,

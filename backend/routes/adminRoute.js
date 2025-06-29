@@ -121,5 +121,9 @@ router.put(
   adminDiscountController.changeStatusDiscount
 );
 
-
+router.delete(
+  "/discounts/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountController.deleteDiscount
+);
 module.exports = router;
