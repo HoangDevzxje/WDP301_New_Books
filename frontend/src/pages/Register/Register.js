@@ -15,8 +15,10 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Register.css";
+import AuthService from "../../services/AuthService";
+import { GoogleLogin } from "@react-oauth/google";
 
-function Register() {
+function Register({ onLoginSuccess }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: "",
@@ -90,7 +92,7 @@ function Register() {
     } catch (error) {
       handleAlert(
         error.response?.data?.message ||
-          "Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại sau.",
+        "Có lỗi xảy ra khi gửi OTP. Vui lòng thử lại sau.",
         "error"
       );
     } finally {
@@ -136,7 +138,7 @@ function Register() {
     } catch (error) {
       handleAlert(
         error.response?.data?.message ||
-          "Có lỗi xảy ra khi xác thực OTP. Vui lòng thử lại.",
+        "Có lỗi xảy ra khi xác thực OTP. Vui lòng thử lại.",
         "error"
       );
     } finally {
@@ -149,22 +151,101 @@ function Register() {
     handleSendOTP();
   };
 
-  const handleFacebookLogin = async () => {
+  const handleFacebookLogin = () => {
+    if (!window.FB) {
+      handleAlert("Facebook SDK chưa tải xong.", "error");
+      return;
+    }
+
+    window.FB.login(
+      function (response) {
+        if (response.authResponse) {
+          const accessToken = response.authResponse.accessToken;
+
+          // Gửi accessToken về server để xác thực
+          axios
+            .post("http://localhost:9999/auth/facebook-auth", { accessToken })
+            .then((res) => {
+              const { accessToken: token, email, role } = res.data;
+
+              const storageMethod = formData.rememberMe
+                ? localStorage
+                : sessionStorage;
+              storageMethod.setItem("access_token", token);
+              storageMethod.setItem("userEmail", email);
+              storageMethod.setItem("userRole", role);
+
+              if (onLoginSuccess) {
+                onLoginSuccess(email, role);
+              }
+
+              handleAlert("Đăng nhập bằng Facebook thành công!", "success");
+
+              setTimeout(() => {
+                if (role === "admin") {
+                  navigate("/admin/dashboard");
+                } else {
+                  navigate("/");
+                }
+              }, 1000);
+            })
+            .catch((err) => {
+              console.error("Facebook auth error:", err);
+              handleAlert("Đăng nhập Facebook thất bại!", "error");
+            });
+        } else {
+          handleAlert("Bạn đã hủy đăng nhập Facebook.", "warning");
+        }
+      },
+      { scope: "email" }
+    );
+  };
+
+  const handleError = (error) => {
+    alert("Login Failed");
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
     try {
-      window.open(`${process.env.REACT_APP_API_URL}/auth/facebook`, "_self");
+      const result = await AuthService.googleAuth(
+        credentialResponse.credential
+      );
+
+      if (result?.accessToken && result?.role) {
+        const storageMethod = formData.rememberMe
+          ? localStorage
+          : sessionStorage;
+
+        storageMethod.setItem("access_token", result.accessToken);
+        storageMethod.setItem("userEmail", result.email); // đảm bảo backend trả về email
+        storageMethod.setItem("userRole", result.role);
+
+        if (onLoginSuccess) {
+          onLoginSuccess(result.email, result.role);
+        }
+
+        handleAlert("Đăng nhập bằng Google thành công!", "success");
+
+        // Chuyển hướng dựa theo role
+        setTimeout(() => {
+          if (result.role === "admin") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
+          }
+        }, 1000);
+      } else {
+        handleAlert(
+          "Không thể đăng nhập bằng Google. Dữ liệu trả về không hợp lệ.",
+          "error"
+        );
+      }
     } catch (error) {
-      setError("Đăng nhập bằng Facebook thất bại. Vui lòng thử lại.");
+      console.error("Google login failed:", error);
+      handleAlert("Đăng nhập bằng Google thất bại. Vui lòng thử lại.", "error");
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      window.open(`${process.env.REACT_APP_API_URL}/auth/google`, "_self");
-    } catch (error) {
-      setError("Đăng nhập bằng Google thất bại. Vui lòng thử lại.");
-    }
-  };
-  
   const resendOTP = async () => {
     try {
       setLoading(true);
@@ -276,20 +357,7 @@ function Register() {
               />
               Facebook
             </Button>
-            <Button
-              variant="outlined"
-              onClick={handleGoogleLogin}
-              fullWidth
-              className="google-button"
-              disabled={loading}
-            >
-              <img
-                src="https://www.google.com/favicon.ico"
-                alt="Google icon"
-                className="social-icon"
-              />
-              Google
-            </Button>
+            <GoogleLogin onSuccess={handleGoogleLogin} onError={handleError} />
           </Box>
         </form>
 
@@ -313,9 +381,9 @@ function Register() {
               error={!!error}
               helperText={error}
             />
-            <Button 
-              onClick={resendOTP} 
-              disabled={loading} 
+            <Button
+              onClick={resendOTP}
+              disabled={loading}
               className="otp-resend-button"
             >
               Gửi lại mã OTP
