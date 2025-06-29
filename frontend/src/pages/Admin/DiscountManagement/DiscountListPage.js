@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import {
   LocalOffer,
+  Refresh,
   EventAvailable as StartDateIcon,
   EventBusy as EndDateIcon,
   Edit,
@@ -213,6 +214,17 @@ export default function DiscountListPage() {
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={3} textAlign="right">
+              <Button
+                startIcon={<Refresh />}
+                onClick={() => {
+                  setFilterCode("");
+                  setFilterType("all");
+                  setFilterStatus("all");
+                  setPage(0);
+                }}
+              >
+                Đặt lại
+              </Button>
               <Button
                 variant="contained"
                 onClick={() => navigate("add")}
