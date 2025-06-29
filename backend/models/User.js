@@ -8,9 +8,10 @@ const userSchema = new mongoose.Schema({
   address: [
     {
       address: { type: String, required: true },
-      provineName: { type: String, required: true },
+      provinceName: { type: String, required: true },
       districtName: { type: String, required: true },
       wardName: { type: String, required: true },
+      isDefault: { type: Boolean, default: false }
     }
   ],
   point: { type: Number, default: 0 },
@@ -29,5 +30,21 @@ const userSchema = new mongoose.Schema({
   accessToken: { type: String, default: null },
   refreshToken: { type: String, default: null }
 }, { timestamps: true });
+
+// Đảm bảo chỉ một địa chỉ được đặt làm mặc định
+userSchema.pre('save', async function (next) {
+  if (this.isModified('address')) {
+    const defaultAddress = this.address.find(addr => addr.isDefault === true);
+    if (defaultAddress) {
+      // Nếu có địa chỉ mặc định mới, đặt tất cả các địa chỉ khác thành không mặc định
+      this.address.forEach(addr => {
+        if (addr._id !== defaultAddress._id) {
+          addr.isDefault = false;
+        }
+      });
+    }
+  }
+  next();
+});
 
 module.exports = mongoose.model('User', userSchema);
