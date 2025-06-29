@@ -15,6 +15,8 @@ import FeedbackManagement from "./pages/Admin/FeedbackManagement/FeedbackManagem
 import Wishlist from "./pages/Wishlist/Wishlist";
 import Chatbot from "./components/Chatbot/Chatbot.js";
 import Cart from "./pages/Cart/Cart.js";
+import DiscountListPage from "./pages/Admin/DiscountManagement/DiscountListPage.js";
+import DiscountFormPage from "./pages/Admin/DiscountManagement/DiscountFormPage.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -31,7 +33,8 @@ const AdminRoute = ({ children }) => {
 };
 
 const UserOnlyRoute = ({ children }) => {
-  const userRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+  const userRole =
+    localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
 
   if (userRole === "admin") {
     return <Navigate to="/forbidden" replace />;
@@ -39,7 +42,6 @@ const UserOnlyRoute = ({ children }) => {
 
   return children;
 };
-
 
 function App() {
   const location = useLocation();
@@ -80,30 +82,47 @@ function App() {
           </Route>
           <Route path="categories" element={<CategoryManagementPage />} />
           <Route path="users" element={<UserManagement />} />
-          <Route path="/admin/feedbacks" element={<FeedbackManagement />} />
+          <Route path="feedbacks" element={<FeedbackManagement />} />
+          <Route path="discounts">
+            <Route index element={<DiscountListPage />} />
+            <Route path="add" element={<DiscountFormPage />} />
+            <Route path=":id/edit" element={<DiscountFormPage />} />
+          </Route>
         </Route>
 
-        <Route path="/account/login" element={<Login onLoginSuccess={updateUserEmail} />} />
+        <Route
+          path="/account/login"
+          element={<Login onLoginSuccess={updateUserEmail} />}
+        />
         <Route path="/account/register" element={<Register />} />
         <Route path="/" element={<HomePage />} />
 
         <Route path="/book/:id" element={<BookDetail />} />
-        <Route path="/user/wishlist" element={
-          <UserOnlyRoute>
-            <Wishlist />
-          </UserOnlyRoute>
-        } />
-          
-        <Route path="/user/cart" element={
-          <UserOnlyRoute>
-            <Cart />
-          </UserOnlyRoute>
-        } />
+        <Route
+          path="/user/wishlist"
+          element={
+            <UserOnlyRoute>
+              <Wishlist />
+            </UserOnlyRoute>
+          }
+        />
 
+        <Route
+          path="/user/cart"
+          element={
+            <UserOnlyRoute>
+              <Cart />
+            </UserOnlyRoute>
+          }
+        />
       </Routes>
 
-      {!isAdminRoute && <Footer />}
-      <Chatbot />
+      {!isAdminRoute && (
+        <>
+          <Footer />
+          <Chatbot />
+        </>
+      )}
     </>
   );
 }

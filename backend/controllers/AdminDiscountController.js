@@ -128,11 +128,24 @@ const updatedDiscount = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const deleteDiscount = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Discount.findByIdAndDelete(id);
+    if (!deleted) {
+      return res.status(404).json({ message: "Discount không tồn tại" });
+    }
+    res.json({ message: "Xóa thành công" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 const discountController = {
   getAllDiscounts,
   getDiscountById,
   getDiscountSuitable,
+  deleteDiscount,
   createDiscount,
   changeStatusDiscount,
   updatedDiscount,
