@@ -1,9 +1,24 @@
-const authRoutes = require('./authRoute')
-const bookRoutes = require('./bookRoute')
-
+const authRoutes = require("./authRoute");
+const bookRoutes = require("./bookRoute");
+const adminRoutes = require("./adminRoute");
+const userRoutes = require("./userRoute");
+const cartRoutes = require("./cartRoute");
+const categoryRoutes = require("./categoryRoute");
+const feedbackRoutes = require("./feedbackRoute");
+const chatbotRoutes = require("./chatbotRoute");
+const discountRoutes = require("./discountRoute");
+const orderRoutes = require('./orderRoute')
 const routes = (app) => {
-    app.use('/auth', authRoutes)
-    app.use('/book', bookRoutes)
-}
+  app.use("/auth", authRoutes);
+  app.use("/book", bookRoutes);
+  app.use("/admin", adminRoutes);
+  app.use("/user", userRoutes);
+  app.use("/cart", cartRoutes);
+  app.use("/category", categoryRoutes);
+  app.use("/feedback", feedbackRoutes);
+  app.use("/chatbot", chatbotRoutes);
+  app.use("/discount", discountRoutes);
+  app.use('/order', orderRoutes);
+};
 
-module.exports = routes
+module.exports = routes;
