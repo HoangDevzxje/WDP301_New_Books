@@ -1,0 +1,156 @@
+/* FeedbackAndRating.css */
+
+.feedback-panel {
+  padding: 16px;
+}
+
+.no-reviews-message {
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 1rem;
+  color: #666;
+}
+
+.average-rating {
+  padding: 16px 0;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-display {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rating-stars {
+  color: #000;
+}
+
+.rating-text {
+  font-size: 1rem;
+  color: #666;
+}
+
+.review-card {
+  margin-bottom: 16px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.review-card-content {
+  padding: 16px;
+}
+
+.review-user-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.review-date {
+  color: #888;
+  font-size: 0.8rem;
+  margin-bottom: 8px;
+}
+
+.review-comment {
+  padding: 8px 0;
+  font-size: 0.9rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.review-rating {
+  margin: 4px 0;
+}
+
+.review-menu-button {
+  padding: 4px;
+}
+
+.edit-form, 
+.submit-form {
+  padding: 16px;
+  margin-top: 16px;
+  border-radius: 8px;
+}
+
+.form-title {
+  margin-bottom: 15px !important;
+  font-weight: 500;
+  font-size: 1.1rem;
+}
+
+.form-title::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 3px;
+  background-color: #c49a6c;
+  margin-top: 4px;
+  border-radius: 2px;
+}
+
+.form-field {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.form-rating {
+  color: #000;
+}
+
+.form-textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  box-sizing: border-box;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.submit-button {
+  text-transform: none;
+  font-weight: 500;
+}
+
+.cancel-button {
+  text-transform: none;
+  border-color: #e0e0e0;
+  color: #666;
+}
+
+.review-button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.review-button {
+  text-transform: none;
+  font-weight: 500;
+}

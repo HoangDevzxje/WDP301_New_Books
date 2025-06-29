@@ -18,6 +18,7 @@ import {
   Divider,
   Tabs,
   Tab,
+  Rating,
 } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -32,6 +33,8 @@ import {getBookById,getBooksByCategory} from "../../services/BookService"
 import {getWishlist, addToWishlist, deleteFromWishlist} from "../../services/WishlistService";
 import {addToCart} from "../../services/CartService";
 import BookCard from "../../components/BookCard/BookCard";
+import FeedbackAndRating from "../../components/FeedbackAndRating/FeedbackAndRating";
+import * as FeedbackService from "../../services/FeedbackService";
 const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const { id } = useParams();
   const [book, setBook] = useState(null);
@@ -59,6 +62,9 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const [hoveredId, setHoveredId] = useState(null);
   const [mainImg, setMainImg] = useState(null);
 
+  const [slideDirection, setSlideDirection] = useState('');
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   useEffect(() => {
     setLoading(true);
     getBookById(id).then((response) => {
@@ -71,6 +77,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
           fetchRelatedBooks(categoryId, response.data._id);
         }
 
+        fetchReviews();
       })
       .catch((error) => {
         console.error("Lỗi khi lấy thông tin sách:", error);
@@ -89,6 +96,144 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         );
   }, [id]);
 
+  const getToken = () => localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+
+  const fetchReviews = () => {
+    FeedbackService.getAllFeedbacksForBook(id)
+      .then((response) => {
+        setReviews(response.data.feedbacks);
+        setAverageRating(response.data.averageRating);
+
+        const token = getToken();
+        if (token) {
+          FeedbackService.getUserFeedbackForBook(id).then((userReviewResponse) => {
+            if (userReviewResponse.data && typeof userReviewResponse.data === 'object') {
+              // Nếu review của user tồn tại, cập nhật state
+              const userReview = userReviewResponse.data.book === id ? userReviewResponse.data : null;
+                setUserReview(userReview);
+                setHasReviewed(userReview ? true : false);
+              } else {
+                console.error("Dữ liệu userReview không phải là đối tượng:", userReviewResponse.data);
+                setHasReviewed(false);
+              }
+            })
+            .catch((error) => {});
+          setHasReviewed(false);
+        }
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy đánh giá sách:", error);
+
+      });
+  };
+
+  const addNotification = (message, severity = "info") => {
+    setNotifications((prev) => [
+      ...prev,
+      { id: new Date().getTime(), message, severity }
+    ]);
+  };
+
+
+
+  const handleSubmitReview = async () => {
+    const token = getToken();
+
+    if (!token) {
+      addNotification("Bạn cần đăng nhập để đánh giá.", "warning");
+      return;
+    }
+
+    try {
+      await FeedbackService.createFeedback(id, {
+        rating,
+        comment
+      });
+
+      localStorage.setItem("hasReviewed", "true");
+      setShowReviewForm(false); 
+      setHasReviewed(true);
+      setRating(1); 
+      setComment(""); 
+      fetchReviews();
+
+      addNotification("Đánh giá đã được gửi!", "success");
+
+    } catch (error) {
+      console.error("Lỗi khi gửi đánh giá:", error);
+      addNotification("Lỗi khi gửi đánh giá. Vui lòng thử lại.", "error");
+    }
+  };
+
+  const handleEdit = (review) => {
+    setEditingReview(review);
+    setRating(review.rating);
+    setComment(review.comment);
+  };
+
+  const handleSubmitEdit = async () => {
+    const token = getToken();
+
+    if (!token) {
+      addNotification("Bạn cần đăng nhập để chỉnh sửa đánh giá.", "warning");
+      return;
+    }
+
+    try {
+      const response = await FeedbackService.updateFeedback(editingReview._id, {
+        rating: editingReview.rating,
+        comment: editingReview.comment
+      });
+
+      if (response.status === 200) {
+        fetchReviews(); 
+        setEditingReview(null);
+        addNotification("Đánh giá đã được cập nhật!", "success");
+      }
+    } catch (error) {
+      console.error("Cập nhật thất bại:", error);
+      addNotification("Cập nhật thất bại, vui lòng thử lại!", "error");
+    }
+  };
+
+  const handleDelete = async (reviewId) => {
+    const token = getToken();
+
+    if (!token) {
+      addNotification("Bạn cần đăng nhập để xóa đánh giá.", "warning");
+      return;
+    }
+
+    try {
+      const response = await FeedbackService.deleteFeedback(reviewId);
+
+      if (response.status === 200) {
+        if (userReview && userReview._id === reviewId) {
+          setHasReviewed(false);
+          localStorage.removeItem("hasReviewed");
+        }
+        fetchReviews();
+        addNotification("Đánh giá đã được xóa!", "success");
+      } else {
+        addNotification("Xóa đánh giá không thành công!", "error");
+      }
+    } catch (error) {
+      console.error("Xóa đánh giá thất bại:", error);
+      addNotification("Xóa thất bại, vui lòng thử lại!", "error");
+    }
+  };
+
+  const handleMenuOpen = (event, review) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedReview(review);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedReview(null);
+  };
+
+  
   const fetchRelatedBooks = (categoryId, currentBookId) => {
     getBooksByCategory(categoryId).then((response) => {
         const filteredBooks = response.data
@@ -279,7 +424,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
 
   if (!book) {
     return (
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" >
         <Box
           sx={{
             display: "flex",
@@ -295,7 +440,24 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   }
   
   const isOutOfStock = book.stock === 0;
+  
+  const handleImageChange = (newImage, newIndex) => {
+    if (newIndex > currentImageIndex) {
+      setSlideDirection('slide-right');
+    } else if (newIndex < currentImageIndex) {
+      setSlideDirection('slide-left');
+    }
+    
+    setMainImg(newImage);
+    setCurrentImageIndex(newIndex);
+    
 
+    setTimeout(() => {
+      setSlideDirection('');
+    }, 400); 
+  };
+
+  
 return (
   <>
     <BookDetailBreadCrumb />
@@ -306,9 +468,10 @@ return (
         <Grid size={6} className="bookdetail-image-container">
           <Box>
             <img 
-              className="bookdetail-image"
+              className={`bookdetail-image ${slideDirection}`}
               src={mainImg}
-              style={{ width: "100%", height: 500, objectFit: "contain" }}/>
+              style={{ width: "100%", height: 500, objectFit: "contain" }}
+            />
           </Box>
           <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
             {book.images.map((image, index) => (
@@ -316,7 +479,7 @@ return (
                 <Box
                   component="img"
                   src={image}
-                  onClick={() => setMainImg(image)}
+                  onClick={() => handleImageChange(image, index)}
                   sx={{
                     width: 80,
                     height: 120,
@@ -333,23 +496,40 @@ return (
 
         {/* thông tin tác giả  */}
         <Grid size={6} display={"flex"} flexDirection={"column"} justifyContent={"space-between"}>
-          <span className="bookdetail-title">
-            {book.title} 
-          </span>
+          <Box className="bookdetail-title-container" display={"flex"} flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
+            <Box>
+              <span className="bookdetail-title">
+                {book.title} 
+              </span>
+            </Box>
+            <Box>
+              <span >
+                <Rating
+                  value={averageRating}
+                  precision={0.1}
+                  readOnly
+                  className="rating-stars"
+                />
+              </span>
+             
+            </Box>
+          </Box>
 
           <Box className="book-meta">
-            <Typography variant="body2" className="book-meta-item">
-              Tác giả:{" "}
-              <Link className="book-meta-link">
-                {book.author}
-              </Link>
-            </Typography>
-            <Typography variant="body2">
-              Nhà xuất bản:{" "}
-              <Link className="book-meta-link">
-                {book.publisher}
-              </Link>
-            </Typography>
+            <Box className="book-meta-left">
+               <Typography variant="body2" className="book-meta-item">
+                  Tác giả:{" "}
+                  <Link className="book-meta-link">
+                    {book.author}
+                  </Link>
+                </Typography>
+                <Typography variant="body2">
+                  Nhà xuất bản:{" "}
+                  <Link className="book-meta-link">
+                    {book.publisher}
+                  </Link>
+                </Typography>
+            </Box>
           </Box>
 
           {/* Giá sản phẩm */}
@@ -391,7 +571,7 @@ return (
               <TableBody>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Nhà phát hành
+                    Nhà phát hành:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                     {book.publisher || "IPM"}
@@ -399,7 +579,7 @@ return (
                 </TableRow>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Hình thức bìa
+                    Hình thức bìa:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                     {book.cover || "Bìa mềm"}
@@ -407,7 +587,7 @@ return (
                 </TableRow>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Số trang
+                    Số trang:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                     {book.totalPage || "160"} trang
@@ -415,7 +595,7 @@ return (
                 </TableRow>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Kích thước
+                    Kích thước:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                     {book.dimensions || "18 x 13 x 0.8 cm"} 
@@ -423,7 +603,7 @@ return (
                 </TableRow>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Độ tuổi
+                    Độ tuổi:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                    {book.minAge || "18"}+ 
@@ -431,7 +611,7 @@ return (
                 </TableRow>
                 <TableRow>
                   <TableCell className="highlights-table-cell-bold">
-                    Trọng lượng
+                    Trọng lượng:
                   </TableCell>
                   <TableCell className="highlights-table-cell">
                     {book.weight || "180g"}g
@@ -479,7 +659,7 @@ return (
                 onClick={() => toggleWishlist(id)}
                 className="wishlist-action-btn"
               >
-                <FavoriteIcon sx={{ color: "black" }} />
+                <FavoriteIcon  sx={{ color: "black" }} />
               </Button>
             </Box>
           </Box>
@@ -488,7 +668,7 @@ return (
 
       {/* mô tả và đánh giá  */}
       <Box className="tabs-container">
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Box >
           <Tabs
             value={tabValue}
             onChange={handleTabChange}
@@ -517,6 +697,29 @@ return (
           )}
         </Box>
 
+        <FeedbackAndRating
+          tabValue={tabValue}
+          reviews={reviews}
+          averageRating={averageRating}
+          userReview={userReview}
+          showReviewForm={showReviewForm}
+          hasReviewed={hasReviewed}
+          rating={rating}
+          comment={comment}
+          editingReview={editingReview}
+          anchorEl={anchorEl}
+          selectedReview={selectedReview}
+          setEditingReview={setEditingReview}
+          setRating={setRating}
+          setComment={setComment}
+          setShowReviewForm={setShowReviewForm}
+          handleMenuOpen={handleMenuOpen}
+          handleMenuClose={handleMenuClose}
+          handleEdit={handleEdit}
+          handleDelete={handleDelete}
+          handleSubmitEdit={handleSubmitEdit}
+          handleSubmitReview={handleSubmitReview}
+        />
       </Box>
 
       {/* Sản phẩm liên quan */}
