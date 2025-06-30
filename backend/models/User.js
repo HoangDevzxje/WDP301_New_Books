@@ -1,50 +1,68 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema({
-  name: String,
-  email: { type: String, unique: true, required: true },
-  password: String,
-  phone: String,
-  address: [
+const AddressSchema = new mongoose.Schema(
+  {
+    address: { type: String, required: true }, // số nhà, đường
+    provinceId: { type: Number, required: true },
+    provinceName: { type: String, required: true },
+    districtId: { type: Number, required: true },
+    districtName: { type: String, required: true },
+    wardCode: { type: String, required: true },
+    wardName: { type: String, required: true },
+    isDefault: { type: Boolean, default: false },
+  },
+  { _id: true }
+);
+
+const userSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: { type: String, unique: true, required: true },
+    password: { type: String, select: false },
+    phone: String,
+    address: [AddressSchema],
+    point: { type: Number, default: 0 },
+    googleId: String,
+    facebookId: String,
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    isActivated: { type: Boolean, default: true },
+    accessToken: { type: String, default: null, select: false },
+    refreshToken: { type: String, default: null, select: false },
+  },
+  { timestamps: true }
+);
+
+// partial unique index – chỉ một địa chỉ mặc định
+userSchema.index(
+  { _id: 1, "address.isDefault": 1 },
+  { unique: true, partialFilterExpression: { "address.isDefault": true } }
+);
+
+// static helper – đổi địa chỉ mặc định
+userSchema.statics.setDefaultAddress = async function (userId, addrId) {
+  await this.updateOne({ _id: userId }, [
     {
-      address: { type: String, required: true },
-      provinceName: { type: String, required: true },
-      districtName: { type: String, required: true },
-      wardName: { type: String, required: true },
-      isDefault: { type: Boolean, default: false }
-    }
-  ],
-  point: { type: Number, default: 0 },
-  googleId: String,
-  facebookId: String,
-  wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
-  role: {
-    type: String,
-    enum: ["user", "admin"],
-    default: "user",
-  },
-  isActivated: {
-    type: Boolean,
-    default: true
-  },
-  accessToken: { type: String, default: null },
-  refreshToken: { type: String, default: null }
-}, { timestamps: true });
+      $set: {
+        address: {
+          $map: {
+            input: "$address",
+            as: "a",
+            in: {
+              $mergeObjects: [
+                "$$a",
+                {
+                  isDefault: {
+                    $eq: ["$$a._id", mongoose.Types.ObjectId(addrId)],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+  ]);
+};
 
-// Đảm bảo chỉ một địa chỉ được đặt làm mặc định
-userSchema.pre('save', async function (next) {
-  if (this.isModified('address')) {
-    const defaultAddress = this.address.find(addr => addr.isDefault === true);
-    if (defaultAddress) {
-      // Nếu có địa chỉ mặc định mới, đặt tất cả các địa chỉ khác thành không mặc định
-      this.address.forEach(addr => {
-        if (addr._id !== defaultAddress._id) {
-          addr.isDefault = false;
-        }
-      });
-    }
-  }
-  next();
-});
-
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model("User", userSchema);
