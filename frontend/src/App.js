@@ -17,6 +17,11 @@ import Chatbot from "./components/Chatbot/Chatbot.js";
 import Cart from "./pages/Cart/Cart.js";
 import DiscountListPage from "./pages/Admin/DiscountManagement/DiscountListPage.js";
 import DiscountFormPage from "./pages/Admin/DiscountManagement/DiscountFormPage.js";
+import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.js";
+import Profile from "./pages/Profile/Profile.js";
+import EditProfile from "./pages/Profile/EditProfile.js";
+import AddressPage from "./pages/Profile/AddressPage.js";
+import ChangePassword from "./pages/Profile/ChangePassword.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -88,6 +93,7 @@ function App() {
             <Route path="add" element={<DiscountFormPage />} />
             <Route path=":id/edit" element={<DiscountFormPage />} />
           </Route>
+          <Route path="orders" element={<OrderManagement />} />
         </Route>
 
         <Route
@@ -98,6 +104,17 @@ function App() {
         <Route path="/" element={<HomePage />} />
 
         <Route path="/book/:id" element={<BookDetail />} />
+        <Route path="/user/profile" element={<Profile />} />
+        <Route path="/user/edit-profile" element={<EditProfile />} />
+        <Route path="/user/addresses" element={<AddressPage />} />
+        <Route
+          path="/auth/change-password"
+          element={
+            <UserOnlyRoute>
+              <ChangePassword />
+            </UserOnlyRoute>
+          }
+        />
         <Route
           path="/user/wishlist"
           element={

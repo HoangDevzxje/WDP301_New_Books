@@ -28,11 +28,11 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <CategoryIcon />,
       link: "/admin/categories",
     },
-    // {
-    //   text: "Quản lý đơn hàng",
-    //   icon: <ReceiptLongIcon />,
-    //   link: "/admin/orders",
-    // },
+    {
+      text: "Quản lý đơn hàng",
+      icon: <ReceiptLongIcon />,
+      link: "/admin/orders",
+    },
     {
       text: "Quản lý mã giảm giá",
       icon: <LocalOfferIcon />,

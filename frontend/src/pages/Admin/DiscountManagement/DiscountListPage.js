@@ -25,7 +25,6 @@ import {
   Alert,
 } from "@mui/material";
 import {
-  LocalOffer,
   EventAvailable as StartDateIcon,
   EventBusy as EndDateIcon,
   Edit,
@@ -153,7 +152,6 @@ export default function DiscountListPage() {
   return (
     <Box p={2}>
       <Box display="flex" alignItems="center" mb={2}>
-        <LocalOffer fontSize="large" />
         <Typography variant="h4" ml={1}>
           Quản lý mã giảm giá
         </Typography>
@@ -232,7 +230,7 @@ export default function DiscountListPage() {
             <TableRow>
               <TableCell>Mã</TableCell>
               <TableCell>Giá trị</TableCell>
-              <TableCell>Min Purchase</TableCell>
+              <TableCell>Giá tối thiểu</TableCell>
               <TableCell>Sử dụng</TableCell>
               <TableCell>
                 <StartDateIcon fontSize="small" /> Bắt đầu
