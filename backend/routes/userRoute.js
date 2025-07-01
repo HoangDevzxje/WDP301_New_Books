@@ -41,7 +41,6 @@ const { checkAuthorize } = require("../middleware/authMiddleware");
  *               $ref: '#/components/schemas/Error'
  */
 router.get("/profile", checkAuthorize(["user"]), userController.getMyProfile);
-
 /**
  * @swagger
  * /wishlist:
@@ -131,7 +130,11 @@ router.get("/wishlist", checkAuthorize(["user"]), userController.getMyWishlist);
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.post("/wishlist/:bookId", checkAuthorize(["user"]), userController.addBookToWishlist);
+router.post(
+  "/wishlist/:bookId",
+  checkAuthorize(["user"]),
+  userController.addBookToWishlist
+);
 
 /**
  * @swagger
@@ -181,7 +184,10 @@ router.post("/wishlist/:bookId", checkAuthorize(["user"]), userController.addBoo
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.delete("/wishlist/:bookId", checkAuthorize(["user"]), userController.deleteBookFromWishlist);
-
-
+router.delete(
+  "/wishlist/:bookId",
+  checkAuthorize(["user"]),
+  userController.deleteBookFromWishlist
+);
+router.put("/profile", checkAuthorize(["user"]), userController.editMyProfile);
 module.exports = router;
