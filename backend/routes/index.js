@@ -21,7 +21,7 @@ const routes = (app) => {
   app.use("/chatbot", chatbotRoutes);
   app.use("/discount", discountRoutes);
   app.use("/order", orderRoutes);
-  app.use("/address", addressRoutes);
+  app.use("/addresses/users/:userId", addressRoutes);
   app.use("/ghn", ghnRoutes);
 };
 
