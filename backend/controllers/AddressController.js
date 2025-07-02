@@ -4,9 +4,7 @@ const User = require("../models/User");
 // helper: validate ObjectId
 const isId = (v) => mongoose.Types.ObjectId.isValid(v);
 
-/**
- * GET /users/:userId/addresses
- */
+
 exports.getAll = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -22,9 +20,7 @@ exports.getAll = async (req, res, next) => {
   }
 };
 
-/**
- * POST /users/:userId/addresses
- */
+
 exports.create = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -77,9 +73,7 @@ exports.create = async (req, res, next) => {
   }
 };
 
-/**
- * PUT /users/:userId/addresses/:addrId
- */
+
 exports.update = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
@@ -125,9 +119,7 @@ exports.update = async (req, res, next) => {
   }
 };
 
-/**
- * PATCH /users/:userId/addresses/:addrId/default
- */
+
 exports.setDefault = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
@@ -145,9 +137,7 @@ exports.setDefault = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /users/:userId/addresses/:addrId
- */
+
 exports.remove = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
