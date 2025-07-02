@@ -5,6 +5,7 @@ const adminController = require("../controllers/AdminController");
 const adminBookController = require("../controllers/AdminBookController");
 const adminFeedbackController = require("../controllers/AdminFeedbackController");
 const adminDiscountController = require("../controllers/AdminDiscountController");
+const { confirmOrder } = require("../controllers/GhnController");
 const router = express.Router();
 
 //Quản lý user
@@ -20,6 +21,21 @@ router.put(
   checkAuthorize(["admin"]),
   adminController.changeStatusUser
 );
+
+//Quản lý đơn hàng
+router.get("/orders", checkAuthorize(["admin"]), adminController.getAllOrders);
+router.put(
+  "/orders/:id/change-status",
+  checkAuthorize(["admin"]),
+  adminController.updateOrderStatus
+);
+router.post(
+  "/orders/update-box-info/:id",
+  checkAuthorize(["admin"]),
+  adminController.updateBoxInfo
+);
+router.post("/orders/confirm/:id", checkAuthorize(["admin"]), confirmOrder);
+
 //Quản lý sách
 router.get(
   "/books",
@@ -121,5 +137,9 @@ router.put(
   adminDiscountController.changeStatusDiscount
 );
 
-
+router.delete(
+  "/discounts/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountController.deleteDiscount
+);
 module.exports = router;

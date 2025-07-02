@@ -13,47 +13,90 @@
 
 .bookdetail-image{
     width: 70%;
+    transition: transform 0.3s ease;
+}
+
+.bookdetail-image.slide-left {
+    animation: slideInLeft 0.4s ease-out;
+}
+
+.bookdetail-image.slide-right {
+    animation: slideInRight 0.4s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-200px);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(200px);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
 .bookdetail-title {
-    font-weight: 600;
-    font-size: 27px;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 1.3;
+    margin-bottom: 8px;
 }
 
 .book-meta {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    margin-top: 10px;
-    margin-bottom: 22px;
+    margin-bottom: 24px;
     color: #606060;
-    gap: 20px;
+    font-size: 16px;
 }
 
 .book-meta-item {
   margin-right: 16px;
+  font-weight: 500;
 }
 
 .book-meta-link {
-  text-decoration: none;
-  color: #606060;
+  text-decoration: none !important;
+  color: #606060 !important;
+  font-weight: 600  !important;
 }
 
-/* Price section */
+.book-meta-left{
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 .price-container {
   display: flex;
   align-items: center;
   gap: 16px;
+  margin-bottom: 8px;
 }
 
 .current-price {
-  font-weight: bold !important;
+  font-weight: 800 !important;
+  font-size: 32px !important;
   color: #d10000;
 }
 
 .original-price {
   text-decoration: line-through;
   color: gray;
+  font-size: 20px;
+  font-weight: 500;
 }
 
 .stock-status {
@@ -62,10 +105,15 @@
   align-items: center;
   gap: 8px;
   color: #606060;
+  font-size: 15px;
+  font-weight: 500;
 }
 
 .book-description {
   margin-bottom: 24px !important;
+  font-size: 16px !important;
+  line-height: 1.6 !important;
+  color: #444;
 }
 
 .highlights-section {
@@ -73,8 +121,8 @@
 }
 
 .highlights-title {
-  margin-bottom: 8px;
-  font-weight: bold !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
 }
 
 .highlights-table {
@@ -82,17 +130,23 @@
 }
 
 .highlights-table-cell {
-  padding: 10px !important;
+  padding: 12px !important;
   border: none !important;
+  font-size: 15px !important;
+  color: #555;
 }
 
 .highlights-table-cell-bold {
-  padding: 0 !important;
+  padding: 12px !important;
   border: none !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  color: #333;
 }
 
 .quantity-container{
-    max-width: 400px !important;
+    max-width: 100% !important;
+    gap: 16px;
 }
 
 .quantity-cart-container {
@@ -109,7 +163,6 @@
   gap: 0.5rem;
   border-radius: 8px;
   padding: 0px 0.5rem;
-  border: 1px solid #e0e0e0;
 }
 
 .quantity-btn {
@@ -128,19 +181,20 @@
 }
 
 .quantity-display {
-  font-size: 1rem !important;
-  font-weight: 600 !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
   color: #2c3e50 !important;
   min-width: 30px;
   text-align: center;
 }
 
 .add-to-cart-btn {
-  font-size: 12px !important;
-  font-weight: bold !important;
-  background-color: #000 !important;
-  border-radius: 8px !important;
-  box-shadow: none !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    background-color: #000 !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+    width: 500px !important;
 }
 
 .add-to-cart-btn:hover {
@@ -156,10 +210,9 @@
 }
 
 .wishlist-action-btn {
-  padding: 12px 24px !important;
-  background-color: #fff;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 8px !important;
+    padding: 12px 24px !important;
+    background-color: #fff;
+    border-radius: 8px !important;
 }
 
 .service-container{
@@ -179,10 +232,14 @@
 .tabs-container {
   width: 100%;
   margin-bottom: 40px;
+  padding: 20px;
+  border-radius: 2px;
 }
 
 .tab-panel {
   padding: 24px;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .related-products-section {
@@ -197,14 +254,16 @@
 }
 
 .related-products-title {
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 24px;
   margin-bottom: 0;
 }
 
 .view-all-link {
   text-decoration: none;
   color: #725400;
-  font-size: 0.9rem;
+  font-size: 16px;
+  font-weight: 500;
   display: flex;
   align-items: center;
 }
@@ -297,6 +356,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   font-weight: 600 !important;
+  font-size: 16px !important;
+  line-height: 1.4;
 }
 
 .related-product-price-container {
@@ -307,7 +368,7 @@
 }
 
 .related-product-price {
-  font-size: 1.2rem !important;
+  font-size: 18px !important;
   font-weight: 700 !important;
   color: #c49a6c;
 }
@@ -315,33 +376,11 @@
 .related-product-original-price {
   text-decoration: line-through;
   color: gray;
-  font-size: 0.75rem;
+  font-size: 14px;
 }
 
 .no-related-products {
   text-align: center;
   color: #666;
-}
-
-@media (max-width: 768px) {
-  .book-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .book-meta-item {
-    margin-right: 0;
-  }
-  
-  .quantity-cart-container {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  
-  .related-product-card {
-    width: 100%;
-    max-width: 220px;
-  }
+  font-size: 16px;
 }

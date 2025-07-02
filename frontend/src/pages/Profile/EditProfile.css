@@ -1,0 +1,162 @@
+* {
+  box-sizing: border-box;
+}
+.centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+.spinner,
+.spinner-small {
+  border: 4px solid #ddd;
+  border-top-color: #1976d2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.spinner {
+  width: 48px;
+  height: 48px;
+}
+.spinner-small {
+  width: 20px;
+  height: 20px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Container chính */
+.edit-profile-container {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+.form-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.back-link {
+  color: #1976d2;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 8px;
+  text-decoration: none;
+}
+.form-header h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Form */
+.form-container {
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+.avatar-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.avatar-circle {
+  width: 80px;
+  height: 80px;
+  background: #1976d2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+}
+
+/* Hàng form */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+.field-label {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #555;
+  margin-bottom: 6px;
+}
+.field-label .icon {
+  margin-right: 6px;
+  color: #888;
+}
+.field-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+.field-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
+}
+
+/* Nút và action */
+.form-actions {
+  text-align: right;
+  margin-top: 24px;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  border: 1px solid #1976d2;
+  border-radius: 4px;
+  background: #fff;
+  color: #1976d2;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.btn.primary {
+  background: #1976d2;
+  color: #fff;
+}
+.btn.primary:hover:not(:disabled) {
+  background: #135ba1;
+}
+
+/* Thông báo lỗi / thành công */
+.error-message {
+  color: #d32f2f;
+  margin-top: -8px;
+  margin-bottom: 16px;
+}
+.snackbar {
+  margin-top: 16px;
+  padding: 12px;
+  text-align: center;
+  border-radius: 4px;
+  animation: fadeIn 0.3s;
+}
+.snackbar.success {
+  background: #4caf50;
+  color: #fff;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

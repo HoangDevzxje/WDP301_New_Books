@@ -7,8 +7,9 @@ const categoryRoutes = require("./categoryRoute");
 const feedbackRoutes = require("./feedbackRoute");
 const chatbotRoutes = require("./chatbotRoute");
 const discountRoutes = require("./discountRoute");
-const orderRoutes = require('./orderRoute')
-const addressRoutes = require('./addressRoute')
+const orderRoutes = require("./orderRoute");
+const addressRoutes = require("./addressRoute");
+const ghnRoutes = require("./ghnRoute");
 const routes = (app) => {
   app.use("/auth", authRoutes);
   app.use("/book", bookRoutes);
@@ -19,8 +20,9 @@ const routes = (app) => {
   app.use("/feedback", feedbackRoutes);
   app.use("/chatbot", chatbotRoutes);
   app.use("/discount", discountRoutes);
-  app.use('/order', orderRoutes);
-  app.use('/address', addressRoutes);
+  app.use("/order", orderRoutes);
+  app.use("/address", addressRoutes);
+  app.use("/ghn", ghnRoutes);
 };
 
 module.exports = routes;

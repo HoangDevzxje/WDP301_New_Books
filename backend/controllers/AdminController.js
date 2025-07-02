@@ -1,3 +1,4 @@
+const Order = require("../models/Order");
 const User = require("../models/User");
 
 exports.getAllUsers = async (req, res) => {
@@ -59,5 +60,50 @@ exports.changeStatusUser = async (req, res) => {
     res.status(200).json({ message: "Thành công", data: user });
   } catch (error) {
     res.status(500).json({ message: "Lỗi server!", error: error.message });
+  }
+};
+
+exports.getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("user", "name email")
+      .populate("items.book", "title price")
+      .populate("discountUsed");
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi lấy danh sách đơn hàng", error });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const updatedOrder = await Order.findByIdAndUpdate(
+      req.params.id,
+      { orderStatus: req.body.orderStatus },
+      { new: true }
+    );
+    if (!updatedOrder)
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Lỗi cập nhật trạng thái đơn hàng", error });
+  }
+};
+
+exports.updateBoxInfo = async (req, res) => {
+  try {
+    const { boxInfo } = req.body;
+    const order = await Order.findById(req.params.id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+    order.boxInfo = boxInfo;
+    const updatedOrder = await order.save();
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
   }
 };
