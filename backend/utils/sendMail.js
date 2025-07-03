@@ -19,14 +19,15 @@ const sendEmail = async (email, otp, type) => {
     let emailHtml = emailTemplate.replace("{{OTP}}", otp);
     if (type === "register") {
       emailHtml = emailHtml.replace("{{TITLE}}", "Xác nhận đăng ký tài khoản");
-    }
-    else if (type === "reset-password") {
+      subject = "Xác nhận đăng ký - Mã OTP của bạn";
+    } else if (type === "reset-password") {
       emailHtml = emailHtml.replace("{{TITLE}}", "Xác nhận đặt lại mật khẩu");
+      subject = "Xác nhận đặt lại mật khẩu - Mã OTP của bạn";
     }
     const mailOptions = {
       from: `"NewBooks " <${process.env.EMAIL_USER}>`, // Hiển thị tên thương hiệu
       to: email,
-      subject: "Xác nhận đăng ký - Mã OTP của bạn",
+      subject,
       html: emailHtml,
     };
 
