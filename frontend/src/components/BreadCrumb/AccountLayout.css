@@ -1,0 +1,61 @@
+.account-container {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+}
+
+.sidebar {
+  width: 220px;
+  background: #f7f7f7;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.avatar-circle {
+  width: 64px;
+  height: 64px;
+  background-color: #187bcd;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  margin: 0 auto 10px;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+}
+
+.nav-list li {
+  margin-bottom: 12px;
+}
+
+.nav-list li a {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-list li.active a {
+  font-weight: bold;
+  color: #187bcd;
+}
+
+.main-panel {
+  flex: 1;
+}

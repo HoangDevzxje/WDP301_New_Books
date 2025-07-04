@@ -33,14 +33,15 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// partial unique index – chỉ một địa chỉ mặc định
+// ✅ Chỉ cho phép 1 địa chỉ mặc định
 userSchema.index(
   { _id: 1, "address.isDefault": 1 },
   { unique: true, partialFilterExpression: { "address.isDefault": true } }
 );
 
-// static helper – đổi địa chỉ mặc định
+// ✅ Đặt lại địa chỉ mặc định duy nhất
 userSchema.statics.setDefaultAddress = async function (userId, addrId) {
+  const objectId = new mongoose.Types.ObjectId(addrId); // ✅ fix lỗi "without 'new'"
   await this.updateOne({ _id: userId }, [
     {
       $set: {
@@ -53,7 +54,7 @@ userSchema.statics.setDefaultAddress = async function (userId, addrId) {
                 "$$a",
                 {
                   isDefault: {
-                    $eq: ["$$a._id", mongoose.Types.ObjectId(addrId)],
+                    $eq: ["$$a._id", objectId],
                   },
                 },
               ],
