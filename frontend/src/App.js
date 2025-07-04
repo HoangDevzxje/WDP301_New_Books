@@ -107,8 +107,9 @@ function App() {
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/edit-profile" element={<EditProfile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
+
         <Route
-          path="/auth/change-password"
+          path="/user/change-password"
           element={
             <UserOnlyRoute>
               <ChangePassword />
