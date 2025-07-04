@@ -42,11 +42,11 @@ export default function AccountLayout({ user, children }) {
               <HomeIcon /> Địa chỉ
             </Link>
           </li>
-          <li className={location.pathname === "/track-order" ? "active" : ""}>
+          {/* <li className={location.pathname === "/track-order" ? "active" : ""}>
             <Link to="/track-order">
               <ShoppingBagIcon /> Đơn hàng
             </Link>
-          </li>
+          </li> */}
         </ul>
       </aside>
       <main className="main-panel">{children}</main>
