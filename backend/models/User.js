@@ -2,13 +2,13 @@ const mongoose = require("mongoose");
 
 const AddressSchema = new mongoose.Schema(
   {
-    address: { type: String, required: true }, // số nhà, đường
-    provinceId: { type: Number, required: true },
-    provinceName: { type: String, required: true },
-    districtId: { type: Number, required: true },
-    districtName: { type: String, required: true },
-    wardCode: { type: String, required: true },
-    wardName: { type: String, required: true },
+    address: { type: String }, // số nhà, đường
+    provinceId: { type: Number },
+    provinceName: { type: String },
+    districtId: { type: Number },
+    districtName: { type: String },
+    wardCode: { type: String },
+    wardName: { type: String },
     isDefault: { type: Boolean, default: false },
   },
   { _id: true }

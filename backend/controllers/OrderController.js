@@ -2,6 +2,8 @@ const Order = require('../models/Order');
 const Book = require('../models/Book');
 const Cart = require('../models/Cart');
 const Discount = require('../models/Discount');
+const User = require('../models/User');
+const sendEmail = require("../utils/sendMail");
 
 const createOrder = async (req, res) => {
     try {
@@ -22,6 +24,7 @@ const createOrder = async (req, res) => {
 
         // Tính tổng giá trị đơn hàng
         let totalAmount = 0;
+        let itemsHtml = "";
         for (const item of cart.cartItems) {
             const book = await Book.findById(item.book);
             if (!book) {
@@ -37,6 +40,12 @@ const createOrder = async (req, res) => {
                 quantity: item.quantity,
                 price: book.price
             });
+            itemsHtml += `
+        <tr>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${book.title}</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${item.quantity}</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${(book.price * item.quantity).toLocaleString("vi-VN")} VND</td>
+        </tr>`;
             // Cập nhập kho hàng
             book.stock -= item.quantity;
             await book.save();
@@ -80,6 +89,16 @@ const createOrder = async (req, res) => {
                     await discount.save();
                 }
             }
+            // Gửi email xác nhận đơn hàng
+            const user = await User.findById(userId);
+            const shippingInfoStr = `${shippingInfo.address}, ${shippingInfo.provineName}, ${shippingInfo.districtName}, ${shippingInfo.wardName}`;
+            await sendEmail(user.email, {
+                orderId: savedOrder._id.toString(),
+                paymentMethod: paymentMethod === "COD" ? "Thanh toán khi nhận hàng" : "Thanh toán trực tuyến",
+                totalAmount,
+                itemsHtml,
+                shippingInfo: shippingInfoStr,
+            }, "orderConfirmation");
         }
         res.status(201).json({ data: savedOrder, totalAmount });
     } catch (error) {
