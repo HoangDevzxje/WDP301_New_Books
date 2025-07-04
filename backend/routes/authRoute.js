@@ -1,5 +1,5 @@
-const router = require('express').Router();
-const authController = require('../controllers/AuthController');
+const router = require("express").Router();
+const authController = require("../controllers/AuthController");
 
 // Xử lý OTP
 /**
