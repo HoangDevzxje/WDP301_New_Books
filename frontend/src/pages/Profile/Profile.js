@@ -5,15 +5,13 @@ import {
   Email as EmailIcon,
   Phone as PhoneIcon,
   Edit as EditIcon,
-  Lock as LockIcon,
-  ShoppingBag as ShoppingBagIcon,
   Login as LoginIcon,
   Home as HomeIcon,
 } from "@mui/icons-material";
 import { getProfile } from "../../services/UserService";
-
 import "./Profile.css";
-import AccountBreadCrumb from "../../components/BreadCrumb/AccountBreadCrumb";
+
+import AccountLayout from "../../components/BreadCrumb/AccountLayout";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
@@ -58,9 +56,6 @@ export default function Profile() {
   if (!isAuthenticated) {
     return (
       <>
-        <AccountBreadCrumb
-          paths={[{ name: "Tài khoản", to: "/user/profile" }]}
-        />
         <div className="login-prompt">
           <div className="login-box">
             <div className="avatar-large">
@@ -84,77 +79,35 @@ export default function Profile() {
 
   return (
     <>
-      <AccountBreadCrumb
-        paths={[
-          { name: "Tài khoản", to: "/user/profile" },
-          { name: "Thông tin tài khoản" },
-        ]}
-      />
+      <AccountLayout user={user}>
+        <div className="profile-header">
+          <h1>THÔNG TIN TÀI KHOẢN</h1>
+          <Link className="btn-edit" to="/user/edit-profile">
+            <EditIcon /> Chỉnh sửa
+          </Link>
+        </div>
 
-      <div className="profile-container">
-        <aside className="profile-sidebar">
-          <div className="profile-avatar">
-            <div className="avatar-circle">
-              {user.name?.charAt(0).toUpperCase() || <PersonIcon />}
-            </div>
-            <div className="profile-name">{user.name || "Khách"}</div>
-            <div className="profile-role">Thành viên</div>
+        <div className="info-row">
+          <div className="info-label">
+            <PersonIcon /> Họ tên:
           </div>
+          <div className="info-value">{user.name || "Chưa cập nhật"}</div>
+        </div>
 
-          <ul className="profile-nav">
-            <li className="nav-item active">
-              <Link to="/user/profile">
-                <PersonIcon /> Thông tin tài khoản
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/auth/change-password">
-                <LockIcon /> Đổi mật khẩu
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/track-order">
-                <ShoppingBagIcon /> Đơn hàng của tôi
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/user/addresses">
-                <HomeIcon /> Địa chỉ
-              </Link>
-            </li>
-          </ul>
-        </aside>
-
-        <main className="profile-main">
-          <div className="profile-header">
-            <h1>THÔNG TIN TÀI KHOẢN</h1>
-            <Link className="btn-edit" to="/user/edit-profile">
-              <EditIcon /> Chỉnh sửa
-            </Link>
+        <div className="info-row">
+          <div className="info-label">
+            <EmailIcon /> Email:
           </div>
+          <div className="info-value">{user.email || "Chưa cập nhật"}</div>
+        </div>
 
-          <div className="info-row">
-            <div className="info-label">
-              <PersonIcon /> Họ tên:
-            </div>
-            <div className="info-value">{user.name || "Chưa cập nhật"}</div>
+        <div className="info-row">
+          <div className="info-label">
+            <PhoneIcon /> Số điện thoại:
           </div>
-
-          <div className="info-row">
-            <div className="info-label">
-              <EmailIcon /> Email:
-            </div>
-            <div className="info-value">{user.email || "Chưa cập nhật"}</div>
-          </div>
-
-          <div className="info-row">
-            <div className="info-label">
-              <PhoneIcon /> Số điện thoại:
-            </div>
-            <div className="info-value">{user.phone || "Chưa cập nhật"}</div>
-          </div>
-        </main>
-      </div>
+          <div className="info-value">{user.phone || "Chưa cập nhật"}</div>
+        </div>
+      </AccountLayout>
     </>
   );
 }

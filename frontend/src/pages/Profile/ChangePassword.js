@@ -3,9 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Visibility,
   VisibilityOff,
-  Person as PersonIcon,
   Lock as LockIcon,
-  ShoppingBag as ShoppingBagIcon,
   Login as LoginIcon,
   Home as HomeIcon,
   Security as SecurityIcon,
@@ -13,7 +11,7 @@ import {
   Error as ErrorIcon,
 } from "@mui/icons-material";
 import { getProfile, changePassword } from "../../services/UserService";
-import ChangePasswordBreadCrumb from "../../components/BreadCrumb/ChangePasswordBreadCrumb";
+import AccountLayout from "../../components/BreadCrumb/AccountLayout";
 import "./ChangePassword.css";
 
 export default function ChangePassword() {
@@ -113,119 +111,90 @@ export default function ChangePassword() {
 
   return (
     <>
-      <ChangePasswordBreadCrumb />
-      <div className="change-password-container">
-        <aside className="sidebar">
-          <div className="user-info">
-            <div className="avatar-circle">
-              {user.name.charAt(0).toUpperCase() || <PersonIcon />}
-            </div>
-            <div className="user-name">{user.name}</div>
+      <AccountLayout user={user}>
+        <h1>
+          <SecurityIcon /> Đổi mật khẩu
+        </h1>
+        <p className="subtitle">
+          Đặt mật khẩu mới ít nhất 6 ký tự để bảo mật tài khoản.
+        </p>
+
+        {message && (
+          <div className={`alert ${alertType}`}>
+            {alertType === "success" ? <CheckCircleIcon /> : <ErrorIcon />}
+            <span>{message}</span>
           </div>
-          <ul className="nav-list">
-            <li>
-              <Link to="/user/profile">
-                <PersonIcon /> Thông tin
-              </Link>
-            </li>
-            <li className="active">
-              <Link to="/user/change-password">
-                <SecurityIcon /> Đổi mật khẩu
-              </Link>
-            </li>
-            <li>
-              <Link to="/track-order">
-                <ShoppingBagIcon /> Đơn hàng
-              </Link>
-            </li>
-          </ul>
-        </aside>
+        )}
 
-        <main className="main-panel">
-          <h1>
-            <SecurityIcon /> Đổi mật khẩu
-          </h1>
-          <p className="subtitle">
-            Đặt mật khẩu mới ít nhất 6 ký tự để bảo mật tài khoản.
-          </p>
-
-          {message && (
-            <div className={`alert ${alertType}`}>
-              {alertType === "success" ? <CheckCircleIcon /> : <ErrorIcon />}
-              <span>{message}</span>
+        <form className="password-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>
+              <LockIcon /> Mật khẩu hiện tại
+            </label>
+            <div className="input-wrap">
+              <input
+                type={showOld ? "text" : "password"}
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-btn"
+                onClick={() => setShowOld((v) => !v)}
+              >
+                {showOld ? <VisibilityOff /> : <Visibility />}
+              </button>
             </div>
-          )}
+          </div>
 
-          <form className="password-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label>
-                <LockIcon /> Mật khẩu hiện tại
-              </label>
-              <div className="input-wrap">
-                <input
-                  type={showOld ? "text" : "password"}
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="toggle-btn"
-                  onClick={() => setShowOld((v) => !v)}
-                >
-                  {showOld ? <VisibilityOff /> : <Visibility />}
-                </button>
-              </div>
+          <div className="form-group">
+            <label>
+              <LockIcon /> Mật khẩu mới
+            </label>
+            <div className="input-wrap">
+              <input
+                type={showNew ? "text" : "password"}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-btn"
+                onClick={() => setShowNew((v) => !v)}
+              >
+                {showNew ? <VisibilityOff /> : <Visibility />}
+              </button>
             </div>
+          </div>
 
-            <div className="form-group">
-              <label>
-                <LockIcon /> Mật khẩu mới
-              </label>
-              <div className="input-wrap">
-                <input
-                  type={showNew ? "text" : "password"}
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="toggle-btn"
-                  onClick={() => setShowNew((v) => !v)}
-                >
-                  {showNew ? <VisibilityOff /> : <Visibility />}
-                </button>
-              </div>
+          <div className="form-group">
+            <label>
+              <LockIcon /> Xác nhận mật khẩu
+            </label>
+            <div className="input-wrap">
+              <input
+                type={showConfirm ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="toggle-btn"
+                onClick={() => setShowConfirm((v) => !v)}
+              >
+                {showConfirm ? <VisibilityOff /> : <Visibility />}
+              </button>
             </div>
+          </div>
 
-            <div className="form-group">
-              <label>
-                <LockIcon /> Xác nhận mật khẩu
-              </label>
-              <div className="input-wrap">
-                <input
-                  type={showConfirm ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="button"
-                  className="toggle-btn"
-                  onClick={() => setShowConfirm((v) => !v)}
-                >
-                  {showConfirm ? <VisibilityOff /> : <Visibility />}
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className="btn primary">
-              Đổi mật khẩu
-            </button>
-          </form>
-        </main>
-      </div>
+          <button type="submit" className="btn primary">
+            Đổi mật khẩu
+          </button>
+        </form>
+      </AccountLayout>
     </>
   );
 }
