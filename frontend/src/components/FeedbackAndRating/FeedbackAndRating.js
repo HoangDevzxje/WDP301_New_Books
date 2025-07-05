@@ -74,8 +74,8 @@ const FeedbackAndRating = ({
                     </Typography>
                   </Box>
                   {userReview && userReview._id === review._id && (
-                    <IconButton 
-                      size="small" 
+                    <IconButton
+                      size="small"
                       onClick={(e) => handleMenuOpen(e, review)}
                       className="review-menu-button"
                     >
@@ -83,11 +83,11 @@ const FeedbackAndRating = ({
                     </IconButton>
                   )}
                 </Box>
-                
-                <Rating 
-                  value={review.rating} 
-                  precision={0.1} 
-                  readOnly 
+
+                <Rating
+                  value={review.rating}
+                  precision={0.1}
+                  readOnly
                   size="small"
                   className="review-rating"
                 />
@@ -200,21 +200,21 @@ const FeedbackAndRating = ({
             variant="outlined"
             onClick={() => setShowReviewForm(true)}
             className="review-button"
-            sx={{ 
-              borderColor: 'black', 
+            sx={{
+              borderColor: 'black',
               color: 'black',
-              '&:hover': { 
-                backgroundColor: 'black', 
+              '&:hover': {
+                backgroundColor: 'black',
                 color: 'white',
                 borderColor: 'black'
-              } 
+              }
             }}
           >
             Viết đánh giá
           </Button>
         </Box>
       )}
-     
+
       {/* Form gửi đánh giá */}
       {showReviewForm && (
         <Box className="submit-form">
