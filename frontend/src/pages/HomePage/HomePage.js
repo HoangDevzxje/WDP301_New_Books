@@ -175,7 +175,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
           <Button
             component={Link}
-            to="/books"
+            to="/shopAll"
             variant="contained"
             size="large"
             className="banner-button"

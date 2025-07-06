@@ -22,6 +22,9 @@ import Profile from "./pages/Profile/Profile.js";
 import EditProfile from "./pages/Profile/EditProfile.js";
 import AddressPage from "./pages/Profile/AddressPage.js";
 import ChangePassword from "./pages/Profile/ChangePassword.js";
+import OrderPage from "./pages/OrderPage/OrderPage.js";
+import OrderSuccessPage from "./pages/OrderSuccessPage/OrderSuccessPage.js";
+import ShopAll from "./pages/ShopAll/ShopAll.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -102,7 +105,7 @@ function App() {
         />
         <Route path="/account/register" element={<Register />} />
         <Route path="/" element={<HomePage />} />
-
+        <Route path="/shopAll" element={<ShopAll />} />
         <Route path="/book/:id" element={<BookDetail />} />
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/edit-profile" element={<EditProfile />} />
@@ -133,6 +136,18 @@ function App() {
             </UserOnlyRoute>
           }
         />
+        <Route path="/checkout" element={
+          <UserOnlyRoute>
+            <OrderPage />
+          </UserOnlyRoute>
+        } />
+
+        <Route path="/payment-success" element={
+          <UserOnlyRoute>
+            <OrderSuccessPage  />
+          </UserOnlyRoute>
+        } />
+
       </Routes>
 
       {!isAdminRoute && (
