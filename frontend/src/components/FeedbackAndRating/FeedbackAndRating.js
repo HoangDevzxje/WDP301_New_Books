@@ -67,7 +67,7 @@ const FeedbackAndRating = ({
                 <Box display="flex" justifyContent="space-between">
                   <Box>
                     <Typography className="review-user-name">
-                      {review.user.name}
+                      {review.user?.name}
                     </Typography>
                     <Typography className="review-date">
                       {new Date(review.createdAt).toLocaleDateString()}

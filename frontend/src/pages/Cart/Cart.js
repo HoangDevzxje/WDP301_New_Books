@@ -152,17 +152,17 @@ function Cart({ updateCartData }) {
             </Button>
           </Box>
         ) : (
-          <Box className="cart-content">
-            <Box className="cart-items-section">
-              <Box className="wishlist-header">
+        <Box sx={{mx: "auto", mt: 4}}>
+          <Box className="wishlist-header">
                 <Typography variant="h4" className="wishlist-main-title">
                     Giỏ hàng của bạn
                  </Typography>
                  <Typography variant="body2" className="wishlist-count">
                     {cartItems.length} sản phẩm
                  </Typography>
-              </Box>                     
-              
+              </Box>       
+          <Box className="cart-content">
+            <Box className="cart-items-section">
               <Card className="cart-table-card">
                 <CardContent className="cart-table-content">
                   <Table className="cart-table">
@@ -316,6 +316,8 @@ function Cart({ updateCartData }) {
               </Card>
             </Box>
           </Box>
+          </Box>
+
         )}
       </Container>
     </div>
