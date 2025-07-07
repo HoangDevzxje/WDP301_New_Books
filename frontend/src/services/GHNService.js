@@ -22,3 +22,10 @@ export const calculateFee = async (payload) => {
   });
   return response.data; // trả về data giống getBookRating()
 };
+
+// services/orderService.js
+export const getTrackingDetails = async (orderId) => {
+  const response = await axiosInstance.get(`/ghn/tracking/${orderId}`);
+  console.log("Tracking response:", response.data);
+  return response; // trả về {code, data: {...}, ...}
+};
