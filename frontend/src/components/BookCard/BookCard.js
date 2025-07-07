@@ -27,12 +27,6 @@ const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist 
   }, [book._id, book.averageRating]);
 
   useEffect(() => {
-    console.log(`BookCard ${book._id} re-render triggered by:`, {
-      bookId: book._id,
-      hoveredId,
-      wishlistIncludes: wishlist.includes(book._id),
-      rating,
-    });
     fetchRating();
   }, [fetchRating]);
   

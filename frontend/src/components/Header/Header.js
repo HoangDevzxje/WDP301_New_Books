@@ -35,7 +35,9 @@ import InputBase from "@mui/material/InputBase";
 import ImageIcon from "@mui/icons-material/Image";
 import { styled } from "@mui/material/styles";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import axios from "axios";
+import * as CategoryService from "../../services/CategoryService";
+import * as BookService from "../../services/BookService";
+import * as WishlistService from "../../services/WishlistService";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -147,7 +149,7 @@ const Header = ({
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get("http://localhost:9999/category/");
+      const response = await CategoryService.getCategories();
       if (response.data && Array.isArray(response.data)) {
         setCategories(response.data);
         if (response.data.length > 0) {
@@ -166,9 +168,7 @@ const Header = ({
     if (categoryBooks[categoryId]) return;
 
     try {
-      const response = await axios.get(
-        `http://localhost:9999/book/category/${categoryId}`
-      );
+      const response = await BookService.getBooksByCategory(categoryId);
       if (response.data) {
         const activeBooks = response.data.filter(
           (book) => book.isActivated !== false
@@ -196,7 +196,7 @@ const Header = ({
 
     const fetchBooks = async () => {
       try {
-        const response = await axios.get("http://localhost:9999/book/");
+        const response = await BookService.getBooks();
         const filteredBooks = response.data.filter((book) =>
           book.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
@@ -259,7 +259,6 @@ const Header = ({
 
     setUserMenuAnchorEl(null);
 
-    // Navigate to login page
     navigate("/account/login");
   };
 
@@ -293,7 +292,7 @@ const Header = ({
     handleClose();
   };
   const handleSearchSubmit = () => {
-    navigate(`/book-result?query=${encodeURIComponent(searchTerm)}`);
+    navigate(`/shopAll?query=${encodeURIComponent(searchTerm)}`);
   };
 
   const displayWishlistText =
@@ -595,8 +594,6 @@ const Header = ({
                                 className="custom-icon-button"
                                 component={Link}
                                 to={`/category/${activeCategory._id}`}
-                                variant="outlined"
-                                size="small"
                                 onClick={handleClose}
                               >
                                 <Typography variant="body2" className="custom-typography">
