@@ -21,9 +21,10 @@ export const createPayment = async (orderId) => {
   return response;
 };
 
-export const getPaymentReturn = async (queryParams = {}) => {
+export const getPaymentReturn = async (queryString = '') => {
+  const params = Object.fromEntries(new URLSearchParams(queryString));
   const response = await axiosInstance.get("/payment/return", {
-    params: queryParams,
+    params,
   });
   return response;
 };
