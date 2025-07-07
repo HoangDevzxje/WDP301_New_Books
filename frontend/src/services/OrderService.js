@@ -11,10 +11,9 @@ export const getMyOrders = async () => {
 };
 
 export const getOrderDetails = async (orderId) => {
-  const response = await axiosInstance.get(`/order/${orderId}`);
+  const response = await axiosInstance.get(`/order/details/${orderId}`);
   return response;
 };
-
 
 export const createPayment = async (orderId) => {
   const response = await axiosInstance.post("/payment/create", { orderId });
