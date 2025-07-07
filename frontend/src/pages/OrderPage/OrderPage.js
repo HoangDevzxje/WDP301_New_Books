@@ -917,7 +917,6 @@ function OrderPage() {
                     </Grid>
                   </Box>
 
-                  {/* Payment Method */}
                   <Box className="payment-paper">
                     <Typography variant="h6" gutterBottom className="payment-title">
                       Phương thức thanh toán
@@ -942,8 +941,7 @@ function OrderPage() {
                           control={<Radio className="custom-radio" />}
                           label={
                             <Box className="payment-method-with-icon">
-                              <Typography>Thanh toán trực tuyến </Typography>
-                              <AccountBalanceIcon />
+                              <Typography>Thanh toán trực tuyến (Online) </Typography>
                             </Box>
                           }
                         />
@@ -952,7 +950,6 @@ function OrderPage() {
                   </Box>
                 </Grid>
 
-                {/* Order Summary */}
                 <Grid size={4} >
                   <Box className="order-summary-paper">
                     <Typography variant="h6" gutterBottom className="order-summary-title">
@@ -1069,7 +1066,6 @@ function OrderPage() {
                       )}
                     </Box>
 
-                    {/* Points Section */}
                     {availablePoints > 0 && (
                       <Paper className="points-paper">
                         <Typography variant="h6" gutterBottom className="points-title">
