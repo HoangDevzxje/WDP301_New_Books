@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   Person as PersonIcon,
   Security as SecurityIcon,
-  ShoppingBag as ShoppingBagIcon,
+  Feedback,
   Home as HomeIcon,
 } from "@mui/icons-material";
 import "./AccountLayout.css";
@@ -42,11 +42,14 @@ export default function AccountLayout({ user, children }) {
               <HomeIcon /> Địa chỉ
             </Link>
           </li>
-          {/* <li className={location.pathname === "/track-order" ? "active" : ""}>
-            <Link to="/track-order">
-              <ShoppingBagIcon /> Đơn hàng
+          <li
+            className={location.pathname === "/user/complaint" ? "active" : ""}
+          >
+            <Link to="/user/complaint">
+              <Feedback />
+              Phản Ánh Khiếu Nại
             </Link>
-          </li> */}
+          </li>
         </ul>
       </aside>
       <main className="main-panel">{children}</main>
