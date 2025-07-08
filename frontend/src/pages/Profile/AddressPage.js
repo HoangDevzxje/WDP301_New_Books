@@ -272,7 +272,7 @@ export default function AddressesPage() {
     <AccountLayout user={user}>
       {!showForm && (
         <button className="btn btn-primary" onClick={() => setShowForm(true)}>
-          ➕ Thêm địa chỉ
+          + Thêm địa chỉ
         </button>
       )}
       <h2>
