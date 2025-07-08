@@ -1,0 +1,695 @@
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+  border-bottom: 3px solid #C49A6C;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.order-main-title {
+  color: #2c3e50 !important;
+  font-weight: 700 !important;
+  font-size: 2.2rem !important;
+  letter-spacing: -0.5px;
+  position: relative;
+}
+
+.order-container {
+  margin-top: 16px;
+  margin-bottom: 32px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 64px;
+}
+
+.centered-loading {
+  display: flex;
+  justify-content: center;
+  margin: 32px 0;
+}
+
+.login-prompt-container {
+  margin-top: 64px;
+}
+
+.login-prompt-paper {
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(196, 154, 108, 0.15);
+  border: 1px solid rgba(196, 154, 108, 0.2);
+}
+
+.login-prompt-text {
+  margin-bottom: 24px;
+  text-align: center;
+  color: #666;
+}
+
+.login-button-container {
+  margin-top: 16px;
+}
+
+.login-button-container .MuiButton-root {
+  background-color: #C49A6C;
+  padding: 12px 32px;
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 500;
+}
+
+.login-button-container .MuiButton-root:hover {
+  background-color: #B8906B;
+}
+
+.checkout-title {
+  margin-bottom: 24px;
+  color: #333;
+  font-weight: 600;
+  text-align: center;
+}
+
+.empty-cart-paper {
+  padding: 40px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.continue-shopping-button {
+  margin-top: 20px;
+  background-color: #C49A6C;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+}
+
+.continue-shopping-button:hover {
+  background-color: #B8906B;
+}
+
+.shipping-paper {
+  padding: 32px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #C49A6C;
+}
+
+.shipping-title {
+  margin-bottom: 24px !important;
+  color: #C49A6C;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.payment-paper {
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #C49A6C;
+}
+
+.custom-radio.Mui-checked {
+  color: #C49A6C !important; 
+}
+
+.payment-title {
+  margin-bottom: 20px;
+  color: #C49A6C;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.payment-method-box {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.payment-method-with-icon {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+}
+
+.order-summary-paper {
+  padding: 32px;
+  position: sticky;
+  top: 20px;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(196, 154, 108, 0.15);
+  border: 1px solid rgba(196, 154, 108, 0.2);
+}
+
+.order-summary-title {
+  margin-bottom: 20px !important;
+  color: #C49A6C;
+}
+
+.order-item {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background-color: #fafafa;
+  border: 1px solid #f0f0f0;
+}
+
+.order-item-image {
+  width: 60px;
+  height: 90px;
+  flex-shrink: 0;
+}
+
+.order-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.order-item-details {
+  margin-left: 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.order-item-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.order-item-quantity {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+}
+
+.order-item-price {
+  color: #C49A6C;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.discount-section {
+  margin-bottom: 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(196, 154, 108, 0.05) 0%, rgba(196, 154, 108, 0.02) 100%);
+  border-radius: 12px;
+  border: 1px solid rgba(196, 154, 108, 0.15);
+}
+
+.discount-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #C49A6C;
+  font-weight: 600;
+}
+
+.discount-title-icon {
+  margin-right: 8px;
+  font-size: 20px;
+}
+
+.applied-discount-container {
+  margin-top: 16px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(196, 154, 108, 0.1) 0%, rgba(196, 154, 108, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid #C49A6C;
+  position: relative;
+}
+
+.applied-discount-container::before {
+  content: "✓";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #C49A6C;
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.applied-discount-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.applied-discount-info .discount-code {
+  font-weight: bold;
+  color: #C49A6C;
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+}
+
+.applied-discount-info .discount-code-icon {
+  margin-right: 8px;
+  font-size: 18px;
+}
+
+.applied-discount-info .discount-amount {
+  color: #2e7d32;
+  font-weight: 600;
+  margin-top: 6px;
+  font-size: 1.05rem;
+}
+
+.applied-discount-info .discount-description {
+  color: #666;
+  margin-top: 4px;
+  font-size: 0.875rem;
+}
+
+.remove-discount-button {
+  min-width: 80px;
+  border-color: #C49A6C;
+  color: #C49A6C;
+  border-radius: 8px;
+}
+
+.remove-discount-button:hover {
+  background-color: rgba(196, 154, 108, 0.1);
+}
+
+/* Discount input */
+.discount-input-container {
+  margin-top: 16px;
+}
+
+.discount-input-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.discount-apply-button {
+  height: 40px;
+  width: 120px;
+  background-color: #C49A6C !important;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 500;
+  text-transform: none !important;
+}
+
+.discount-apply-button:hover {
+  background-color: #B8906B;
+}
+
+.discount-apply-button:disabled {
+  background-color: #e0e0e0;
+}
+
+/* Available discounts */
+.discount-toggle-container {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.discount-toggle-button {
+  text-transform: none;
+  padding: 8px 16px;
+  color: #aaaaaa !important;
+  border-radius: 8px;
+  font-weight: 500;
+  text-transform: none !important;
+}
+
+.discount-toggle-button:hover {
+  background-color: rgba(196, 154, 108, 0.1);
+}
+
+.discount-count {
+  margin-left: 8px;
+  color: #C49A6C;
+  font-weight: bold;
+  background-color: rgba(196, 154, 108, 0.1);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+}
+
+.discount-loading-center {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* Discount list */
+.discount-list {
+  width: 100%;
+  margin-top: 12px;
+  max-height: 280px;
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(196, 154, 108, 0.2);
+  background-color: white;
+}
+
+.discount-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.discount-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.discount-list::-webkit-scrollbar-thumb {
+  background: #C49A6C;
+  border-radius: 3px;
+}
+
+.discount-list-item {
+  border-left: 4px solid #C49A6C;
+  transition: all 0.2s ease;
+  padding: 16px;
+}
+
+.discount-list-item:hover {
+  background-color: rgba(196, 154, 108, 0.05);
+}
+
+.discount-item-content {
+  width: 100%;
+}
+
+.discount-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.discount-item-code {
+  font-weight: bold;
+  color: #C49A6C;
+  font-size: 1.05rem;
+}
+
+.discount-item-header .MuiButton-root {
+  background-color: #C49A6C;
+  color: white;
+  border-radius: 6px;
+  padding: 6px 16px;
+  font-size: 0.8rem;
+  text-transform: none;
+}
+
+.discount-item-header .MuiButton-root:hover {
+  background-color: #B8906B;
+}
+
+.discount-item-description {
+  color: #2e7d32;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.discount-item-min-order {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 4px;
+}
+
+.discount-item-expiry {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Points section */
+.points-paper {
+  padding: 24px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.05) 0%, rgba(255, 193, 7, 0.02) 100%);
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.points-title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  color: #ff8f00;
+  font-weight: 600;
+}
+
+.points-icon {
+  margin-right: 8px;
+  display: flex;
+  color: #ffc107;
+}
+
+.points-content {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.points-available {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.points-available-amount {
+  margin-left: 8px;
+  font-weight: bold;
+  color: #ff8f00;
+  font-size: 1.1rem;
+}
+
+.points-input-container {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 200px;
+}
+
+.points-savings {
+  margin-top: 12px;
+  color: #2e7d32;
+  font-weight: 500;
+  background-color: rgba(46, 125, 50, 0.1);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Order summary calculations */
+.summary-divider {
+  margin: 20px 0;
+  background-color: rgba(196, 154, 108, 0.2);
+}
+
+.summary-section {
+  margin-bottom: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 8px 0;
+  font-size: 1rem;
+}
+
+.summary-row:nth-child(even) {
+  background-color: rgba(196, 154, 108, 0.03);
+  margin: 0 -16px;
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+
+.summary-shipping-fee {
+  font-weight: 500;
+}
+
+.summary-discount {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.summary-points {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(196, 154, 108, 0.1) 0%, rgba(196, 154, 108, 0.05) 100%);
+  border-radius: 12px;
+  border: 2px solid #C49A6C;
+}
+
+.summary-total-amount {
+  color: #C49A6C;
+  font-weight: bold;
+  font-size: 1.3rem;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.back-to-cart-button {
+  font-size: 0.9rem;
+  color: #aaaaaa !important;
+  border-color: #ddd;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-transform: none !important;
+}
+
+.back-to-cart-button:hover {
+  background-color: #f5f5f5;
+  border-color: #C49A6C;
+  color: #C49A6C;
+}
+
+.place-order-button {
+  font-size: 1rem;
+  background-color: #C49A6C !important;
+  padding: 14px 32px;
+  border-radius: 8px;
+  text-transform: none;
+  font-weight: 600;
+  flex: 2;
+  box-shadow: 0 4px 12px rgba(196, 154, 108, 0.3);
+}
+
+.place-order-button:hover {
+  background-color: #B8906B !important;
+  box-shadow: 0 6px 16px rgba(196, 154, 108, 0.4);
+}
+
+.place-order-button:disabled {
+  background-color: #e0e0e0;
+  box-shadow: none;
+}
+
+.address-selection-paper{
+  margin-bottom: 20px;
+}
+
+.address-selection-title {
+  margin:0 0 10px 5px !important;
+  display: flex;
+  gap: 5px;
+  color: #2c3e50 !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+}
+
+.address-radio-group {
+  margin-left: 20px;
+  gap: 12px;
+}
+
+.address-option, .address-option-check {
+  align-items: flex-start;
+  margin-bottom: 0;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 8px;
+  padding: 12px;
+  margin-right: 0 !important;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.address-option:hover {
+  border-color: #C49A6C;
+  background-color: rgba(196, 154, 108, 0.02);
+}
+
+.address-option-check {
+  border-color: #C49A6C !important;
+  background-color: rgba(196, 154, 108, 0.05);
+}
+
+.address-selection-paper .MuiRadio-root.Mui-checked {
+  color: #C49A6C;
+}
+
+.address-label-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.address-name-phone {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.default-label {
+  background-color: #C49A6C;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  height: fit-content;
+}
+
+.address-full-text {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+
+/* Address Full Text */
+.address-full-text {
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.new-address-option {
+  padding: 0 12px 12px
+}
+
+.new-address-option .MuiTypography-root {
+  color: #C49A6C;
+  font-weight: 500;
+  font-size: 14px;
+}
