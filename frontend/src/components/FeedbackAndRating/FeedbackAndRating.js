@@ -1,143 +1,258 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
-  Rating,
   Card,
   CardContent,
+  Button,
+  Rating,
   IconButton,
   Menu,
   MenuItem,
-  Button,
-} from "@mui/material";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { Edit, Delete } from "@mui/icons-material";
-import "./FeedbackAndRating.css";
+  LinearProgress,
+  Divider,
+  Grid,
+  Avatar,
+  TextField
+} from '@mui/material';
+import {
+  MoreVert as MoreVertIcon,
+  Edit,
+  Delete,
+  Star,
+  StarBorder
+} from '@mui/icons-material';
+import './FeedbackAndRating.css';
 
-const FeedbackAndRating = ({
-  tabValue,
-  reviews,
-  averageRating,
-  userReview,
-  showReviewForm,
+const FeedbackAndRating = ({ 
+  reviews, 
+  averageRating, 
+  userReview, 
   hasReviewed,
+  tabValue,
   rating,
   comment,
   editingReview,
+  showReviewForm,
   anchorEl,
   selectedReview,
-  setEditingReview,
   setRating,
   setComment,
+  setEditingReview,
   setShowReviewForm,
+  handleSubmitReview,
+  handleSubmitEdit,
   handleMenuOpen,
   handleMenuClose,
   handleEdit,
-  handleDelete,
-  handleSubmitEdit,
-  handleSubmitReview,
+  handleDelete
 }) => {
+  const ratingDistribution = {
+    5: 0,
+    4: 0,
+    3: 0,
+    2: 0,
+    1: 0
+  };
+
+  reviews.forEach(review => {
+    const roundedRating = Math.round(review.rating);
+    if (roundedRating >= 1 && roundedRating <= 5) {
+      ratingDistribution[roundedRating]++;
+    }
+  });
+
+  const totalReviews = reviews.length;
+
   return (
-    <Box role="tabpanel" hidden={tabValue !== 1} id="tabpanel-1" className="feedback-panel">
-      {tabValue === 1 && reviews.length === 0 ? (
-        <Typography className="no-reviews-message">
-          Chưa có đánh giá nào cho sản phẩm này.
-        </Typography>
-      ) : (
+    <Box 
+      role="tabpanel" 
+      hidden={tabValue !== 1} 
+      id="tabpanel-1" 
+      className="feedback-panel"
+    >
+      {tabValue === 1 && (
         <>
-          <Typography variant="h6" className="average-rating">
-            Đánh giá trung bình:
-            <span className="rating-display">
-              <Rating
-                value={averageRating}
-                precision={0.1}
-                readOnly
-                className="rating-stars"
-              />
-            </span>
-            <span className="rating-text">
-              {averageRating.toFixed(1)} / 5
-            </span>
-          </Typography>
+          {reviews.length === 0 ? (
+            <Box className="no-reviews-container">
+              <StarBorder className="no-reviews-icon" />
+              <Typography variant="h6" className="no-reviews-title">
+                Chưa có đánh giá nào
+              </Typography>
+              <Typography className="no-reviews-subtitle">
+                Hãy là người đầu tiên đánh giá sản phẩm này
+              </Typography>
+            </Box>
+          ) : (
+            <Grid container spacing={3}>
+              <Grid size={4}>
+                <Card className="styled-rating" sx={{ position: 'sticky', top: '80px' }}>
+                  <CardContent className="rating-overview-content">
+                    <Typography variant="h6" className="overview-title">
+                      Đánh giá sản phẩm
+                    </Typography>
+                    
+                    <Box className="average-rating-display">
+                      <Typography variant="h2" className="average-rating-number">
+                        {averageRating.toFixed(1)}
+                      </Typography>
+                      <Box className="average-rating-stars">
+                        <Rating
+                          value={averageRating}
+                          precision={0.1}
+                          readOnly
+                          size="large"
+                          className="rating-stars"
+                        />
+                        <Typography className="total-reviews">
+                          {totalReviews} đánh giá
+                        </Typography>
+                      </Box>
+                    </Box>
 
-          {/* Render danh sách review */}
-          {reviews.map((review) => (
-            <Card key={review._id} className="review-card" variant="outlined">
-              <CardContent className="review-card-content">
-                <Box display="flex" justifyContent="space-between">
-                  <Box>
-                    <Typography className="review-user-name">
-                      {review.user?.name}
-                    </Typography>
-                    <Typography className="review-date">
-                      {new Date(review.createdAt).toLocaleDateString()}
-                    </Typography>
+                    <Divider className="gradient-divider" />
+
+                    <Box className="rating-distribution">
+                      {[5, 4, 3, 2, 1].map((star) => (
+                        <Box key={star} className="rating-row">
+                          <Box className="rating-row-label">
+                            <Typography variant="body2">
+                              {star}
+                            </Typography>
+                            <Star fontSize="small" className="star-icon" />
+                          </Box>
+                          <Box className="rating-progress-container">
+                            <LinearProgress
+                              variant="determinate"
+                              value={totalReviews > 0 ? (ratingDistribution[star] / totalReviews) * 100 : 0}
+                              className="rating-progress"
+                            />
+                          </Box>
+                          <Typography variant="body2" className="rating-count">
+                            {ratingDistribution[star]}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid size={{xs:12 , md:8}}>
+                <Box className="reviews-section">
+                  <Typography variant="h6" className="reviews-title">
+                    Bình luận từ khách hàng
+                  </Typography>
+                  
+                  <Box className="reviews-list">
+                    {reviews.map((review) => (
+                      <Card key={review._id} className="styled-card" variant="outlined">
+                        <CardContent className="review-card-content">
+                          <Box className="review-header">
+                            <Box className="review-user-info">
+                              <Avatar className="user-avatar">
+                                {review.user?.name?.charAt(0).toUpperCase()}
+                              </Avatar>
+                              <Box className="user-details">
+                                <Typography className="review-user-name">
+                                  {review.user?.name}
+                                </Typography>
+                                <Typography className="review-date">
+                                  {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                                </Typography>
+                              </Box>
+                            </Box>
+                            {userReview && userReview._id === review._id && (
+                              <IconButton
+                                size="small"
+                                onClick={(e) => handleMenuOpen(e, review)}
+                                className="review-menu-button"
+                              >
+                                <MoreVertIcon fontSize="small" />
+                              </IconButton>
+                            )}
+                          </Box>
+
+                          <Box className="review-rating-wrapper">
+                            <Rating
+                              value={review.rating}
+                              precision={0.1}
+                              readOnly
+                              size="small"
+                              className="rating-stars"
+                            />
+                          </Box>
+
+                          <Typography className="review-comment">
+                            {review.comment}
+                          </Typography>
+
+                          <Menu
+                            anchorEl={anchorEl}
+                            open={
+                              Boolean(anchorEl) &&
+                              selectedReview &&
+                              selectedReview._id === review._id
+                            }
+                            onClose={handleMenuClose}
+                            anchorOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                            transformOrigin={{
+                              vertical: 'top',
+                              horizontal: 'right',
+                            }}
+                            PaperProps={{
+                              elevation: 4,
+                              sx: {
+                                borderRadius: '8px',
+                                minWidth: '160px',
+                                boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)'
+                              }
+                            }}
+                          >
+                            <MenuItem
+                              onClick={() => {
+                                handleEdit(review);
+                                handleMenuClose();
+                              }}
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: '#f5f5f5'
+                                }
+                              }}
+                            >
+                              <Edit fontSize="small" sx={{ mr: 1 }} />
+                              Chỉnh sửa
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                handleDelete(review._id);
+                                handleMenuClose();
+                              }}
+                              sx={{
+                                '&:hover': {
+                                  backgroundColor: '#f5f5f5'
+                                }
+                              }}
+                            >
+                              <Delete fontSize="small" sx={{ mr: 1}} />
+                              Xóa
+                            </MenuItem>
+                          </Menu>
+                        </CardContent>
+                      </Card>
+                    ))}
                   </Box>
-                  {userReview && userReview._id === review._id && (
-                    <IconButton
-                      size="small"
-                      onClick={(e) => handleMenuOpen(e, review)}
-                      className="review-menu-button"
-                    >
-                      <MoreVertIcon fontSize="small" />
-                    </IconButton>
-                  )}
                 </Box>
+              </Grid>
+            </Grid>
+          )}
 
-                <Rating
-                  value={review.rating}
-                  precision={0.1}
-                  readOnly
-                  size="small"
-                  className="review-rating"
-                />
-                <Typography className="review-comment">
-                  {review.comment}
-                </Typography>
-
-                <Menu
-                  anchorEl={anchorEl}
-                  open={
-                    Boolean(anchorEl) &&
-                    selectedReview &&
-                    selectedReview._id === review._id
-                  }
-                  onClose={handleMenuClose}
-                  anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                  transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                  }}
-                >
-                  <MenuItem
-                    onClick={() => {
-                      handleEdit(review);
-                      handleMenuClose();
-                    }}
-                  >
-                    <Edit fontSize="small" sx={{ mr: 1 }} />
-                    Chỉnh sửa
-                  </MenuItem>
-                  <MenuItem
-                    onClick={() => {
-                      handleDelete(review._id);
-                      handleMenuClose();
-                    }}
-                  >
-                    <Delete fontSize="small" sx={{ mr: 1 }} />
-                    Xóa
-                  </MenuItem>
-                </Menu>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Form chỉnh sửa review */}
+          {/* Edit Review Form */}
           {editingReview && (
-            <Box className="edit-form">
+            <Box className="review-form-container">
               <Typography variant="h6" className="form-title">
                 Chỉnh sửa đánh giá
               </Typography>
@@ -151,14 +266,16 @@ const FeedbackAndRating = ({
                     setEditingReview({ ...editingReview, rating: newValue })
                   }
                   precision={1}
-                  className="form-rating"
+                  className="rating-stars"
                 />
               </Box>
               <Box className="form-field">
                 <Typography className="form-label">
                   Nhận xét:
                 </Typography>
-                <textarea
+                <TextField
+                  multiline
+                  rows={4}
                   value={editingReview.comment}
                   onChange={(e) =>
                     setEditingReview({
@@ -166,9 +283,9 @@ const FeedbackAndRating = ({
                       comment: e.target.value,
                     })
                   }
-                  rows="4"
-                  className="form-textarea"
                   placeholder="Viết nhận xét của bạn..."
+                  fullWidth
+                  className="review-textarea"
                 />
               </Box>
               <Box className="form-buttons">
@@ -181,87 +298,75 @@ const FeedbackAndRating = ({
                 </Button>
                 <Button
                   variant="contained"
+                  className="review-button"
                   onClick={handleSubmitEdit}
-                  className="submit-button"
-                  sx={{ backgroundColor: 'black', '&:hover': { backgroundColor: '#333' } }}
                 >
                   Lưu đánh giá
                 </Button>
               </Box>
             </Box>
           )}
+
+          {!hasReviewed && !editingReview && !showReviewForm && (
+            <Box className="review-button-container">
+              <Button
+                variant="contained"
+                className="review-button"
+                onClick={() => setShowReviewForm(true)}
+              >
+                Viết đánh giá
+              </Button>
+            </Box>
+          )}
+
+          {showReviewForm && (
+            <Box className="review-form-container">
+              <Typography variant="h6" className="form-title">
+                Đánh giá sản phẩm
+              </Typography>
+              <Box className="form-field">
+                <Typography className="form-label">
+                  Đánh giá của bạn:
+                </Typography>
+                <Rating
+                  value={rating}
+                  onChange={(e, newValue) => setRating(newValue)}
+                  precision={1}
+                  className="rating-stars"
+                />
+              </Box>
+              <Box className="form-field">
+                <Typography className="form-label">
+                  Nhận xét:
+                </Typography>
+                <TextField  
+                  multiline
+                  rows={4}
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Viết nhận xét của bạn..."
+                  fullWidth
+                  className="review-textarea"
+                />
+              </Box>
+              <Box className="form-buttons">
+                <Button
+                  className="cancel-button"
+                  onClick={() => setShowReviewForm(false)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  variant="contained"
+                  className="review-button"
+                  onClick={handleSubmitReview}
+                >
+                  Gửi đánh giá
+                </Button>
+              </Box>
+            </Box>
+          )}
         </>
-      )}
-
-      {/* Nút mở form đánh giá nếu user chưa đánh giá */}
-      {!hasReviewed && (
-        <Box className="review-button-container">
-          <Button
-            variant="outlined"
-            onClick={() => setShowReviewForm(true)}
-            className="review-button"
-            sx={{
-              borderColor: 'black',
-              color: 'black',
-              '&:hover': {
-                backgroundColor: 'black',
-                color: 'white',
-                borderColor: 'black'
-              }
-            }}
-          >
-            Viết đánh giá
-          </Button>
-        </Box>
-      )}
-
-      {/* Form gửi đánh giá */}
-      {showReviewForm && (
-        <Box className="submit-form">
-          <Typography variant="h6" className="form-title">
-            Đánh giá sản phẩm
-          </Typography>
-          <Box className="form-field">
-            <Typography className="form-label">
-              Rating  của bạn:
-            </Typography>
-            <Rating
-              value={rating}
-              onChange={(e, newValue) => setRating(newValue)}
-              precision={1}
-              className="form-rating"
-            />
-          </Box>
-          <Box className="form-field">
-            <Typography className="form-label">
-              Nhận xét:
-            </Typography>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              rows="4"
-              className="form-textarea"
-              placeholder="Viết nhận xét của bạn..."
-            />
-          </Box>
-          <Box className="form-buttons">
-            <Button
-              variant="outlined"
-              className="cancel-button"
-              onClick={() => setShowReviewForm(false)}
-            >
-              Hủy
-            </Button>
-            <Button
-              variant="contained"
-              onClick={handleSubmitReview}
-              className="submit-button"
-              sx={{ backgroundColor: 'black', '&:hover': { backgroundColor: '#333' } }}
-            >
-              Gửi đánh giá
-            </Button>
-          </Box>
-        </Box>
       )}
     </Box>
   );
