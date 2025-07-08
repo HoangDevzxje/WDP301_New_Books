@@ -104,7 +104,6 @@
   box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.2);
 }
 
-/* Nút và action */
 .form-actions {
   text-align: right;
   margin-top: 24px;
@@ -134,7 +133,6 @@
   background: #135ba1;
 }
 
-/* Thông báo lỗi / thành công */
 .error-message {
   color: #d32f2f;
   margin-top: -8px;

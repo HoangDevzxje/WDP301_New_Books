@@ -25,7 +25,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import NoBackpackIcon from "@mui/icons-material/NoBackpack";
 import FlagIcon from "@mui/icons-material/Flag";
 import RoomIcon from "@mui/icons-material/Room";
@@ -303,15 +303,11 @@ const Header = ({
 
   return (
     <Box className="sticky-header">
-      <div className="nav-bar-container" >
+      <div className="nav-bar-container">
         <Box className="nav-bar">
           <div className="nav-logo">
             <img src="/NB (2).png" alt="logo" />
-            <Typography
-              component={Link}
-              to="/"
-              className="logo-text"
-            >
+            <Typography component={Link} to="/" className="logo-text">
               NewBooks
             </Typography>
           </div>
@@ -372,21 +368,19 @@ const Header = ({
           </div>
 
           <div className="nav-buttons">
-            
             {userEmail ? (
               <Box
                 className="user-menu-container"
                 onMouseEnter={handleUserMenuMouseEnter}
                 onMouseLeave={handleUserMenuMouseLeave}
               >
-                <Button
-                  className="custom-icon-button"
-                >
+                <Button className="custom-icon-button">
                   <PersonPinOutlinedIcon className="custom-icon" />
                   <Typography
                     variant="body2"
                     className="cart-text custom-typography"
-                    component={Link} to="/user/profile"
+                    component={Link}
+                    to="/user/profile"
                   >
                     {userEmail.split("@")[0]}
                   </Typography>
@@ -416,7 +410,24 @@ const Header = ({
                         >
                           Tài khoản của tôi
                         </MenuItem>
-                        <MenuItem onClick={handleLogout} className="user-menu-item">
+                        <MenuItem
+                          component={Link}
+                          to="/user/complaint"
+                          className="user-menu-item"
+                        >
+                          Phản ánh khiếu nại
+                        </MenuItem>
+                        <MenuItem
+                          component={Link}
+                          to="/user/refund"
+                          className="user-menu-item"
+                        >
+                          Chính Sách Hoàn Trả Sách
+                        </MenuItem>
+                        <MenuItem
+                          onClick={handleLogout}
+                          className="user-menu-item"
+                        >
                           Thoát tài khoản
                         </MenuItem>
                       </Box>
@@ -427,7 +438,8 @@ const Header = ({
             ) : (
               <Button
                 className="custom-icon-button"
-                component={Link} to="/account/login"
+                component={Link}
+                to="/account/login"
               >
                 <PersonPinOutlinedIcon className="custom-icon" />
                 <Typography
@@ -439,19 +451,21 @@ const Header = ({
               </Button>
             )}
 
-             <Button
-                className="custom-icon-button"
-                component={Link} to="/user/cart"
-              >
-                <AddShoppingCartIcon className="custom-icon" />
-              </Button>
+            <Button
+              className="custom-icon-button"
+              component={Link}
+              to="/user/cart"
+            >
+              <AddShoppingCartIcon className="custom-icon" />
+            </Button>
 
-              <Button
-                className="custom-icon-button"
-                component={Link} to="/user/wishlist"
-              > 
-                <FavoriteBorderIcon className="custom-icon" />
-              </Button>   
+            <Button
+              className="custom-icon-button"
+              component={Link}
+              to="/user/wishlist"
+            >
+              <FavoriteBorderIcon className="custom-icon" />
+            </Button>
 
             <Box className="more-menu-container">
               <Button onClick={handleOpenMenu}>
@@ -488,10 +502,7 @@ const Header = ({
 
       <Container maxWidth="lg" className="dropdown">
         <Box className="dropdown-container">
-          <Box
-            className="dropdown-trigger"
-            onMouseLeave={handleClose}
-          >
+          <Box className="dropdown-trigger" onMouseLeave={handleClose}>
             <Popper
               open={open}
               anchorEl={anchorEl}
@@ -500,10 +511,8 @@ const Header = ({
               className="dropdown-popper"
             >
               {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350} >
-                  <Paper
-                    className="dropdown-paper"
-                  >
+                <Fade {...TransitionProps} timeout={350}>
+                  <Paper className="dropdown-paper">
                     <Box className="dropdown-content">
                       <Box className="category-list">
                         {isLoading ? (
@@ -516,11 +525,12 @@ const Header = ({
                               key={category._id}
                               onClick={() => handleCategoryClick2(category._id)}
                               onMouseEnter={() => handleCategoryHover(category)}
-                              className={`category-menu-item ${activeCategory &&
+                              className={`category-menu-item ${
+                                activeCategory &&
                                 activeCategory._id === category._id
-                                ? "active"
-                                : ""
-                                }`}
+                                  ? "active"
+                                  : ""
+                              }`}
                             >
                               {category.name}
                             </MenuItem>
@@ -535,10 +545,7 @@ const Header = ({
                       <Box className="books-display">
                         {activeCategory ? (
                           <>
-                            <Typography
-                              variant="h6"
-                              className="category-title"
-                            >
+                            <Typography variant="h6" className="category-title">
                               {activeCategory.name}
                             </Typography>
 
@@ -564,7 +571,8 @@ const Header = ({
                                               className="book-image2"
                                               onError={(e) => {
                                                 e.target.onerror = null;
-                                                e.target.src = "/placeholder.jpg";
+                                                e.target.src =
+                                                  "/placeholder.jpg";
                                               }}
                                             />
                                           </Box>
@@ -579,12 +587,18 @@ const Header = ({
                                     ))}
                                 </Grid>
                               ) : (
-                                <Typography variant="body2" className="no-books-text">
+                                <Typography
+                                  variant="body2"
+                                  className="no-books-text"
+                                >
                                   Không có sách nào trong danh mục này
                                 </Typography>
                               )
                             ) : (
-                              <Typography variant="body2" className="loading-books-text">
+                              <Typography
+                                variant="body2"
+                                className="loading-books-text"
+                              >
                                 Đang tải sách...
                               </Typography>
                             )}
@@ -596,14 +610,20 @@ const Header = ({
                                 to={`/category/${activeCategory._id}`}
                                 onClick={handleClose}
                               >
-                                <Typography variant="body2" className="custom-typography">
+                                <Typography
+                                  variant="body2"
+                                  className="custom-typography"
+                                >
                                   Xem tất cả
                                 </Typography>
                               </Button>
                             </Box>
                           </>
                         ) : (
-                          <Typography variant="body1" className="select-category-text">
+                          <Typography
+                            variant="body1"
+                            className="select-category-text"
+                          >
                             Vui lòng chọn danh mục để xem sách
                           </Typography>
                         )}

@@ -27,6 +27,9 @@ import OrderSuccessPage from "./pages/OrderSuccessPage/OrderSuccessPage.js";
 import ShopAll from "./pages/ShopAll/ShopAll.js";
 import TrackOrderPage from "./pages/TrackOrder/TrackOrderPage.js";
 import OrderDetailPage from "./pages/TrackOrder/OrderDetailPage.js";
+import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.js";
+import ComplaintPage from "./pages/ComplaintPage/ComplaintPage.js";
+import Refund from "./pages/Refund/Refund.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -56,6 +59,21 @@ const UserOnlyRoute = ({ children }) => {
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
+
+  const noFooterRoutes = [
+    "/user/profile",
+    "/user/change-password",
+    "/user/addresses",
+    "/user/complaint",
+    "/user/refund",
+    "/track-order",
+  ];
+
+  const shouldHideFooter = noFooterRoutes.some(
+    (route) =>
+      location.pathname === route || location.pathname.startsWith(route + "/")
+  );
+
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -100,7 +118,6 @@ function App() {
           </Route>
           <Route path="orders" element={<OrderManagement />} />
         </Route>
-
         <Route
           path="/account/login"
           element={<Login onLoginSuccess={updateUserEmail} />}
@@ -112,7 +129,9 @@ function App() {
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/edit-profile" element={<EditProfile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
-
+        <Route path="/account/forgotpassword" element={<ForgotPassword />} />
+        <Route path="/user/complaint" element={<ComplaintPage />} />
+        <Route path="/user/refund" element={<Refund />} />
         <Route
           path="/user/change-password"
           element={
@@ -129,7 +148,6 @@ function App() {
             </UserOnlyRoute>
           }
         />
-
         <Route
           path="/user/cart"
           element={
@@ -162,7 +180,6 @@ function App() {
             </UserOnlyRoute>
           }
         />
-
         <Route
           path="/payment-success"
           element={
@@ -173,7 +190,7 @@ function App() {
         />
       </Routes>
 
-      {!isAdminRoute && (
+      {!isAdminRoute && !shouldHideFooter && (
         <>
           <Footer />
           <Chatbot />
