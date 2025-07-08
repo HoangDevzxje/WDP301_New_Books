@@ -1,0 +1,118 @@
+.book-management-container {
+  width: 95%;
+  margin: auto;
+}
+
+.book-management-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.header-icon {
+  font-size: 40px;
+  color: #2c3e50;
+}
+
+.header-title {
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.search-controls {
+  display: flex;
+  margin-bottom: 16px;
+}
+
+.add-book-button {
+  padding: 0;
+  width: 17%;
+}
+
+.book-table-container {
+  border-radius: 8px;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+
+.table-head {
+  background-color: #2c3e50;
+}
+
+.table-head .MuiTableCell-root {
+  color: #fff;
+  font-weight: 700;
+}
+
+.header-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-row:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.table-row:hover {
+  background-color: #f0f0f0;
+}
+
+.book-image {
+  width: 50px;
+  height: 50px;
+  cursor: pointer;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.book-title {
+  font-weight: 500;
+}
+
+.category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.category-chip {
+  background-color: #e0e0e0;
+}
+
+.edit-button:hover {
+  background-color: rgba(0, 0, 255, 0.1);
+}
+
+.delete-button:hover {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.pagination {
+  border-top: 1px solid #e0e0e0;
+}
+
+.pagination .MuiTablePagination-selectLabel,
+.pagination .MuiTablePagination-displayedRows {
+  font-weight: 500;
+}
+
+.dialog-image {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.category-buttons {
+  margin-top: 16px;
+}
+
+.snackbar {
+  top: 16px;
+  right: 16px;
+}
+.book-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+}
