@@ -14,7 +14,7 @@
   width: 48px;
   height: 48px;
   border: 5px solid #ddd;
-  border-top-color: #1976d2;
+  border-top-color: #c49a6c;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -43,7 +43,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 16px;
-  background: #1976d2;
+  background: #c49a6c;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -61,25 +61,24 @@
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  border: 1px solid #1976d2;
+  border: 1px solid #c49a6c;
   background: #fff;
-  color: #1976d2;
+  color: #c49a6c;
   text-decoration: none;
   border-radius: 4px;
   font-size: 0.9rem;
 }
 .btn.primary {
-  background: #1976d2;
+  background: #c49a6c;
   color: #fff;
 }
 .btn:hover {
   background: #f0f0f0;
 }
 .btn.primary:hover {
-  background: #135ba1;
+  background: #c49a6c;
 }
 
-/* Layout chính */
 .profile-container {
   display: flex;
   flex-wrap: wrap;
@@ -103,7 +102,6 @@
   padding: 24px;
 }
 
-/* Avatar & tên */
 .profile-avatar {
   text-align: center;
   margin-bottom: 24px;
@@ -112,7 +110,7 @@
   width: 80px;
   height: 80px;
   margin: 0 auto 8px;
-  background: #1976d2;
+  background: #c49a6c;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -128,13 +126,12 @@
   display: inline-block;
   margin-top: 4px;
   font-size: 0.85rem;
-  color: #1976d2;
-  border: 1px solid #1976d2;
+  color: #c49a6c;
+  border: 1px solid #c49a6c;
   padding: 2px 8px;
   border-radius: 12px;
 }
 
-/* Sidebar nav */
 .profile-nav {
   list-style: none;
 }
@@ -153,10 +150,9 @@
 .profile-nav .nav-item a:hover,
 .profile-nav .nav-item.active a {
   background: #f0f0f0;
-  color: #1976d2;
+  color: #c49a6c;
 }
 
-/* Main content header */
 .profile-header {
   display: flex;
   justify-content: space-between;
@@ -172,8 +168,8 @@
   align-items: center;
   gap: 4px;
   padding: 6px 12px;
-  color: #1976d2;
-  border: 1px solid #1976d2;
+  color: #c49a6c;
+  border: 1px solid #c49a6c;
   border-radius: 4px;
   text-decoration: none;
   font-size: 0.9rem;

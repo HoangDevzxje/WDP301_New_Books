@@ -2,12 +2,8 @@ require("dotenv").config();
 const axios = require("axios");
 const Order = require("../models/Order");
 const Book = require("../models/Book");
-const {
-  GHN_API_URL,
-  GHN_TOKEN,
-  GHN_SHOP_ID,
-  GHN_SERVICE_TYPE_NHE,
-} = process.env;
+const { GHN_API_URL, GHN_TOKEN, GHN_SHOP_ID, GHN_SERVICE_TYPE_NHE } =
+  process.env;
 const getProvince = async (req, res) => {
   try {
     const response = await axios.get(`${GHN_API_URL}/master-data/province`, {
@@ -80,7 +76,9 @@ const calculateFee = async (req, res) => {
     const { to_ward_code, to_district_id, insurance_value, weight } = req.query; // Dùng query thay vì body
 
     if (!to_ward_code || !to_district_id || !insurance_value || !weight) {
-      return res.status(400).json({ message: "Thiếu thông tin tính phí vận chuyển" });
+      return res
+        .status(400)
+        .json({ message: "Thiếu thông tin tính phí vận chuyển" });
     }
 
     const response = await axios.get(`${GHN_API_URL}/v2/shipping-order/fee`, {
@@ -98,21 +96,27 @@ const calculateFee = async (req, res) => {
     });
 
     if (!response.data || !response.data.data) {
-      return res.status(400).json({ message: "Không nhận được dữ liệu phí vận chuyển" });
+      return res
+        .status(400)
+        .json({ message: "Không nhận được dữ liệu phí vận chuyển" });
     }
 
     res.json(response.data);
   } catch (error) {
-    console.error("GHN Fee Calculation Error:", error.response?.data || error.message);
+    console.error(
+      "GHN Fee Calculation Error:",
+      error.response?.data || error.message
+    );
     res.status(500).json({ message: "Lỗi khi tính phí vận chuyển" });
   }
 };
 
-
 const confirmOrder = async (req, res) => {
   try {
     const orderId = req.params.id;
-    const order = await Order.findById(orderId).populate("items.book", "stock").populate("discountUsed");
+    const order = await Order.findById(orderId)
+      .populate("items.book", "stock")
+      .populate("discountUsed");
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
@@ -121,19 +125,26 @@ const confirmOrder = async (req, res) => {
       return res.status(400).json({ message: "Đơn hàng đã được xác nhận" });
     }
 
-    if(order.paymentStatus !== "Completed"){
+    if (
+      order.paymentMethod === "Online" &&
+      order.paymentStatus !== "Completed"
+    ) {
       return res.status(400).json({ message: "Đơn hàng chưa được thanh toán" });
     }
 
     if (order.boxInfo === null) {
-      return res.status(400).json({ message: "Vui lòng nhập thông tin (weight, length, width, height)"});
+      return res.status(400).json({
+        message: "Vui lòng nhập thông tin (weight, length, width, height)",
+      });
     }
 
     let totalValue = 0;
     for (const item of order.items) {
       const book = item.book;
       if (book.stock < item.quantity) {
-        return res.status(400).json({ message: `Sách "${book.title}" không đủ hàng!` });
+        return res
+          .status(400)
+          .json({ message: `Sách "${book.title}" không đủ hàng!` });
       }
       totalValue += item.price * item.quantity;
     }
@@ -192,13 +203,41 @@ const confirmOrder = async (req, res) => {
         })
       );
       await order.save();
-      res.status(200).json({ message: "Xác nhận đơn hàng thành công", orderCode });
+      res
+        .status(200)
+        .json({ message: "Xác nhận đơn hàng thành công", orderCode });
     } else {
       res.status(400).json({ message: dataResponse?.message });
     }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error?.response?.data?.message });
+  }
+};
+const getTrackingDetails = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId);
+    if (!order || !order.trackingNumber)
+      return res
+        .status(404)
+        .json({ message: "Không tìm thấy đơn hoặc chưa có mã GHN" });
+
+    // GHN API: /v2/shipping-order/detail
+    const ghRes = await axios.get(`${GHN_API_URL}/v2/shipping-order/detail`, {
+      params: { order_code: order.trackingNumber },
+      headers: { Token: GHN_TOKEN, ShopId: GHN_SHOP_ID },
+    });
+
+    const data = ghRes.data; // GHN trả về {code, message, data}
+    // (tuỳ ý) cập nhật nhanh trạng thái vào DB cho các lần hiển thị sau
+    order.shippingStatus = data?.data?.status_name || order.shippingStatus;
+    await order.save({ validateBeforeSave: false });
+
+    return res.json(data);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Lỗi lấy trạng thái GHN" });
   }
 };
 
@@ -208,5 +247,6 @@ const ghnController = {
   getWard,
   calculateFee,
   confirmOrder,
+  getTrackingDetails,
 };
 module.exports = ghnController;

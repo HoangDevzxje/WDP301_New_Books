@@ -6,6 +6,7 @@ const adminBookController = require("../controllers/AdminBookController");
 const adminFeedbackController = require("../controllers/AdminFeedbackController");
 const adminDiscountController = require("../controllers/AdminDiscountController");
 const adminDashboardController = require("../controllers/AdminDashBoardController");
+const adminComplaintController = require("../controllers/AdminComplaintController");
 const { confirmOrder } = require("../controllers/GhnController");
 const router = express.Router();
 
@@ -57,6 +58,11 @@ router.post("/discounts", checkAuthorize(["admin"]), adminDiscountController.cre
 router.put("/discounts/:id", checkAuthorize(["admin"]), adminDiscountController.updatedDiscount);
 router.put("/discounts/:id/change-status", checkAuthorize(["admin"]), adminDiscountController.changeStatusDiscount);
 router.delete("/discounts/:id", checkAuthorize(["admin"]), adminDiscountController.deleteDiscount);
+
+// Quản lý khiếu nại
+router.get("/complaints", checkAuthorize(["admin"]), adminComplaintController.getAllComplaints);
+router.put("/complaints/:id", checkAuthorize(["admin"]), adminComplaintController.updateComplaintStatus);
+
 
 //Quản lý DashBoard
 router.get("/dashboard", checkAuthorize(["admin"]), adminDashboardController.getAdminDashboardStats);

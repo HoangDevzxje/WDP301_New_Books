@@ -39,7 +39,7 @@ h2 {
 }
 
 .address-item.default {
-  border-color: #0d6efd;
+  border-color: #c49a6c !important;
   background-color: #eaf2ff;
 }
 
@@ -51,7 +51,7 @@ h2 {
 }
 
 .badge {
-  background-color: #0d6efd;
+  background-color: #c49a6c !important;
   color: white;
   padding: 3px 8px;
   border-radius: 6px;
@@ -87,7 +87,7 @@ h2 {
 }
 
 .input:focus {
-  border-color: #0d6efd;
+  border-color: #c49a6c !important;
   outline: none;
   background-color: #f9fcff;
 }
@@ -112,12 +112,12 @@ h2 {
 }
 
 .btn-primary {
-  background-color: #0d6efd;
-  color: white;
+  background-color: white;
+  color: #c49a6c !important;
 }
 
 .btn-primary:hover {
-  background-color: #0b5ed7;
+  background-color: white;
 }
 
 .btn-secondary {

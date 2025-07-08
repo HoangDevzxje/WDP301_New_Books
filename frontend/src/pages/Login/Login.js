@@ -159,8 +159,7 @@ function Login({ onLoginSuccess }) {
           axios
             .post("http://localhost:9999/auth/facebook-auth", { accessToken })
             .then((res) => {
-              const { accessToken: token, email, role } = res.data;
-
+              const { accessTokenLogin: token, email, role } = res.data;
               const storageMethod = formData.rememberMe
                 ? localStorage
                 : sessionStorage;

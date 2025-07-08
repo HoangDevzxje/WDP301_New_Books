@@ -84,7 +84,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           if (response.data && response.data.wishlist) {
             const wishlistIds = response.data.wishlist.map((book) => book._id);
             setWishlist(wishlistIds);
-           console.log("Wishlist IDs:", wishlistIds);
+          //  console.log("Wishlist IDs:", wishlistIds);
           }
         })
         .catch((error) =>
@@ -175,7 +175,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
           <Button
             component={Link}
-            to="/books"
+            to="/shopAll"
             variant="contained"
             size="large"
             className="banner-button"
