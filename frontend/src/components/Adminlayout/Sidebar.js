@@ -44,9 +44,9 @@ const Sidebar = ({ isSidebarOpen }) => {
     //   link: "/admin/reports",
     // },
     {
-      text: "Quản lý đánh giá",
+      text: "Quản lý khiếu nại",
       icon: <FeedbackIcon />,
-      link: "/admin/feedbacks",
+      link: "/admin/complaints",
     },
   ];
 
