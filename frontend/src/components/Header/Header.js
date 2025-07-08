@@ -410,20 +410,7 @@ const Header = ({
                         >
                           Tài khoản của tôi
                         </MenuItem>
-                        <MenuItem
-                          component={Link}
-                          to="/user/complaint"
-                          className="user-menu-item"
-                        >
-                          Phản ánh khiếu nại
-                        </MenuItem>
-                        <MenuItem
-                          component={Link}
-                          to="/user/refund"
-                          className="user-menu-item"
-                        >
-                          Chính Sách Hoàn Trả Sách
-                        </MenuItem>
+
                         <MenuItem
                           onClick={handleLogout}
                           className="user-menu-item"
@@ -478,11 +465,21 @@ const Header = ({
                 onClose={handleCloseMenu}
                 className="more-menu"
               >
-                <MenuItem onClick={handleCloseMenu} className="more-menu-item">
-                  <NoBackpackIcon className="more-menu-icon" />
+                <MenuItem
+                  onClick={handleCloseMenu}
+                  component={Link}
+                  to="/user/refund"
+                  className="more-menu-item user-menu-item"
+                >
+                  <FlagIcon className="more-menu-icon" />
                   Hoàn trả sách
                 </MenuItem>
-                <MenuItem onClick={handleCloseMenu} className="more-menu-item">
+                <MenuItem
+                  onClick={handleCloseMenu}
+                  component={Link}
+                  to="/user/complaint"
+                  className="more-menu-item user-menu-item"
+                >
                   <FlagIcon className="more-menu-icon" />
                   Phản ánh khiếu nại
                 </MenuItem>

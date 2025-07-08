@@ -23,7 +23,7 @@
 .avatar-circle {
   width: 64px;
   height: 64px;
-  background-color: #187bcd;
+  background-color: #c49a6c !important;
   color: white;
   border-radius: 50%;
   display: flex;
@@ -55,17 +55,24 @@
   gap: 6px;
   padding: 8px 12px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, color 0.2s;
 }
 
-.nav-list li a:hover {
-  background-color: #e3f2fd;
+/* Inherit color for SVG icons */
+.nav-list li a svg {
+  color: inherit !important;
 }
 
+/* Hover and active states */
+.nav-list li a:hover,
 .nav-list li.active a {
-  font-weight: bold;
-  color: #187bcd;
-  background-color: #e3f2fd;
+  background-color: #c49a6c !important;
+  color: #fff !important;
+}
+
+.nav-list li a:hover svg,
+.nav-list li.active a svg {
+  color: #fff !important;
 }
 
 .main-panel {
@@ -75,6 +82,17 @@
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   min-height: 400px;
+}
+
+/* Override MUI outlined-primary buttons */
+.MuiButton-outlinedPrimary {
+  border-color: #c49a6c !important;
+  color: #c49a6c !important;
+}
+.MuiButton-outlinedPrimary:hover {
+  background-color: #c49a6c !important;
+  border-color: #c49a6c !important;
+  color: #fff !important;
 }
 
 @media (max-width: 768px) {

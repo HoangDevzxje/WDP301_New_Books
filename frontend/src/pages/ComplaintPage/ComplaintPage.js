@@ -154,15 +154,13 @@ const ComplaintPage = () => {
 
   return (
     <div className="container">
-      <h1 className="title">
-        <Feedback style={{ color: "#1976d2" }} /> Phản ánh khiếu nại
-      </h1>
+      <h1 className="title">Phản ánh khiếu nại</h1>
 
       <div className="grid">
         <div className="left">
           <div className="card">
             <h3 className="title">
-              <ReportProblem style={{ color: "#f57c00" }} /> Gửi phản ánh
+              <ReportProblem style={{ color: "#C49A6C" }} /> Gửi phản ánh
             </h3>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -210,7 +208,7 @@ const ComplaintPage = () => {
         <div className="right">
           <div className="card">
             <h3 className="title">
-              <History style={{ color: "#2196f3" }} /> Lịch sử phản ánh
+              <History style={{ color: "#C49A6C" }} /> Lịch sử phản ánh
             </h3>
             {complaints.length > 0 ? (
               complaints.map((item) => (
