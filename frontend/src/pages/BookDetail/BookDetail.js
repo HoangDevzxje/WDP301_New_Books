@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Typography,
   Box,
@@ -65,6 +65,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const [slideDirection, setSlideDirection] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const fullDescRef = useRef(null);
   useEffect(() => {
     setLoading(true);
     getBookById(id).then((response) => {
@@ -134,7 +135,24 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
     ]);
   };
 
+  const handleViewMore = () => {
+    const element = fullDescRef.current;
 
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      const offsetTop = window.scrollY + rect.top;
+
+      const screenHeight = window.innerHeight;
+      const elementHeight = element.offsetHeight;
+
+      const scrollTo = offsetTop - (screenHeight / 2) + (elementHeight / 2);
+
+      window.scrollTo({
+        top: scrollTo,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   const handleSubmitReview = async () => {
     const token = getToken();
@@ -558,10 +576,10 @@ return (
           </Box>
 
           {/* sách Description */}
-          <Typography variant="body2" gutterBottom className="book-description">
-            {book.description}
-          </Typography>
-
+            <Typography variant="body2" gutterBottom className="book-description">
+              {book.description}
+            </Typography>
+            <div onClick={handleViewMore} className="view-more">Xem thêm</div>
           {/* Thông tin sách */}
           <Box className="highlights-section">
             <Typography className="highlights-title">
@@ -689,9 +707,10 @@ return (
           hidden={tabValue !== 0}
           id="tab-0"
           className="tab-panel"
+          ref={fullDescRef}
         >
           {tabValue === 0 && (
-            <Typography variant="body1" component="div">
+            <Typography variant="body1" component="div"  className="book-description-full">
               {book.description}
             </Typography>
           )}
