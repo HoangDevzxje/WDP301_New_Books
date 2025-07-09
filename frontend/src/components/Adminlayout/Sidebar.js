@@ -20,7 +20,7 @@ import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
   const menuItems = [
-    // { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
+    { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
     { text: "Quản lý người dùng", icon: <PeopleIcon />, link: "/admin/users" },
     { text: "Quản lý sách", icon: <MenuBookIcon />, link: "/admin/books" },
     {
