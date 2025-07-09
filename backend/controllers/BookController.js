@@ -52,11 +52,34 @@ const getNewBooks = async (req, res) => {
         res.status(500).json({ message: "Lỗi server!", error: error.message });
     }
 };
+const getBookByAuthor = async (req, res) => {
+    try {
+        const { author } = req.params;
+        const books = await Book.find({ author: author });
+        if (books.length === 0) return res.status(404).json({ message: "Không tìm thấy sách của tác giả này" });
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server!", error: error.message });
+    }
+}
+
+const getBookByPublisher = async (req, res) => {
+    try {
+        const { publisher } = req.params;
+        const books = await Book.find({ publisher });
+        if (books.length === 0) return res.status(404).json({ message: "Không tìm thấy sách của nhà xuất bản này" });
+        res.status(200).json(books);
+    } catch (error) {
+        res.status(500).json({ message: "Lỗi server!", error: error.message });
+    }
+}
 
 module.exports = {
     getAllBooks,
     getBookById,
     getBookByCategory,
     getDiscountedBooks,
-    getNewBooks
+    getNewBooks,
+    getBookByAuthor,
+    getBookByPublisher
 }
