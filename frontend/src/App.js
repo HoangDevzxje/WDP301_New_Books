@@ -31,6 +31,7 @@ import ForgotPassword from "./pages/ForgotPassword/ForgotPassword.js";
 import ComplaintPage from "./pages/ComplaintPage/ComplaintPage.js";
 import Refund from "./pages/Refund/Refund.js";
 import ComplaintManagement from "./pages/Admin/ComplaintManagement/ComplaintManagement.js";
+import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -119,6 +120,7 @@ function App() {
           </Route>
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
         </Route>
         <Route
           path="/account/login"

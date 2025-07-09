@@ -1,0 +1,209 @@
+.dashboardContainer {
+  padding: 24px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.errorText {
+  color: #e74c3c;
+}
+
+.dashboardTitle {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.statCard {
+  padding: 24px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.statIcon {
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+
+.statIcon.revenue {
+  color: #3498db;
+}
+
+.statIcon.users {
+  color: #27ae60;
+}
+
+.statIcon.books {
+  color: #e67e22;
+}
+
+.statTitle {
+  font-weight: 500;
+  color: #34495e;
+}
+
+.statValue {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.statValue.revenue {
+  color: #3498db;
+}
+
+.statValue.users {
+  color: #27ae60;
+}
+
+.statValue.books {
+  color: #e67e22;
+}
+
+.sectionContainer {
+  margin-top: 32px;
+}
+
+.sectionTitle {
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.noDataText {
+  color: #888;
+}
+
+.statusCard {
+  padding: 24px;
+  background-color: #ffffff;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+.statusIcon {
+  font-size: 36px;
+  margin-bottom: 8px;
+}
+
+.statusIcon.pending {
+  color: #f39c12;
+}
+
+.statusIcon.confirmed {
+  color: #2ecc71;
+}
+
+.statusIcon.cancelled {
+  color: #e74c3c;
+}
+
+.statusTitle {
+  font-weight: 600;
+  color: #34495e;
+}
+
+.statusValue {
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.productsRevenueContainer {
+  margin-top: 32px;
+  display: flex;
+  gap: 24px;
+  height: 500px;
+}
+
+.productsContainer {
+  flex: 1;
+  height: 100%;
+}
+
+.revenueContainer {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.productsTable {
+  height: calc(100% - 50px);
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+}
+
+.tableHeader {
+  font-weight: 700;
+  color: #2c3e50;
+  background-color: #ecf0f1;
+  border-right: 1px solid #e0e0e0;
+}
+
+.tableRow {
+  background-color: #fff;
+}
+
+.tableRow:nth-of-type(odd) {
+  background-color: #f9f9f9;
+}
+
+.tableRow:hover {
+  background-color: #f1f1f1;
+}
+
+.tableCell {
+  border-right: 1px solid #e0e0e0;
+  font-weight: 500;
+}
+
+.tableCell:last-child {
+  border-right: none;
+}
+
+.productImage {
+  width: 56px;
+  height: 56px;
+  border-radius: 4px;
+  margin: 0 auto;
+  border: 1px solid #e0e0e0;
+}
+
+.revenueTabs {
+  margin-bottom: 16px;
+}
+
+.revenueTabs .MuiTabs-indicator {
+  background-color: #2c3e50;
+  height: 3px;
+}
+
+.revenueTab {
+  min-height: 48px;
+}
+
+.revenueTab.Mui-selected {
+  color: #2c3e50;
+}
+
+.chartContainer {
+  flex: 1;
+  padding: 16px;
+}
