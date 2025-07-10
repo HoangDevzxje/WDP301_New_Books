@@ -3,6 +3,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const routes = require('./routes');
+const cookieParser = require("cookie-parser");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 
@@ -23,10 +24,25 @@ const swaggerOptions = {
             {
                 url: "http://localhost:9999"
             }
+        ],
+        components: {
+            securitySchemes: {
+                bearerAuth: {
+                    type: "http",
+                    scheme: "bearer",
+                    bearerFormat: "JWT"
+                }
+            }
+        },
+        security: [
+            {
+                bearerAuth: []
+            }
         ]
     },
     apis: ["./routes/*.js"]
 };
+
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.get("/swagger.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
@@ -36,7 +52,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Middleware
 app.use(cors());
 app.use(express.json());
-
+app.use(cookieParser())
 // Routes
 routes(app);
 
