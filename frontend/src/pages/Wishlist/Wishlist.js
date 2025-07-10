@@ -50,7 +50,7 @@ function Wishlist({ updateWishlistCount }) {
                     const wishlistIds = wishlistBooks.map(book => book._id);
                     setWishlistId(wishlistIds);
                     if (updateWishlistCount) {
-                        updateWishlistCount(wishlistIds.length);
+                        updateWishlistCount();
                     }
                     setError(null);
                 }
@@ -88,7 +88,7 @@ function Wishlist({ updateWishlistCount }) {
             setWishlistId(updatedWishlistId);
 
             if (updateWishlistCount) {
-                updateWishlistCount(updatedWishlistId.length);
+                updateWishlistCount();
             }
 
             setNotifications(prev => [...prev, {
