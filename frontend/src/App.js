@@ -19,7 +19,6 @@ import DiscountListPage from "./pages/Admin/DiscountManagement/DiscountListPage.
 import DiscountFormPage from "./pages/Admin/DiscountManagement/DiscountFormPage.js";
 import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.js";
 import Profile from "./pages/Profile/Profile.js";
-import EditProfile from "./pages/Profile/EditProfile.js";
 import AddressPage from "./pages/Profile/AddressPage.js";
 import ChangePassword from "./pages/Profile/ChangePassword.js";
 import OrderPage from "./pages/OrderPage/OrderPage.js";
@@ -131,7 +130,6 @@ function App() {
         <Route path="/shopAll" element={<ShopAll />} />
         <Route path="/book/:id" element={<BookDetail />} />
         <Route path="/user/profile" element={<Profile />} />
-        <Route path="/user/edit-profile" element={<EditProfile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
         <Route path="/account/forgotpassword" element={<ForgotPassword />} />
         <Route path="/user/complaint" element={<ComplaintPage />} />

@@ -4,109 +4,328 @@
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
-  margin-top: 60px;
+  margin-top: 100px;
 }
 
 .sidebar {
-  width: 220px;
-  background: #f7f7f7;
-  padding: 16px;
+  width: 260px;
+  background: #fff;
+  padding: 24px;
   border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   flex-shrink: 0;
+  height: fit-content;
 }
 
 .user-info {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 .avatar-circle {
   width: 64px;
   height: 64px;
-  background-color: #c49a6c !important;
+  background: #c49a6c;
   color: white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 32px;
-  margin: 0 auto 10px;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 auto 12px;
 }
 
 .user-name {
-  font-weight: bold;
+  font-weight: 600;
   font-size: 16px;
+  color: #333;
 }
 
 .nav-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .nav-list li {
-  margin-bottom: 12px;
+  margin-bottom: 4px;
 }
 
 .nav-list li a {
   text-decoration: none;
-  color: #333;
+  color: #666;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
-  border-radius: 4px;
-  transition: background-color 0.2s, color 0.2s;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
-/* Inherit color for SVG icons */
 .nav-list li a svg {
-  color: inherit !important;
+  color: inherit;
+  font-size: 20px;
 }
 
-/* Hover and active states */
-.nav-list li a:hover,
+.nav-list li a:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
 .nav-list li.active a {
-  background-color: #c49a6c !important;
-  color: #fff !important;
-}
-
-.nav-list li a:hover svg,
-.nav-list li.active a svg {
-  color: #fff !important;
+  background: #c49a6c;
+  color: #fff;
 }
 
 .main-panel {
   flex: 1;
   background: #fff;
-  padding: 24px;
+  padding: 32px;
   border-radius: 8px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   min-height: 400px;
 }
 
-/* Override MUI outlined-primary buttons */
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.btn-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  color: #c49a6c;
+  border: 1px solid #c49a6c;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit:hover {
+  background: #c49a6c;
+  color: #fff;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.btn-cancel {
+  color: #666;
+  border-color: #ddd;
+  background: #fff;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #f8f9fa;
+  border-color: #999;
+}
+
+.btn-save.primary {
+  color: #fff;
+  border-color: #c49a6c;
+  background: #c49a6c;
+  min-width: 80px;
+  justify-content: center;
+}
+
+.btn-save.primary:hover:not(:disabled) {
+  background: #b8926a;
+  border-color: #b8926a;
+}
+
+.info-row {
+  display: flex;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-label {
+  flex: 0 0 160px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.info-label svg {
+  color: #c49a6c;
+  font-size: 18px;
+}
+
+.info-value {
+  flex: 1;
+  color: #333;
+}
+
+.field-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s ease;
+  background: #fff;
+}
+
+.field-input:focus {
+  outline: none;
+  border-color: #c49a6c;
+  box-shadow: 0 0 0 2px rgba(196, 154, 108, 0.1);
+}
+
+.error-message {
+  color: #e53e3e;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: #fef2f2;
+  border-radius: 6px;
+  border-left: 3px solid #e53e3e;
+  font-size: 14px;
+}
+
+.success-message {
+  color: #38a169;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  background: #f0fff4;
+  border-radius: 6px;
+  border-left: 3px solid #38a169;
+  font-size: 14px;
+}
+
+.spinner-small {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Override MUI styles */
 .MuiButton-outlinedPrimary {
   border-color: #c49a6c !important;
   color: #c49a6c !important;
 }
+
 .MuiButton-outlinedPrimary:hover {
   background-color: #c49a6c !important;
   border-color: #c49a6c !important;
   color: #fff !important;
 }
 
+/* Responsive */
 @media (max-width: 768px) {
   .account-container {
     flex-direction: column;
     padding: 16px;
+    margin-top: 100px;
+    gap: 16px;
   }
 
   .sidebar {
     width: 100%;
-    margin-bottom: 16px;
+    padding: 20px;
+  }
+
+  .nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .nav-list li {
+    margin-bottom: 0;
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .nav-list li a {
+    padding: 10px 8px;
+    font-size: 13px;
+    justify-content: center;
   }
 
   .main-panel {
-    padding: 16px;
+    padding: 20px;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+
+  .edit-actions {
+    justify-content: center;
+  }
+
+  .info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 0;
+  }
+
+  .info-label {
+    flex: none;
+  }
+
+  .info-value {
+    width: 100%;
   }
 }
