@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Header.css";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Box,
-  IconButton,
   Container,
   Popper,
   Paper,
@@ -24,9 +21,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import NoBackpackIcon from "@mui/icons-material/NoBackpack";
 import FlagIcon from "@mui/icons-material/Flag";
 import RoomIcon from "@mui/icons-material/Room";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -34,10 +29,8 @@ import Badge from "@mui/material/Badge";
 import InputBase from "@mui/material/InputBase";
 import ImageIcon from "@mui/icons-material/Image";
 import { styled } from "@mui/material/styles";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import * as CategoryService from "../../services/CategoryService";
 import * as BookService from "../../services/BookService";
-import * as WishlistService from "../../services/WishlistService";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -96,7 +89,6 @@ const Header = ({
   updateUserEmail,
   wishlistCount = 0,
   cartCount = 0,
-  cartTotal = 0,
   updateCartCount,
   updateCartTotal,
   updateWishlistCount,
@@ -112,11 +104,7 @@ const Header = ({
   const [activeCategory, setActiveCategory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const userMenuRef = useRef(null);
   const searchRef = useRef(null);
-
-  const [showBanner, setShowBanner] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const [anchorEl2, setAnchorEl2] = useState(null);
 
@@ -130,20 +118,7 @@ const Header = ({
 
   useEffect(() => {
     fetchCategories();
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY) {
-        setShowBanner(false);
-      } else {
-        setShowBanner(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    console.log("userEmail", userEmail);
   }, []);
 
   const fetchCategories = async () => {
@@ -295,8 +270,7 @@ const Header = ({
     navigate(`/shopAll?query=${encodeURIComponent(searchTerm)}`);
   };
 
-  const displayWishlistText =
-    wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
+  const displayWishlistText = wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
 
   const open = Boolean(anchorEl);
   const userMenuOpen = Boolean(userMenuAnchorEl);
@@ -443,7 +417,13 @@ const Header = ({
               component={Link}
               to="/user/cart"
             >
-              <AddShoppingCartIcon className="custom-icon" />
+              <Badge
+                  badgeContent={userEmail ? cartCount : 0}
+                  color="error"
+                  showZero
+                >
+                <AddShoppingCartIcon className="custom-icon" />
+              </Badge>
             </Button>
 
             <Button
@@ -451,7 +431,13 @@ const Header = ({
               component={Link}
               to="/user/wishlist"
             >
-              <FavoriteBorderIcon className="custom-icon" />
+              <Badge
+                  badgeContent={userEmail ? wishlistCount : 0}
+                  color="error"
+                  showZero
+                >
+                  <FavoriteBorderIcon  className="custom-icon"  />
+                </Badge>
             </Button>
 
             <Box className="more-menu-container">
