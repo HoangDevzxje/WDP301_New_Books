@@ -121,37 +121,42 @@ const createOrder = async (req, res) => {
   }
 };
 
-const getMyOrders = async (req, res) => {
+async function getMyOrders(req, res) {
   try {
-    const orders = await Order.find({ user: req.user.id });
-    res.status(200).json(orders);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const orders = await Order.find({ user: req.user._id })
+      .populate("items.book", "title images price")
+      .sort({ createdAt: -1 });
+    return res.json({ data: orders });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error" });
   }
-};
+}
 
-const getOrderDetails = async (req, res) => {
+async function getOrderDetails(req, res) {
   const orderId = req.params.id;
   const user = req.user;
   try {
     const order = await Order.findById(orderId)
-      .populate("items.book", "title images")
-      .populate("discountUsed");
+      .populate("items.book", "title images price")
+      .populate("discountUsed", "code amount");
+
     if (!order) {
       return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
     }
-
     if (
       order.user.toString() !== user._id.toString() &&
       user.role !== "admin"
     ) {
       return res.status(403).json({ message: "Forbidden" });
     }
-    res.status(200).json(order);
+
+    return res.status(200).json({ data: order });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    return res.status(500).json({ message: error.message });
   }
-};
+}
 
 module.exports = {
   createOrder,
