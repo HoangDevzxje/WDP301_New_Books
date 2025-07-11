@@ -85,6 +85,7 @@ export default function FeedbackManagement() {
   const handleChangePage = (_, newPage) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (e) => {
     setRowsPerPage(parseInt(e.target.value, 10));
     setPage(0);
@@ -93,7 +94,7 @@ export default function FeedbackManagement() {
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>
-        Quản lý đánh giá và xếp hạng
+        Quản lý đánh giá
       </Typography>
 
       <Box
@@ -187,12 +188,16 @@ export default function FeedbackManagement() {
                   }}
                 >
                   <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                  <TableCell>{fb.book.title}</TableCell>
-                  <TableCell>{fb.user.name}</TableCell>
-                  <TableCell>{fb.rating} / 5</TableCell>
-                  <TableCell>{fb.comment}</TableCell>
+                  <TableCell>{fb.book?.title || "Sách đã bị xóa"}</TableCell>
                   <TableCell>
-                    {new Date(fb.createdAt).toLocaleString("vi-VN")}
+                    {fb.user?.name || "Người dùng đã bị xóa"}
+                  </TableCell>
+                  <TableCell>{fb.rating || 0} / 5</TableCell>
+                  <TableCell>{fb.comment || "Không có bình luận"}</TableCell>
+                  <TableCell>
+                    {fb.createdAt
+                      ? new Date(fb.createdAt).toLocaleString("vi-VN")
+                      : "Không xác định"}
                   </TableCell>
                   <TableCell>
                     <Tooltip title="Xóa phản hồi">

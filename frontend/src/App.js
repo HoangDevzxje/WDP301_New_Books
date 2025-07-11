@@ -120,6 +120,7 @@ function App() {
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="feedbacks" element={<FeedbackManagement />} />
         </Route>
         <Route
           path="/account/login"

@@ -38,11 +38,12 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <LocalOfferIcon />,
       link: "/admin/discounts",
     },
-    // {
-    //   text: "Quản lý các báo cáo",
-    //   icon: <RateReview />,
-    //   link: "/admin/reports",
-    // },
+    {
+      text: "Quản lý đánh giá",
+      icon: <RateReview />,
+      link: "/admin/feedbacks",
+    },
+
     {
       text: "Quản lý khiếu nại",
       icon: <FeedbackIcon />,
