@@ -335,7 +335,6 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
 
   const toggleWishlist = async (bookId) => {
     const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-    console.log("Access Token:", access_token);
     if (!access_token) {
       setNotifications((prev) => [
         ...prev,
@@ -357,8 +356,8 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         setWishlist(prev => prev.filter(id => id !== targetBookId));
         if (targetBookId === id) setInWishlist(false);
 
-        if (typeof updateWishlistCount === "function") {
-          updateWishlistCount((prev) => prev - 1);
+        if (updateWishlistCount) {
+            updateWishlistCount();
         }
 
         setNotifications((prev) => [
@@ -375,8 +374,8 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         setWishlist(prev => [...prev, targetBookId]);
         if (targetBookId === id) setInWishlist(true);
 
-        if (typeof updateWishlistCount === "function") {
-          updateWishlistCount((prev) => prev + 1);
+        if (updateWishlistCount) {
+          updateWishlistCount();
         }
 
         setNotifications((prev) => [

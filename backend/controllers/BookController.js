@@ -1,5 +1,6 @@
 const Book = require("../models/Book");
 const Category = require("../models/Category");
+const Order = require("../models/Order");
 
 const getAllBooks = async (req, res) => {
     try {
@@ -73,6 +74,68 @@ const getBookByPublisher = async (req, res) => {
         res.status(500).json({ message: "Lỗi server!", error: error.message });
     }
 }
+const getBestSellers = async (req, res) => {
+    try {
+        const topSellingBooks = await Order.aggregate([
+            // Chỉ lấy đơn hàng đã thanh toán và không bị hủy
+            {
+                $match: {
+                    paymentStatus: "Completed",
+                    orderStatus: { $ne: "Cancelled" }
+                }
+            },
+
+            // Tách từng sản phẩm trong đơn hàng
+            { $unwind: "$items" },
+
+            // Gom nhóm theo sách và tính tổng số lượng đã bán
+            {
+                $group: {
+                    _id: "$items.book",
+                    totalQuantity: { $sum: "$items.quantity" }
+                }
+            },
+
+            // Sắp xếp giảm dần theo số lượng bán
+            { $sort: { totalQuantity: -1 } },
+
+            // Giới hạn 20 cuốn sách bán chạy nhất
+            { $limit: 20 },
+
+            // Lấy thông tin sách từ collection books
+            {
+                $lookup: {
+                    from: "books",
+                    localField: "_id",
+                    foreignField: "_id",
+                    as: "bookDetails"
+                }
+            },
+
+            // Tách object trong mảng bookDetails
+            { $unwind: "$bookDetails" },
+
+            // Chọn trường cần trả về
+            {
+                $project: {
+                    bookId: "$_id",
+                    bookName: "$bookDetails.title",
+                    totalQuantity: 1,
+                    bookImages: "$bookDetails.images",
+                    author: "$bookDetails.author",
+                    price: "$bookDetails.price"
+                }
+            }
+        ]);
+
+        return res.status(200).json(topSellingBooks);
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server!",
+            error: error.message
+        });
+    }
+};
 
 module.exports = {
     getAllBooks,
@@ -81,5 +144,6 @@ module.exports = {
     getDiscountedBooks,
     getNewBooks,
     getBookByAuthor,
-    getBookByPublisher
+    getBookByPublisher,
+    getBestSellers
 }
