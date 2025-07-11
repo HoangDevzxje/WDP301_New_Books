@@ -37,10 +37,7 @@ const TrackOrderPage = () => {
       </div>
 
       {isLoading ? (
-        <div className="loading-spinner">
-          <div className="spinner" />
-          <p>Đang tải đơn hàng...</p>
-        </div>
+        <div className="loading-spinner"></div>
       ) : orders.length === 0 ? (
         <div className="empty-orders">
           <img
