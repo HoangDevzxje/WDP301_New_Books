@@ -13,7 +13,9 @@ const TrackOrderPage = () => {
     (async () => {
       try {
         const res = await getMyOrders();
-        setOrders(res.data);
+        const list = Array.isArray(res.data?.data) ? res.data.data : [];
+        list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        setOrders(list);
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -22,10 +24,13 @@ const TrackOrderPage = () => {
     })();
   }, []);
 
+  const calcTotal = (items) =>
+    items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
   return (
     <div className="track-order-container">
       <div className="track-order-header">
-        <h1>Theo dõi đơn hàng</h1>
+        <h1>Đơn hàng của tôi</h1>
         <p className="track-order-subtitle">
           Xem trạng thái và chi tiết đơn hàng của bạn
         </p>
@@ -33,7 +38,7 @@ const TrackOrderPage = () => {
 
       {isLoading ? (
         <div className="loading-spinner">
-          <div className="spinner"></div>
+          <div className="spinner" />
           <p>Đang tải đơn hàng...</p>
         </div>
       ) : orders.length === 0 ? (
@@ -57,8 +62,10 @@ const TrackOrderPage = () => {
             <thead>
               <tr>
                 <th>STT</th>
-                <th>Ngày tạo</th>
-                <th>Phương thức</th>
+                <th>Ngày đặt</th>
+
+                <th>Sản phẩm</th>
+                <th>Tổng giá (₫)</th>
                 <th>Mã vận đơn</th>
                 <th>Thao tác</th>
               </tr>
@@ -68,13 +75,39 @@ const TrackOrderPage = () => {
                 <tr key={o._id}>
                   <td>{idx + 1}</td>
                   <td>{dayjs(o.createdAt).format("DD/MM/YYYY HH:mm")}</td>
-                  <td>
-                    <span
-                      className={`payment-method ${o.paymentMethod.toLowerCase()}`}
-                    >
-                      {o.paymentMethod}
-                    </span>
+
+                  <td className="product-cell">
+                    {o.items.map((item) => {
+                      const book = item.book;
+                      const imgUrl =
+                        book.images?.[0] || "/images/placeholder-book.png";
+                      return (
+                        <div
+                          key={`${o._id}-${book._id}`}
+                          className="product-item"
+                        >
+                          <div className="product-left">
+                            <img
+                              src={imgUrl}
+                              alt={book.title}
+                              className="product-image"
+                            />
+                            <div className="product-info">
+                              <p className="product-title">{book.title}</p>
+                              {/* Nếu cần: <p className="product-extra">Phân loại: ...</p> */}
+                            </div>
+                          </div>
+                          <div className="product-right">
+                            <p className="product-qty">x{item.quantity}</p>
+                            <p className="product-price">
+                              {item.price.toLocaleString()}₫
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </td>
+                  <td>{calcTotal(o.items).toLocaleString()}₫</td>
                   <td>
                     {o.trackingNumber ? (
                       <a
