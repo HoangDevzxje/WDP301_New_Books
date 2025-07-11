@@ -31,14 +31,13 @@ import {
 import {
   fetchAllFeedbacks,
   deleteFeedback,
-  fetchFeedbacksByBook,
-  fetchFeedbacksByUser,
 } from "../../../services/AdminService/feedbackService";
 
 export default function FeedbackManagement() {
+  const [originalFeedbacks, setOriginalFeedbacks] = useState([]);
   const [feedbacks, setFeedbacks] = useState([]);
   const [filterType, setFilterType] = useState("all");
-  const [filterId, setFilterId] = useState("");
+  const [filterQuery, setFilterQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -49,33 +48,33 @@ export default function FeedbackManagement() {
   const loadFeedbacks = async () => {
     try {
       const data = await fetchAllFeedbacks();
+      setOriginalFeedbacks(data);
       setFeedbacks(data);
     } catch (err) {
       console.error("Lỗi khi tải feedback:", err);
     }
   };
 
-  const handleSearch = async () => {
-    try {
-      let data = [];
-      if (filterType === "book" && filterId) {
-        data = await fetchFeedbacksByBook(filterId);
-      } else if (filterType === "user" && filterId) {
-        data = await fetchFeedbacksByUser(filterId);
-      } else {
-        data = await fetchAllFeedbacks();
-      }
-      setFeedbacks(data);
-      setPage(0);
-    } catch (err) {
-      console.error("Lỗi khi lọc feedback:", err);
+  const handleSearch = () => {
+    let filtered = originalFeedbacks;
+    if (filterType === "book" && filterQuery.trim()) {
+      filtered = originalFeedbacks.filter((f) =>
+        f.book?.title?.toLowerCase().includes(filterQuery.trim().toLowerCase())
+      );
+    } else if (filterType === "user" && filterQuery.trim()) {
+      filtered = originalFeedbacks.filter((f) =>
+        f.user?.name?.toLowerCase().includes(filterQuery.trim().toLowerCase())
+      );
     }
+    setFeedbacks(filtered);
+    setPage(0);
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Bạn có chắc muốn xóa phản hồi này?")) return;
     try {
       await deleteFeedback(id);
+      setOriginalFeedbacks((prev) => prev.filter((f) => f._id !== id));
       setFeedbacks((prev) => prev.filter((f) => f._id !== id));
     } catch (err) {
       console.error("Lỗi khi xóa feedback:", err);
@@ -113,7 +112,10 @@ export default function FeedbackManagement() {
           <InputLabel>Filter theo</InputLabel>
           <Select
             value={filterType}
-            onChange={(e) => setFilterType(e.target.value)}
+            onChange={(e) => {
+              setFilterType(e.target.value);
+              setFilterQuery("");
+            }}
             label="Filter theo"
             IconComponent={FilterIcon}
           >
@@ -125,10 +127,10 @@ export default function FeedbackManagement() {
 
         {(filterType === "book" || filterType === "user") && (
           <TextField
-            label={filterType === "book" ? "Book ID" : "User ID"}
+            label={filterType === "book" ? "Tên sách" : "Tên người dùng"}
             variant="outlined"
-            value={filterId}
-            onChange={(e) => setFilterId(e.target.value)}
+            value={filterQuery}
+            onChange={(e) => setFilterQuery(e.target.value)}
             sx={{ flexGrow: 1 }}
             InputProps={{
               endAdornment: (
@@ -139,12 +141,20 @@ export default function FeedbackManagement() {
                 </InputAdornment>
               ),
             }}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
           />
         )}
 
         {filterType === "all" && (
           <Tooltip title="Tải lại">
-            <IconButton onClick={loadFeedbacks}>
+            <IconButton
+              onClick={() => {
+                setFilterQuery("");
+                loadFeedbacks();
+              }}
+            >
               <SearchIcon />
             </IconButton>
           </Tooltip>

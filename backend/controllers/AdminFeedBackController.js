@@ -9,12 +9,10 @@ exports.getAllFeedbacks = async (req, res) => {
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Lỗi khi lấy danh sách feedback",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Lỗi khi lấy danh sách feedback",
+      error: error.message,
+    });
   }
 };
 
@@ -51,12 +49,10 @@ exports.getFeedbacksByBook = async (req, res) => {
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Lỗi khi lấy feedbacks cho sách",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Lỗi khi lấy feedbacks cho sách",
+      error: error.message,
+    });
   }
 };
 
@@ -76,11 +72,9 @@ exports.getFeedbacksByUser = async (req, res) => {
 
     res.status(200).json(feedbacks);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Lỗi khi lấy feedbacks cho người dùng",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Lỗi khi lấy feedbacks cho người dùng",
+      error: error.message,
+    });
   }
 };
