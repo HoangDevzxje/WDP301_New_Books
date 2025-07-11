@@ -19,7 +19,6 @@ import DiscountListPage from "./pages/Admin/DiscountManagement/DiscountListPage.
 import DiscountFormPage from "./pages/Admin/DiscountManagement/DiscountFormPage.js";
 import OrderManagement from "./pages/Admin/OrderManagement/OrderManagement.js";
 import Profile from "./pages/Profile/Profile.js";
-import EditProfile from "./pages/Profile/EditProfile.js";
 import AddressPage from "./pages/Profile/AddressPage.js";
 import ChangePassword from "./pages/Profile/ChangePassword.js";
 import OrderPage from "./pages/OrderPage/OrderPage.js";
@@ -32,6 +31,8 @@ import ComplaintPage from "./pages/ComplaintPage/ComplaintPage.js";
 import Refund from "./pages/Refund/Refund.js";
 import ComplaintManagement from "./pages/Admin/ComplaintManagement/ComplaintManagement.js";
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard.js";
+import * as WishlistService from "./services/WishlistService";
+import * as CartService from "./services/CartService";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -58,10 +59,15 @@ const UserOnlyRoute = ({ children }) => {
   return children;
 };
 
+
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
-
+  const [cartCount, setCartCount] = useState(0);
+  const [wishlistCount, setWishlistCount] = useState(0);
+  const [userEmail, setUserEmail] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  
   const noFooterRoutes = [
     "/user/profile",
     "/user/change-password",
@@ -76,24 +82,69 @@ function App() {
       location.pathname === route || location.pathname.startsWith(route + "/")
   );
 
-  const [userEmail, setUserEmail] = useState(null);
-  const [userRole, setUserRole] = useState(null);
-  const [wishlistCount, setWishlistCount] = useState(0);
+  useEffect(() => {
+    const storedEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+    const storedRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+    setUserEmail(storedEmail);
+    setUserRole(storedRole);
 
-  const storedEmail =
-    localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+    if (storedEmail) {
+      fetchWishlistCount();
+      fetchCartData();
+    }
+  }, []);
 
   const updateUserEmail = (email, role = null) => {
     setUserEmail(email);
     if (role) {
       setUserRole(role);
     }
+
+    if (email) {
+      fetchWishlistCount();
+      fetchCartData();
+    } else {
+      // If user logs out, reset counts
+      setWishlistCount(0);
+      setCartCount(0);
+      setUserRole(null);
+    }
   };
+
+  const fetchWishlistCount = async () => {
+    try {
+      const response = await WishlistService.getWishlist();
+
+      if (response.data && response.data.wishlist) {
+        setWishlistCount(response.data.wishlist.length);
+      }
+    } catch (error) {
+      console.error("Error fetching wishlist count:", error);
+    }
+  };
+
+  const fetchCartData = async () => {
+    try {
+      const response = await CartService.getCart();
+
+      if (response.data && response.data.cartItems) {
+        setCartCount(response.data.cartItems.length);
+      }
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+    }
+  };
+
 
   return (
     <>
       {!isAdminRoute && (
-        <Header userEmail={storedEmail} updateUserEmail={updateUserEmail} />
+        <Header
+          userEmail={userEmail}
+          updateUserEmail={updateUserEmail}
+          wishlistCount={wishlistCount}
+          cartCount={cartCount}
+        />
       )}
 
       <Routes>
@@ -121,17 +172,17 @@ function App() {
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="feedbacks" element={<FeedbackManagement />} />
         </Route>
         <Route
           path="/account/login"
           element={<Login onLoginSuccess={updateUserEmail} />}
         />
         <Route path="/account/register" element={<Register />} />
-        <Route path="/" element={<HomePage />} />
-        <Route path="/shopAll" element={<ShopAll />} />
-        <Route path="/book/:id" element={<BookDetail />} />
+        <Route path="/" element={<HomePage  updateWishlistCount={fetchWishlistCount} />} />
+        <Route path="/shopAll" element={<ShopAll  updateWishlistCount={fetchWishlistCount} />} />
+        <Route path="/book/:id" element={<BookDetail  updateWishlistCount={fetchWishlistCount} />} />
         <Route path="/user/profile" element={<Profile />} />
-        <Route path="/user/edit-profile" element={<EditProfile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
         <Route path="/account/forgotpassword" element={<ForgotPassword />} />
         <Route path="/user/complaint" element={<ComplaintPage />} />
@@ -148,7 +199,7 @@ function App() {
           path="/user/wishlist"
           element={
             <UserOnlyRoute>
-              <Wishlist />
+              <Wishlist updateWishlistCount={fetchWishlistCount} />
             </UserOnlyRoute>
           }
         />
