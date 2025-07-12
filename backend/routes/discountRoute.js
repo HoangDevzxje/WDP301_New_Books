@@ -15,13 +15,20 @@ const discountController = require("../controllers/DiscountController");
  *     summary: Lấy danh sách mã giảm giá phù hợp với số tiền mua hàng
  *     tags: [Discount]
  *     parameters:
- *       - in: query
- *         name: amount
- *         required: true
- *         description: Số tiền mua hàng để lọc các mã giảm giá phù hợp
- *         schema:
- *           type: number
- *           example: 500000
+        - in: query
+            name: amount
+            required: true
+            description: Số tiền mua hàng để lọc các mã giảm giá phù hợp
+            schema:
+            type: number
+            example: 500000
+        - in: query
+            name: productId
+            required: false
+            description: ID sách cụ thể (nếu có) để lọc thêm giảm giá áp dụng cho sách
+            schema:
+            type: string
+            example: 66ffe7e91a9babc123456789
  *     responses:
  *       200:
  *         description: Danh sách mã giảm giá phù hợp
