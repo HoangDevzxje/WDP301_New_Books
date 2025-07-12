@@ -143,6 +143,16 @@ router.delete(
   checkAuthorize(["admin"]),
   adminDiscountController.deleteDiscount
 );
+router.patch(
+  "/discounts/:id/products",
+  checkAuthorize(["admin"]),
+  adminDiscountController.updateDiscountProducts
+);
+router.delete(
+  "/discounts/:discountId/books/:bookId",
+  checkAuthorize(["admin"]),
+  adminDiscountController.removeBookFromDiscount
+);
 
 // Quản lý khiếu nại
 router.get(
