@@ -60,7 +60,6 @@ const UserOnlyRoute = ({ children }) => {
   return children;
 };
 
-
 function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
@@ -68,7 +67,7 @@ function App() {
   const [wishlistCount, setWishlistCount] = useState(0);
   const [userEmail, setUserEmail] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  
+
   const noFooterRoutes = [
     "/user/profile",
     "/user/change-password",
@@ -84,8 +83,10 @@ function App() {
   );
 
   useEffect(() => {
-    const storedEmail = localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
-    const storedRole = localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
+    const storedEmail =
+      localStorage.getItem("userEmail") || sessionStorage.getItem("userEmail");
+    const storedRole =
+      localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
     setUserEmail(storedEmail);
     setUserRole(storedRole);
 
@@ -136,7 +137,6 @@ function App() {
     }
   };
 
-
   return (
     <>
       {!isAdminRoute && (
@@ -148,7 +148,7 @@ function App() {
         />
       )}
 
-      <ScrollToTop /> 
+      <ScrollToTop />
 
       <Routes>
         <Route
@@ -175,15 +175,25 @@ function App() {
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
           <Route path="feedbacks" element={<FeedbackManagement />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
         </Route>
         <Route
           path="/account/login"
           element={<Login onLoginSuccess={updateUserEmail} />}
         />
         <Route path="/account/register" element={<Register />} />
-        <Route path="/" element={<HomePage  updateWishlistCount={fetchWishlistCount} />} />
-        <Route path="/shopAll" element={<ShopAll  updateWishlistCount={fetchWishlistCount} />} />
-        <Route path="/book/:id" element={<BookDetail  updateWishlistCount={fetchWishlistCount} />} />
+        <Route
+          path="/"
+          element={<HomePage updateWishlistCount={fetchWishlistCount} />}
+        />
+        <Route
+          path="/shopAll"
+          element={<ShopAll updateWishlistCount={fetchWishlistCount} />}
+        />
+        <Route
+          path="/book/:id"
+          element={<BookDetail updateWishlistCount={fetchWishlistCount} />}
+        />
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
         <Route path="/account/forgotpassword" element={<ForgotPassword />} />

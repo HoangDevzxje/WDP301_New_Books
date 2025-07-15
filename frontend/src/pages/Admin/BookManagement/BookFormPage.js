@@ -1,20 +1,4 @@
 import React, { useEffect, useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  MenuItem,
-  FormControl,
-  InputLabel,
-  Select,
-  Switch,
-  FormHelperText,
-  Snackbar,
-  Alert,
-  Paper,
-  Grid,
-} from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   createBook,
@@ -22,6 +6,7 @@ import {
   updateBook,
 } from "../../../services/AdminService/bookService";
 import { getCategories } from "../../../services/AdminService/categoryService";
+import "./BookFormPage.css";
 
 export default function BookFormPage() {
   const { id } = useParams();
@@ -109,7 +94,11 @@ export default function BookFormPage() {
   };
 
   const handleCategoriesChange = (e) => {
-    setForm((f) => ({ ...f, categories: e.target.value }));
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
+    setForm((f) => ({ ...f, categories: selectedOptions }));
     if (errors.categories) setErrors((err) => ({ ...err, categories: null }));
   };
 
@@ -134,17 +123,14 @@ export default function BookFormPage() {
     try {
       const formData = new FormData();
 
-      // Append các field thông thường
       Object.entries(form).forEach(([key, value]) => {
         if (key === "images") {
-          // Nếu là FileList hoặc mảng File
           if (value instanceof FileList || Array.isArray(value)) {
             Array.from(value).forEach((file) => {
               formData.append("images", file);
             });
           }
         } else if (key === "categories") {
-          // Chuyển mảng ID thành JSON string
           formData.append("categories", JSON.stringify(value));
         } else {
           formData.append(key, value ?? "");
@@ -167,273 +153,318 @@ export default function BookFormPage() {
   };
 
   return (
-    <Paper sx={{ p: 3, maxWidth: 800, m: "auto" }}>
-      <Typography variant="h5" gutterBottom>
-        {isEdit ? "Chỉnh sửa sách" : "Thêm sách mới"}
-      </Typography>
-      <Grid container spacing={3.5}>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Tiêu đề"
-            name="title"
-            value={form.title}
-            onChange={handleChange}
-            error={!!errors.title}
-            helperText={errors.title}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Tác giả"
-            name="author"
-            value={form.author}
-            onChange={handleChange}
-            error={!!errors.author}
-            helperText={errors.author}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Thể loại"
-            name="genre"
-            value={form.genre}
-            onChange={handleChange}
-            error={!!errors.genre}
-            helperText={errors.genre}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Nhà xuất bản"
-            name="publisher"
-            value={form.publisher}
-            onChange={handleChange}
-            error={!!errors.publisher}
-            helperText={errors.publisher}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Mô tả"
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            multiline
-            rows={4}
-            error={!!errors.description}
-            helperText={errors.description}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Ngôn ngữ"
-            name="language"
-            value={form.language}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Người dịch"
-            name="translator"
-            value={form.translator}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            type="date"
-            label="Ngày xuất bản"
-            name="publishDate"
-            InputLabelProps={{ shrink: true }}
-            value={form.publishDate}
-            onChange={handleChange}
-            error={!!errors.publishDate}
-            helperText={errors.publishDate}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            type="number"
-            label="Giá"
-            name="price"
-            value={form.price}
-            onChange={handleChange}
-            error={!!errors.price}
-            helperText={errors.price}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            type="number"
-            label="Số lượng"
-            name="stock"
-            value={form.stock}
-            onChange={handleChange}
-            error={!!errors.stock}
-            helperText={errors.stock}
-          />
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            type="number"
-            label="Số trang"
-            name="totalPage"
-            value={form.totalPage}
-            onChange={handleChange}
-            error={!!errors.totalPage}
-            helperText={errors.totalPage}
-          />
-        </Grid>
-        <Grid>
-          <FormControl fullWidth>
-            <InputLabel>Loại bìa</InputLabel>
-            <Select
+    <div className="book-form-container">
+      <div className="book-form-paper">
+        <h2 className="book-form-title">
+          {isEdit ? "Chỉnh sửa sách" : "Thêm sách mới"}
+        </h2>
+
+        <div className="book-form-grid">
+          <div className="form-group">
+            <label htmlFor="title">Tiêu đề</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              className={errors.title ? "error" : ""}
+            />
+            {errors.title && <span className="error-text">{errors.title}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="author">Tác giả</label>
+            <input
+              type="text"
+              id="author"
+              name="author"
+              value={form.author}
+              onChange={handleChange}
+              className={errors.author ? "error" : ""}
+            />
+            {errors.author && (
+              <span className="error-text">{errors.author}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="genre">Thể loại</label>
+            <input
+              type="text"
+              id="genre"
+              name="genre"
+              value={form.genre}
+              onChange={handleChange}
+              className={errors.genre ? "error" : ""}
+            />
+            {errors.genre && <span className="error-text">{errors.genre}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="publisher">Nhà xuất bản</label>
+            <input
+              type="text"
+              id="publisher"
+              name="publisher"
+              value={form.publisher}
+              onChange={handleChange}
+              className={errors.publisher ? "error" : ""}
+            />
+            {errors.publisher && (
+              <span className="error-text">{errors.publisher}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="description">Mô tả</label>
+            <textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={2}
+              className={errors.description ? "error" : ""}
+            />
+            {errors.description && (
+              <span className="error-text">{errors.description}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="language">Ngôn ngữ</label>
+            <input
+              type="text"
+              id="language"
+              name="language"
+              value={form.language}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="translator">Người dịch</label>
+            <input
+              type="text"
+              id="translator"
+              name="translator"
+              value={form.translator}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="publishDate">Ngày xuất bản</label>
+            <input
+              type="date"
+              id="publishDate"
+              name="publishDate"
+              value={form.publishDate}
+              onChange={handleChange}
+              className={errors.publishDate ? "error" : ""}
+            />
+            {errors.publishDate && (
+              <span className="error-text">{errors.publishDate}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="price">Giá</label>
+            <input
+              type="number"
+              id="price"
+              name="price"
+              value={form.price}
+              onChange={handleChange}
+              className={errors.price ? "error" : ""}
+            />
+            {errors.price && <span className="error-text">{errors.price}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="stock">Số lượng</label>
+            <input
+              type="number"
+              id="stock"
+              name="stock"
+              value={form.stock}
+              onChange={handleChange}
+              className={errors.stock ? "error" : ""}
+            />
+            {errors.stock && <span className="error-text">{errors.stock}</span>}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="totalPage">Số trang</label>
+            <input
+              type="number"
+              id="totalPage"
+              name="totalPage"
+              value={form.totalPage}
+              onChange={handleChange}
+              className={errors.totalPage ? "error" : ""}
+            />
+            {errors.totalPage && (
+              <span className="error-text">{errors.totalPage}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="cover">Loại bìa</label>
+            <select
+              id="cover"
               name="cover"
               value={form.cover}
               onChange={handleChange}
-              label="Loại bìa"
             >
-              <MenuItem value="hard">Cứng</MenuItem>
-              <MenuItem value="soft">Mềm</MenuItem>
-            </Select>
-          </FormControl>
-        </Grid>
-        <Grid>
-          <TextField
-            fullWidth
-            label="Kích thước (DxRxC)"
-            name="dimensions"
-            value={form.dimensions}
-            onChange={handleChange}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <TextField
-            fullWidth
-            type="number"
-            label="Khối lượng (g)"
-            name="weight"
-            value={form.weight}
-            onChange={handleChange}
-            error={!!errors.weight}
-            helperText={errors.weight}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <TextField
-            fullWidth
-            type="number"
-            label="Tuổi tối thiểu"
-            name="minAge"
-            value={form.minAge}
-            onChange={handleChange}
-            error={!!errors.minAge}
-            helperText={errors.minAge}
-          />
-        </Grid>
-        <Grid>
-          <FormControl fullWidth sx={{ minWidth: 200 }}>
-            <InputLabel>Danh mục</InputLabel>
-            <Select
-              multiple
+              <option value="hard">Cứng</option>
+              <option value="soft">Mềm</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="dimensions">Kích thước (DxRxC)</label>
+            <input
+              type="text"
+              id="dimensions"
+              name="dimensions"
+              value={form.dimensions}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group form-group-small">
+            <label htmlFor="weight">Khối lượng (g)</label>
+            <input
+              type="number"
+              id="weight"
+              name="weight"
+              value={form.weight}
+              onChange={handleChange}
+              className={errors.weight ? "error" : ""}
+            />
+            {errors.weight && (
+              <span className="error-text">{errors.weight}</span>
+            )}
+          </div>
+
+          <div className="form-group form-group-small">
+            <label htmlFor="minAge">Tuổi tối thiểu</label>
+            <input
+              type="number"
+              id="minAge"
+              name="minAge"
+              value={form.minAge}
+              onChange={handleChange}
+              className={errors.minAge ? "error" : ""}
+            />
+            {errors.minAge && (
+              <span className="error-text">{errors.minAge}</span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="categories">Danh mục</label>
+            <select
+              id="categories"
               name="categories"
+              multiple
               value={form.categories}
               onChange={handleCategoriesChange}
-              label="Danh mục"
+              className={errors.categories ? "error" : ""}
             >
               {categories.map((c) => (
-                <MenuItem key={c._id} value={c._id}>
+                <option key={c._id} value={c._id}>
                   {c.name}
-                </MenuItem>
+                </option>
               ))}
-            </Select>
+            </select>
             {errors.categories && (
-              <FormHelperText>{errors.categories}</FormHelperText>
+              <span className="error-text">{errors.categories}</span>
             )}
-          </FormControl>
-        </Grid>
-        <Grid item xs={12}>
-          <Typography variant="subtitle1" gutterBottom>
-            Ảnh bìa sách
-          </Typography>
+          </div>
 
-          {/* Hiển thị ảnh hiện có (nếu là URL) */}
-          {Array.isArray(form.images) &&
-            typeof form.images[0] === "string" &&
-            form.images.map((imgUrl, idx) => (
-              <img
-                key={idx}
-                src={imgUrl}
-                alt={`Ảnh ${idx}`}
-                style={{ width: 100, marginRight: 8, marginBottom: 8 }}
+          <div className="form-group form-group-full">
+            <label>Ảnh bìa sách</label>
+
+            {Array.isArray(form.images) &&
+              typeof form.images[0] === "string" &&
+              form.images.map((imgUrl, idx) => (
+                <img
+                  key={idx}
+                  src={imgUrl}
+                  alt={`Ảnh ${idx}`}
+                  className="preview-image"
+                />
+              ))}
+
+            <input
+              type="file"
+              name="images"
+              multiple
+              accept="image/*"
+              onChange={(e) =>
+                setForm((f) => ({ ...f, images: e.target.files }))
+              }
+              className="file-input"
+            />
+            <span className="helper-text">
+              Bạn có thể chọn nhiều ảnh. Nếu chọn ảnh mới, ảnh cũ sẽ bị thay
+              thế.
+            </span>
+          </div>
+
+          <div className="switches-container">
+            <label className="switch-label">
+              <input
+                type="checkbox"
+                name="isActivated"
+                checked={form.isActivated}
+                onChange={handleChange}
+                className="switch-input"
               />
-            ))}
+              <span className="switch-slider"></span>
+              Kích hoạt
+            </label>
 
-          {/* Upload ảnh mới */}
-          <input
-            type="file"
-            name="images"
-            multiple
-            accept="image/*"
-            onChange={(e) => setForm((f) => ({ ...f, images: e.target.files }))}
-            style={{ marginTop: 8 }}
-          />
-          <FormHelperText>
-            Bạn có thể chọn nhiều ảnh. Nếu chọn ảnh mới, ảnh cũ sẽ bị thay thế.
-          </FormHelperText>
-        </Grid>
+            <label className="switch-label">
+              <input
+                type="checkbox"
+                name="isNewRelease"
+                checked={form.isNewRelease}
+                onChange={handleChange}
+                className="switch-input"
+              />
+              <span className="switch-slider"></span>
+              Mới phát hành
+            </label>
+          </div>
+        </div>
 
-        <Grid>
-          <Box display="flex" alignItems="center">
-            <Switch
-              checked={form.isActivated}
-              onChange={handleChange}
-              name="isActivated"
-            />
-            <Typography ml={1}>Kích hoạt</Typography>
-          </Box>
-        </Grid>
-        <Grid>
-          <Box display="flex" alignItems="center">
-            <Switch
-              checked={form.isNewRelease}
-              onChange={handleChange}
-              name="isNewRelease"
-            />
-            <Typography ml={1}>Mới phát hành</Typography>
-          </Box>
-        </Grid>
-      </Grid>
+        <div className="form-actions">
+          <button className="btn btn-primary" onClick={handleSubmit}>
+            Lưu
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => navigate("/admin/books")}
+          >
+            Hủy
+          </button>
+        </div>
 
-      <Box mt={3}>
-        <Button variant="contained" onClick={handleSubmit}>
-          Lưu
-        </Button>
-        <Button sx={{ ml: 2 }} onClick={() => navigate("/admin/books")}>
-          Hủy
-        </Button>
-      </Box>
-
-      <Snackbar
-        open={alert.open}
-        autoHideDuration={3000}
-        onClose={() => setAlert((a) => ({ ...a, open: false }))}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
-      >
-        <Alert severity={alert.severity}>{alert.message}</Alert>
-      </Snackbar>
-    </Paper>
+        {alert.open && (
+          <div className={`alert alert-${alert.severity}`}>
+            <span>{alert.message}</span>
+            <button
+              className="alert-close"
+              onClick={() => setAlert((a) => ({ ...a, open: false }))}
+            >
+              ×
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
