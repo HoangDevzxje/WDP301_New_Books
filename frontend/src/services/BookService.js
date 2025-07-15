@@ -39,3 +39,8 @@ export const getBookByPublisher = async (publisher) => {
   const response = await axiosInstance.get(`/book/publisher/${publisher}`);
   return response;
 };
+
+export const getBestSellers = async () => {
+  const response = await axiosInstance.get(`/book/best-seller`);
+  return response;
+};

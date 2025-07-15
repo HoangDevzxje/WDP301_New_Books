@@ -9,7 +9,7 @@ const Footer = () => {
     <Box component="footer" bgcolor="grey.900" color="white" py={6}>
       <Container maxWidth="xl" sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <Grid container spacing={4}>
-          <Grid item  xs={12} sm={6} md={3}>
+          <Grid size={{ xs: 12, sm: 6, md: 3 }}  >
             <Box display="flex" alignItems="center" mb={2}>
               <Book color="#facc15" style={{ marginRight: 8 }} />
               <Typography variant="h6" fontWeight="bold" fontFamily="serif">NewBooks</Typography>
@@ -30,7 +30,7 @@ const Footer = () => {
             </Stack>
           </Grid>
 
-          <Grid item  xs={12} sm={6} md={3}>
+          <Grid  size={{ xs: 12, sm: 6, md: 3 }} >
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Quick Links
             </Typography>
@@ -44,7 +44,7 @@ const Footer = () => {
             </Stack>
           </Grid>
 
-          <Grid item  xs={12} sm={6} md={3}>
+          <Grid  size={{ xs: 12, sm: 6, md: 3 }} >
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Categories
             </Typography>
@@ -58,7 +58,7 @@ const Footer = () => {
             </Stack>
           </Grid>
 
-          <Grid item  xs={12} sm={6} md={3}>
+          <Grid  size={{ xs: 12, sm: 6, md: 3 }} >
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
               Contact Us
             </Typography>

@@ -14,7 +14,7 @@ import {
   Button,
   CardActions,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {
@@ -36,7 +36,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [hoveredId, setHoveredId] = useState(null);
   const [newBooks, setNewBooks] = useState([]);
   const [saleBooks, setSaleBooks] = useState([]);
-
+  const navigate = useNavigate();
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
@@ -55,7 +55,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
   const handleScroll = (direction) => {
     const container = scrollRef.current;
-    const scrollAmount = 300;
+    const scrollAmount = 445;
 
     if (direction === "left") {
       container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
@@ -183,6 +183,18 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
     setHoveredId(null);
   };
 
+  const handleClickToAll = (filterType) => {
+    navigate("/shopAll", {
+      state: { selectedFilter: filterType },
+    });
+  };
+
+  const handleCategoryClick2 = (categoryId) => {
+    navigate("/shopAll", {
+      state: { selectedCategoryId: categoryId }, 
+    });
+  };
+
   return (
     <Box className="homepage-container">
       <Box className="banner-container" 
@@ -224,6 +236,12 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           <Typography className="bestseller-subtitle" sx={{ mt: 2, mb: 4 }}>
             Các loại sách mới được phát hành, hãy là người đầu tiên trải nghiệm những cuốn sách mới này
           </Typography>
+
+          <Box className="buttonAll">
+              <Typography sx={{fontWeight: "bold"}} onClick={() => handleClickToAll("new-release")}>
+                  Xem tất cả
+              </Typography>
+          </Box>
         </Box>
         <Box className="books-grid-container">
           {isLoading ? (
@@ -262,6 +280,12 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           <Typography className="bestseller-subtitle" sx={{ mt: 2, mb: 4 }}>
             Các loại sách mới nhất đang được sales trong đợt Big Sale
           </Typography>
+
+          <Box className="buttonAll">
+              <Typography sx={{fontWeight: "bold"}} onClick={() => handleClickToAll("big-sale")}>
+                  Xem tất cả
+              </Typography>
+          </Box>
         </Box>
 
           <Box className="books-grid-container">
@@ -336,7 +360,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Box>
       </Box>
 
-      <Container maxWidth="xl" className="categories-section">
+      <Box  className="categories-section">
          <Box className="bestseller-container">
           <Typography
             variant="h3"
@@ -359,27 +383,18 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
           <Box ref={scrollRef} className="categories-scroll">
             {categories.map((category) => (
-              <Card key={category._id} className="category-card">
-                <CardMedia
-                  component="img"
-                  height="250"
-                  image="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
-                  alt="Paella dish"
-                />
-                <CardContent className="category-content">
-                  <Typography className="category-name">
-                    {category.name}
-                  </Typography>
-                  <Typography className="category-description">
-                    {category.description}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button className="category-button" variant="contained">
-                    Learn More
-                  </Button>
-                </CardActions>
-              </Card>
+              <Box key={category._id} className="category-card" onClick={() => handleCategoryClick2(category._id)}>
+              <img
+                src="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
+                alt={category.name}
+              />
+              <Box className="category-overlay">
+                <Typography className="category-title2">
+                  {category.name}
+                </Typography>
+              </Box>
+            </Box>
+
             ))}
           </Box>
 
@@ -390,7 +405,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <ArrowForwardIos />
           </IconButton>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };
