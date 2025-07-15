@@ -33,6 +33,7 @@ import ComplaintManagement from "./pages/Admin/ComplaintManagement/ComplaintMana
 import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard.js";
 import * as WishlistService from "./services/WishlistService";
 import * as CartService from "./services/CartService";
+import ScrollToTop from "./utils/ScrollToTop.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -147,6 +148,8 @@ function App() {
         />
       )}
 
+      <ScrollToTop /> 
+
       <Routes>
         <Route
           path="/admin"
@@ -171,7 +174,6 @@ function App() {
           </Route>
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
-          <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="feedbacks" element={<FeedbackManagement />} />
         </Route>
         <Route

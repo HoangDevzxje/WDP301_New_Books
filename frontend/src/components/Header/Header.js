@@ -263,9 +263,12 @@ const Header = ({
   };
 
   const handleCategoryClick2 = (categoryId) => {
-    navigate(`/category/${categoryId}`);
+    navigate("/shopAll", {
+      state: { selectedCategoryId: categoryId }, 
+    });
     handleClose();
   };
+
   const handleSearchSubmit = () => {
     navigate(`/shopAll?query=${encodeURIComponent(searchTerm)}`);
   };
@@ -589,9 +592,7 @@ const Header = ({
                             <Box className="view-all-container">
                               <Button
                                 className="custom-icon-button"
-                                component={Link}
-                                to={`/category/${activeCategory._id}`}
-                                onClick={handleClose}
+                                 onClick={() => handleCategoryClick2(activeCategory._id)}
                               >
                                 <Typography
                                   variant="body2"
