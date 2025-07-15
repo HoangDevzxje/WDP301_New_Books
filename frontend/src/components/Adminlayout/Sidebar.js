@@ -49,6 +49,11 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <FeedbackIcon />,
       link: "/admin/complaints",
     },
+    {
+      text: "Quản lý blog",
+      icon: <RateReview />,
+      link: "/admin/reviews",
+    },
   ];
 
   return (

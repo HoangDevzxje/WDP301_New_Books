@@ -34,6 +34,7 @@ import AdminDashboard from "./pages/Admin/Dashboard/AdminDashboard.js";
 import * as WishlistService from "./services/WishlistService";
 import * as CartService from "./services/CartService";
 import ScrollToTop from "./utils/ScrollToTop.js";
+import AdminReviews from "./pages/Admin/ReviewMangement/reviews.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -176,6 +177,7 @@ function App() {
           <Route path="complaints" element={<ComplaintManagement />} />
           <Route path="feedbacks" element={<FeedbackManagement />} />
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="reviews" element={<AdminReviews />} />
         </Route>
         <Route
           path="/account/login"
