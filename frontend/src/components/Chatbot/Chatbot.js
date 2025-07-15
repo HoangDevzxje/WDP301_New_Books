@@ -23,7 +23,7 @@ const Chatbot = () => {
     // Add welcome message when chat opens
     useEffect(() => {
         if (isOpen && messages.length === 0) {
-            const welcomeMessage = "Xin chào! Tôi là trợ lí ảo UniSwap với AI thông minh. Tôi có thể gợi ý sản phẩm phù hợp với mong muốn của bạn. Bạn cần tôi giúp gì không?";
+            const welcomeMessage = "Xin chào! Tôi là trợ lí ảo NewBooks với AI thông minh. Tôi có thể gợi ý sản phẩm phù hợp với mong muốn của bạn. Bạn cần tôi giúp gì không?";
             setMessages([{ sender: 'bot', text: welcomeMessage }]);
         }
     }, [isOpen]);
