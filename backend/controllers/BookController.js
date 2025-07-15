@@ -77,7 +77,7 @@ const getBookByPublisher = async (req, res) => {
 const getBestSellers = async (req, res) => {
     try {
         const topSellingBooks = await Order.aggregate([
-            // Chỉ lấy đơn hàng đã thanh toán và không bị hủy
+            // Lọc các đơn hàng đã hoàn tất
             {
                 $match: {
                     paymentStatus: "Completed",
@@ -85,10 +85,10 @@ const getBestSellers = async (req, res) => {
                 }
             },
 
-            // Tách từng sản phẩm trong đơn hàng
+            // Tách từng sách trong đơn
             { $unwind: "$items" },
 
-            // Gom nhóm theo sách và tính tổng số lượng đã bán
+            // Gom theo sách để tính tổng số lượng bán
             {
                 $group: {
                     _id: "$items.book",
@@ -98,9 +98,6 @@ const getBestSellers = async (req, res) => {
 
             // Sắp xếp giảm dần theo số lượng bán
             { $sort: { totalQuantity: -1 } },
-
-            // Giới hạn 20 cuốn sách bán chạy nhất
-            { $limit: 20 },
 
             // Lấy thông tin sách từ collection books
             {
@@ -112,30 +109,31 @@ const getBestSellers = async (req, res) => {
                 }
             },
 
-            // Tách object trong mảng bookDetails
+            // Lấy object thay vì mảng
             { $unwind: "$bookDetails" },
 
-            // Chọn trường cần trả về
+            // Gộp lại tất cả thông tin sách + thêm totalQuantity
             {
-                $project: {
-                    bookId: "$_id",
-                    bookName: "$bookDetails.title",
-                    totalQuantity: 1,
-                    bookImages: "$bookDetails.images",
-                    author: "$bookDetails.author",
-                    price: "$bookDetails.price"
+                $replaceRoot: {
+                    newRoot: {
+                        $mergeObjects: ["$bookDetails", { totalQuantity: "$totalQuantity" }]
+                    }
                 }
-            }
+            },
+
+            // Giới hạn 20 kết quả
+            { $limit: 20 }
         ]);
 
         return res.status(200).json(topSellingBooks);
     } catch (error) {
         return res.status(500).json({
-            message: "Lỗi server!",
+            message: "Lỗi khi lấy sách",
             error: error.message
         });
     }
 };
+
 
 module.exports = {
     getAllBooks,
