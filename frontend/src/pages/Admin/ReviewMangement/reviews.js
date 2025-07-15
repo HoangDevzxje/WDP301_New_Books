@@ -117,7 +117,7 @@ export default function AdminReviews() {
 
   return (
     <div className="admin-reviews">
-      <h1>Quản lý Reviews</h1>
+      <h1>Quản lý Blog</h1>
 
       <button
         className="btn-add-review"

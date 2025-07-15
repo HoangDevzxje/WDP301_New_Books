@@ -16,6 +16,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import RateReview from "@mui/icons-material/RateReview";
 import CategoryIcon from "@mui/icons-material/Category";
+import StarIcon from "@mui/icons-material/Star";
 import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -40,7 +41,7 @@ const Sidebar = ({ isSidebarOpen }) => {
     },
     {
       text: "Quản lý đánh giá",
-      icon: <RateReview />,
+      icon: <StarIcon />,
       link: "/admin/feedbacks",
     },
 
@@ -50,7 +51,7 @@ const Sidebar = ({ isSidebarOpen }) => {
       link: "/admin/complaints",
     },
     {
-      text: "Quản lý blog",
+      text: "Quản lý Blog",
       icon: <RateReview />,
       link: "/admin/reviews",
     },
