@@ -52,6 +52,37 @@ const getAdminDashboardStats = async (req, res) => {
                 }
             }
         ]);
+        // Top 10 least-selling products
+        const leastSellingProducts = await Order.aggregate([
+            { $unwind: "$items" },
+            {
+                $group: {
+                    _id: "$items.book",
+                    totalQuantity: { $sum: "$items.quantity" },
+                    totalRevenue: { $sum: { $multiply: ["$items.quantity", "$items.price"] } }
+                }
+            },
+            { $sort: { totalQuantity: 1 } },
+            { $limit: 10 },
+            {
+                $lookup: {
+                    from: 'books',
+                    localField: '_id',
+                    foreignField: '_id',
+                    as: 'bookDetails'
+                }
+            },
+            { $unwind: "$bookDetails" },
+            {
+                $project: {
+                    bookId: "$_id",
+                    bookName: "$bookDetails.title",
+                    totalQuantity: 1,
+                    totalRevenue: 1,
+                    bookImages: "$bookDetails.images"
+                }
+            }
+        ]);
 
         // Total Revenue Calculation
         const totalRevenueResult = await Order.aggregate([
@@ -167,6 +198,7 @@ const getAdminDashboardStats = async (req, res) => {
             totalRevenue: totalRevenueResult[0]?.totalRevenue || 0,
             orderStatusCount: formattedOrderStatus,
             topSellingProducts,
+            leastSellingProducts,
             revenueAnalysis
         });
     } catch (error) {
