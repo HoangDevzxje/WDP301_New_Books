@@ -1,0 +1,139 @@
+.container {
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 24px;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+  text-align: center;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.address-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 32px;
+}
+
+.address-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.address-item:hover {
+  background-color: #f0f8ff;
+}
+
+.address-item.default {
+  border-color: #c49a6c !important;
+  background-color: #eaf2ff;
+}
+
+.address-item p {
+  margin: 0;
+  color: #333;
+  line-height: 1.5;
+  font-size: 15px;
+}
+
+.badge {
+  background-color: #c49a6c !important;
+  color: white;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.actions .btn {
+  flex-shrink: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border 0.2s;
+}
+
+.input:focus {
+  border-color: #c49a6c !important;
+  outline: none;
+  background-color: #f9fcff;
+}
+
+.checkbox-label {
+  font-size: 14px;
+  color: #444;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.btn {
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-primary {
+  background-color: white;
+  color: #c49a6c !important;
+}
+
+.btn-primary:hover {
+  background-color: white;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5c636a;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #bb2d3b;
+}

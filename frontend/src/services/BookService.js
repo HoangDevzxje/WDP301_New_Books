@@ -19,3 +19,28 @@ export const getBooksByCategory = async (categoryId) => {
   const response = await axiosInstance.get(`/book/category/${categoryId}`);
   return response;
 };
+
+export const getNewBook = async() => {
+  const response = await axiosInstance.get(`/book/new-book`);
+  return response;
+}
+
+export const getSalesBook = async() => {
+  const response = await axiosInstance.get(`/book/sales`);
+  return response;
+}
+
+export const getBooksByAuthor = async (author) => {
+  const response = await axiosInstance.get(`/book/author/${author}`);
+  return response;
+};
+
+export const getBookByPublisher = async (publisher) => {
+  const response = await axiosInstance.get(`/book/publisher/${publisher}`);
+  return response;
+};
+
+export const getBestSellers = async () => {
+  const response = await axiosInstance.get(`/book/best-seller`);
+  return response;
+};

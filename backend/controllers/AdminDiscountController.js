@@ -23,22 +23,32 @@ const getDiscountById = async (req, res) => {
 
 const getDiscountSuitable = async (req, res) => {
   try {
-    const { amount } = req.query;
+    const { amount, productId } = req.query;
+
     if (!amount || isNaN(amount) || amount < 0) {
       return res.status(400).json({ message: "Số tiền không hợp lệ" });
     }
 
     const today = new Date();
 
-    // Lọc các discount hợp lệ
-    const discounts = await Discount.find({
-      isActive: true, // Chỉ lấy discount đang kích hoạt
-      minPurchase: { $lte: amount }, // amount >= minPurchase
-      startDate: { $lte: today }, // startDate <= hôm nay
-      endDate: { $gte: today }, // endDate >= hôm nay
-      $expr: { $lt: ["$usedCount", "$usageLimit"] }, // usedCount < usageLimit
-    });
+    const query = {
+      isActive: true,
+      minPurchase: { $lte: amount },
+      startDate: { $lte: today },
+      endDate: { $gte: today },
+      $expr: { $lt: ["$usedCount", "$usageLimit"] },
+    };
 
+    // Nếu có productId → chỉ lấy các giảm giá áp dụng cho sản phẩm đó hoặc toàn sàn
+    if (productId) {
+      query.$or = [
+        { productIds: { $exists: false } },
+        { productIds: { $size: 0 } },
+        { productIds: productId },
+      ];
+    }
+
+    const discounts = await Discount.find(query);
     res.json({ discounts });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -91,6 +101,7 @@ const updatedDiscount = async (req, res) => {
       "startDate",
       "endDate",
       "isActive",
+      "productIds",
     ];
 
     const update = {};
@@ -140,6 +151,44 @@ const deleteDiscount = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+const updateDiscountProducts = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { productIds } = req.body;
+
+    const discount = await Discount.findByIdAndUpdate(
+      id,
+      { productIds },
+      { new: true }
+    );
+
+    if (!discount)
+      return res.status(404).json({ message: "Không tìm thấy mã giảm giá" });
+
+    res.json({ message: "Cập nhật sách áp dụng thành công", discount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+const removeBookFromDiscount = async (req, res) => {
+  try {
+    const { discountId, bookId } = req.params;
+
+    const discount = await Discount.findById(discountId);
+    if (!discount)
+      return res.status(404).json({ message: "Không tìm thấy mã giảm giá" });
+
+    discount.productIds = discount.productIds.filter(
+      (id) => id.toString() !== bookId
+    );
+
+    await discount.save();
+
+    res.json({ message: "Đã xóa sách khỏi mã giảm giá", discount });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
 
 const discountController = {
   getAllDiscounts,
@@ -149,6 +198,8 @@ const discountController = {
   createDiscount,
   changeStatusDiscount,
   updatedDiscount,
+  updateDiscountProducts,
+  removeBookFromDiscount,
 };
 
 module.exports = discountController;

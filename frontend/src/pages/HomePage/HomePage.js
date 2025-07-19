@@ -14,7 +14,7 @@ import {
   Button,
   CardActions,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import {
@@ -23,9 +23,10 @@ import {
 } from "@mui/icons-material";
 
 import BookCard from "../../components/BookCard/BookCard";
-import { getBooks } from "../../services/BookService";
+import * as BookService from "../../services/BookService";
 import { getWishlist, addToWishlist, deleteFromWishlist } from "../../services/WishlistService";
 import * as CategoryService from "../../services/CategoryService";
+
 const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [books, setBooks] = useState([]);
   const [notifications, setNotifications] = useState([]);
@@ -33,7 +34,9 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
-
+  const [newBooks, setNewBooks] = useState([]);
+  const [saleBooks, setSaleBooks] = useState([]);
+  const navigate = useNavigate();
   const fetchCategories = async () => {
     setIsLoading(true);
     try {
@@ -52,7 +55,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
   const handleScroll = (direction) => {
     const container = scrollRef.current;
-    const scrollAmount = 300;
+    const scrollAmount = 445;
 
     if (direction === "left") {
       container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
@@ -64,8 +67,8 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
   useEffect(() => {
     setIsLoading(true);
     fetchCategories();
-    getBooks().then(async (response) => {
-        const bookData = response.data.map((book) => ({
+    BookService.getBooks().then(async (response) => {
+      const bookData = response.data.map((book) => ({
           ...book,
           price: book.price,
           originalPrice: book.originalPrice,
@@ -77,6 +80,23 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         console.error("Lỗi khi lấy danh sách sách:", error);
         setIsLoading(false);
       });
+      
+      BookService.getNewBook().then((response) => {
+        console.log("New books:", response.data);
+        setNewBooks(response.data);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy danh sách sách:", error);
+      });
+      
+      BookService.getSalesBook().then((response) => {
+        console.log("Sale books:", response.data);
+        setSaleBooks(response.data);
+      })
+      .catch((error) => {
+        console.error("Lỗi khi lấy danh sách sách:", error);
+      })
+      
 
     const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
     if (access_token) {
@@ -84,13 +104,15 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
           if (response.data && response.data.wishlist) {
             const wishlistIds = response.data.wishlist.map((book) => book._id);
             setWishlist(wishlistIds);
-           console.log("Wishlist IDs:", wishlistIds);
+          //  console.log("Wishlist IDs:", wishlistIds);
           }
         })
         .catch((error) =>
           console.error("Lỗi khi lấy danh sách yêu thích:", error)
         );
-      }
+    }
+
+    
   }, []);
 
   const toggleWishlist = async (bookId) => {
@@ -113,8 +135,8 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         await deleteFromWishlist(bookId);
 
         setWishlist((prev) => prev.filter((id) => id !== bookId));
-        if (typeof updateWishlistCount === "function") {
-          updateWishlistCount((prev) => prev - 1);
+        if (updateWishlistCount) {
+          updateWishlistCount();
         }
         setNotifications((prev) => [
           ...prev,
@@ -128,8 +150,8 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         await addToWishlist(bookId);
 
         setWishlist((prev) => [...prev, bookId]);
-        if (typeof updateWishlistCount === "function") {
-          updateWishlistCount((prev) => prev + 1);
+        if ( updateWishlistCount) {
+          updateWishlistCount();
         }
         setNotifications((prev) => [
           ...prev,
@@ -161,9 +183,27 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
     setHoveredId(null);
   };
 
+  const handleClickToAll = (filterType) => {
+    navigate("/shopAll", {
+      state: { selectedFilter: filterType },
+    });
+  };
+
+  const handleCategoryClick2 = (categoryId) => {
+    navigate("/shopAll", {
+      state: { selectedCategoryId: categoryId }, 
+    });
+  };
+
   return (
     <Box className="homepage-container">
-      <Box className="banner-container">
+      <Box className="banner-container" 
+       sx={{
+          backgroundImage: `url("/book2.jpeg")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          height: "92vh",
+        }}>
         <Box className="banner-content">
           <Typography variant="h1" className="banner-title">
             Khám phá thế giới sách đầy màu sắc
@@ -175,7 +215,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
           <Button
             component={Link}
-            to="/books"
+            to="/shopAll"
             variant="contained"
             size="large"
             className="banner-button"
@@ -185,21 +225,30 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Box>
       </Box>
 
-      <Container maxWidth="xl" className="main-container">
-        <Typography
-          variant="h3"
-          sx={{ mt: 2, mb: 4 }}
-          className="bestseller-title"
-        >
-          Best Sellers
-        </Typography>
+      <Box maxWidth="xl" className="main-container">
+        <Box className="bestseller-container">
+          <Typography
+            variant="h3"
+            className="bestseller-title"
+          >
+            New Released Books
+          </Typography>
+          <Typography className="bestseller-subtitle" sx={{ mt: 2, mb: 4 }}>
+            Các loại sách mới được phát hành, hãy là người đầu tiên trải nghiệm những cuốn sách mới này
+          </Typography>
 
+          <Box className="buttonAll">
+              <Typography sx={{fontWeight: "bold"}} onClick={() => handleClickToAll("new-release")}>
+                  Xem tất cả
+              </Typography>
+          </Box>
+        </Box>
         <Box className="books-grid-container">
           {isLoading ? (
             <Typography className="loading-text">Đang tải...</Typography>
           ) : (
             <Grid container spacing={4}>
-              {books.slice(0, 10).map((book) => (
+              {books.slice(5, 10).map((book) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
                   <BookCard
                     book={book}
@@ -213,6 +262,52 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
               ))}
             </Grid>
           )}
+        </Box>
+      </Box>
+
+        <Box className="banner-1"> 
+          <img src="banner2.png" alt="Background" className="background-image" />
+        </Box>
+        
+      <Box maxWidth="xl" className="main-container">
+        <Box className="bestseller-container">
+          <Typography
+            variant="h3"
+            className="bestseller-title"
+          >
+            Books on Sales
+          </Typography>
+          <Typography className="bestseller-subtitle" sx={{ mt: 2, mb: 4 }}>
+            Các loại sách mới nhất đang được sales trong đợt Big Sale
+          </Typography>
+
+          <Box className="buttonAll">
+              <Typography sx={{fontWeight: "bold"}} onClick={() => handleClickToAll("big-sale")}>
+                  Xem tất cả
+              </Typography>
+          </Box>
+        </Box>
+
+          <Box className="books-grid-container">
+            {isLoading ? (
+              <Typography className="loading-text">Đang tải...</Typography>
+            ) : (
+              <Grid container spacing={4}>
+                {saleBooks.slice(0, 5).map((book) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
+                    <BookCard
+                      book={book}
+                      hoveredId={hoveredId}
+                      wishlist={wishlist}
+                      onHover={handleMouseEnter}
+                      onLeave={handleMouseLeave}
+                      toggleWishlist={toggleWishlist}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
+            )}
+          </Box>
         </Box>
 
         {notifications.map((notification) => (
@@ -235,8 +330,9 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
              </Alert>
              </Snackbar>
           ))}
-      </Container>
 
+
+       
       <Box className="blog-section">
         <Box className="blog-image-container">
           <img
@@ -264,10 +360,18 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Box>
       </Box>
 
-      <Container maxWidth="xl" className="categories-section">
-        <Typography variant="h3" className="bestseller-title">
-          Thể loại sách
-        </Typography>
+      <Box  className="categories-section">
+         <Box className="bestseller-container">
+          <Typography
+            variant="h3"
+            className="bestseller-title"
+          >
+            Thể loại sách
+          </Typography>
+          <Typography className="bestseller-subtitle" sx={{ mt: 2, mb: 4 }}>
+            Bạn có thể tìm sách của các thể loại sách mà bạn yêu thích
+          </Typography>
+        </Box>
 
         <Box className="categories-container">
           <IconButton
@@ -279,27 +383,18 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
 
           <Box ref={scrollRef} className="categories-scroll">
             {categories.map((category) => (
-              <Card key={category._id} className="category-card">
-                <CardMedia
-                  component="img"
-                  height="250"
-                  image="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
-                  alt="Paella dish"
-                />
-                <CardContent className="category-content">
-                  <Typography className="category-name">
-                    {category.name}
-                  </Typography>
-                  <Typography className="category-description">
-                    {category.description}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button className="category-button" variant="contained">
-                    Learn More
-                  </Button>
-                </CardActions>
-              </Card>
+              <Box key={category._id} className="category-card" onClick={() => handleCategoryClick2(category._id)}>
+              <img
+                src="https://i.pinimg.com/736x/47/c1/88/47c1880a9ca02b67d5911862f757336d.jpg"
+                alt={category.name}
+              />
+              <Box className="category-overlay">
+                <Typography className="category-title2">
+                  {category.name}
+                </Typography>
+              </Box>
+            </Box>
+
             ))}
           </Box>
 
@@ -310,7 +405,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <ArrowForwardIos />
           </IconButton>
         </Box>
-      </Container>
+      </Box>
     </Box>
   );
 };

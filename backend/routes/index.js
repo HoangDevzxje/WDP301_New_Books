@@ -10,6 +10,9 @@ const discountRoutes = require("./discountRoute");
 const orderRoutes = require("./orderRoute");
 const addressRoutes = require("./addressRoute");
 const ghnRoutes = require("./ghnRoute");
+const paymentRoutes = require("./paymentRoute");
+const reviewRoutees = require("./reviewRoute");
+const commnetRoutes = require("./commnetRoute");
 const routes = (app) => {
   app.use("/auth", authRoutes);
   app.use("/book", bookRoutes);
@@ -21,8 +24,11 @@ const routes = (app) => {
   app.use("/chatbot", chatbotRoutes);
   app.use("/discount", discountRoutes);
   app.use("/order", orderRoutes);
-  app.use("/address", addressRoutes);
+  app.use("/addresses/users/:userId", addressRoutes);
   app.use("/ghn", ghnRoutes);
+  app.use("/payment", paymentRoutes);
+  app.use("/review", reviewRoutees);
+  app.use("/comment", commnetRoutes);
 };
 
 module.exports = routes;

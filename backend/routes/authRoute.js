@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const authController = require('../controllers/AuthController');
+const { checkAuthorize } = require('../middleware/authMiddleware');
 
 // Xử lý OTP
 /**
@@ -293,7 +294,7 @@ router.post("/refresh-token", authController.refreshToken);
  *       500:
  *         description: Lỗi hệ thống
  */
-router.post("/change-password", authController.changePassword);
+router.post("/change-password", checkAuthorize(["user"]), authController.changePassword);
 
 /**
  * @swagger

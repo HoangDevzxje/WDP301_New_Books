@@ -1,0 +1,267 @@
+.track-order-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+}
+
+.track-order-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.track-order-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #c49a6c;
+  margin-bottom: 0.5rem;
+}
+
+.track-order-subtitle {
+  font-size: 1rem;
+  color: #7f8c8d;
+}
+
+/* Loading */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty orders */
+.empty-orders {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 0;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.empty-order-image {
+  width: 200px;
+  margin-bottom: 1.5rem;
+  opacity: 0.7;
+}
+
+.empty-order-text {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  margin-bottom: 1.5rem;
+}
+
+.primary-button {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.primary-button:hover {
+  background-color: #2980b9;
+}
+
+/* Table styles */
+.orders-table-container {
+  overflow-x: auto;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin-top: 1.5rem;
+}
+
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+}
+
+.orders-table th {
+  background-color: #2c3e50;
+  color: #fff;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.orders-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.orders-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.orders-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* Payment Method */
+.payment-method {
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+.payment-method.cod {
+  background-color: #ffeaa7;
+  color: #e17055;
+}
+.payment-method.bank {
+  background-color: #a5d8ff;
+  color: #1864ab;
+}
+.payment-method.momo {
+  background-color: #ffc9ff;
+  color: #862e9c;
+}
+
+/* Tracking link */
+.tracking-link {
+  color: #3498db;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.tracking-link:hover {
+  color: #1a5276;
+  text-decoration: underline;
+}
+.external-icon {
+  font-size: 0.8rem;
+}
+.no-tracking {
+  color: #95a5a6;
+  font-style: italic;
+}
+
+/* Detail button */
+.detail-button {
+  background-color: #2ecc71;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.detail-button:hover {
+  background-color: #27ae60;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .track-order-container {
+    padding: 1rem;
+  }
+  .track-order-header h1 {
+    font-size: 1.8rem;
+  }
+  .orders-table th,
+  .orders-table td {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* === Shopee-style product layout === */
+.product-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.product-image {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.product-extra {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.product-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.product-qty {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ee4d2d;
+  margin: 0;
+}

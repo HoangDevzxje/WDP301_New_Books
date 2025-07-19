@@ -5,21 +5,25 @@ import {
   Email as EmailIcon,
   Phone as PhoneIcon,
   Edit as EditIcon,
-  Lock as LockIcon,
-  ShoppingBag as ShoppingBagIcon,
   Login as LoginIcon,
   Home as HomeIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
 } from "@mui/icons-material";
-import { getProfile } from "../../services/UserService";
-
+import { getProfile, updateProfile } from "../../services/UserService";
 import "./Profile.css";
-import AccountBreadCrumb from "../../components/BreadCrumb/AccountBreadCrumb";
+import AccountLayout from "../../components/BreadCrumb/AccountLayout";
 
 export default function Profile() {
   const [user, setUser] = useState(null);
+  const [editData, setEditData] = useState({ name: "", email: "", phone: "" });
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [editError, setEditError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,6 +32,11 @@ export default function Profile() {
         const res = await getProfile();
         if (res.data?.user) {
           setUser(res.data.user);
+          setEditData({
+            name: res.data.user.name || "",
+            email: res.data.user.email || "",
+            phone: res.data.user.phone || "",
+          });
           setIsAuthenticated(true);
         } else {
           setError("Dữ liệu người dùng không hợp lệ");
@@ -46,6 +55,45 @@ export default function Profile() {
     })();
   }, [navigate]);
 
+  const handleEditChange = (e) => {
+    setEditData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const startEdit = () => {
+    setIsEditing(true);
+    setEditError("");
+    setSuccess(false);
+  };
+
+  const cancelEdit = () => {
+    setIsEditing(false);
+    setEditData({
+      name: user.name || "",
+      email: user.email || "",
+      phone: user.phone || "",
+    });
+    setEditError("");
+  };
+
+  const saveEdit = async () => {
+    setSaving(true);
+    setEditError("");
+    try {
+      await updateProfile(editData);
+      setUser({ ...user, ...editData });
+      setSuccess(true);
+      setIsEditing(false);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setEditError(
+        err.response?.data?.message ||
+          "Cập nhật thất bại. Vui lòng thử lại sau."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // loading spinner
   if (loading) {
     return (
@@ -58,9 +106,6 @@ export default function Profile() {
   if (!isAuthenticated) {
     return (
       <>
-        <AccountBreadCrumb
-          paths={[{ name: "Tài khoản", to: "/user/profile" }]}
-        />
         <div className="login-prompt">
           <div className="login-box">
             <div className="avatar-large">
@@ -84,77 +129,103 @@ export default function Profile() {
 
   return (
     <>
-      <AccountBreadCrumb
-        paths={[
-          { name: "Tài khoản", to: "/user/profile" },
-          { name: "Thông tin tài khoản" },
-        ]}
-      />
-
-      <div className="profile-container">
-        <aside className="profile-sidebar">
-          <div className="profile-avatar">
-            <div className="avatar-circle">
-              {user.name?.charAt(0).toUpperCase() || <PersonIcon />}
-            </div>
-            <div className="profile-name">{user.name || "Khách"}</div>
-            <div className="profile-role">Thành viên</div>
-          </div>
-
-          <ul className="profile-nav">
-            <li className="nav-item active">
-              <Link to="/user/profile">
-                <PersonIcon /> Thông tin tài khoản
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/auth/change-password">
-                <LockIcon /> Đổi mật khẩu
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/track-order">
-                <ShoppingBagIcon /> Đơn hàng của tôi
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/user/addresses">
-                <HomeIcon /> Địa chỉ
-              </Link>
-            </li>
-          </ul>
-        </aside>
-
-        <main className="profile-main">
-          <div className="profile-header">
-            <h1>THÔNG TIN TÀI KHOẢN</h1>
-            <Link className="btn-edit" to="/user/edit-profile">
+      <AccountLayout user={user}>
+        <div className="profile-header">
+          <h1>THÔNG TIN TÀI KHOẢN</h1>
+          {!isEditing ? (
+            <button className="btn-edit" onClick={startEdit}>
               <EditIcon /> Chỉnh sửa
-            </Link>
-          </div>
-
-          <div className="info-row">
-            <div className="info-label">
-              <PersonIcon /> Họ tên:
+            </button>
+          ) : (
+            <div className="edit-actions">
+              <button
+                className="btn btn-cancel"
+                onClick={cancelEdit}
+                disabled={saving}
+              >
+                <CancelIcon /> Hủy
+              </button>
+              <button
+                className="btn btn-save primary"
+                onClick={saveEdit}
+                disabled={saving}
+              >
+                {saving ? (
+                  <div className="spinner-small" />
+                ) : (
+                  <>
+                    <SaveIcon /> Lưu
+                  </>
+                )}
+              </button>
             </div>
-            <div className="info-value">{user.name || "Chưa cập nhật"}</div>
-          </div>
+          )}
+        </div>
 
-          <div className="info-row">
-            <div className="info-label">
-              <EmailIcon /> Email:
-            </div>
-            <div className="info-value">{user.email || "Chưa cập nhật"}</div>
-          </div>
+        {editError && <div className="error-message">{editError}</div>}
+        {success && (
+          <div className="success-message">Cập nhật thông tin thành công!</div>
+        )}
 
-          <div className="info-row">
-            <div className="info-label">
-              <PhoneIcon /> Số điện thoại:
-            </div>
-            <div className="info-value">{user.phone || "Chưa cập nhật"}</div>
+        <div className="info-row">
+          <div className="info-label">
+            <PersonIcon /> Họ tên:
           </div>
-        </main>
-      </div>
+          <div className="info-value">
+            {isEditing ? (
+              <input
+                className="field-input"
+                name="name"
+                value={editData.name}
+                onChange={handleEditChange}
+                placeholder="Nhập họ và tên"
+              />
+            ) : (
+              user.name || "Chưa cập nhật"
+            )}
+          </div>
+        </div>
+
+        <div className="info-row">
+          <div className="info-label">
+            <EmailIcon /> Email:
+          </div>
+          <div className="info-value">
+            {isEditing ? (
+              <input
+                className="field-input"
+                name="email"
+                type="email"
+                value={editData.email}
+                onChange={handleEditChange}
+                placeholder="Nhập email"
+                required
+              />
+            ) : (
+              user.email || "Chưa cập nhật"
+            )}
+          </div>
+        </div>
+
+        <div className="info-row">
+          <div className="info-label">
+            <PhoneIcon /> Số điện thoại:
+          </div>
+          <div className="info-value">
+            {isEditing ? (
+              <input
+                className="field-input"
+                name="phone"
+                value={editData.phone}
+                onChange={handleEditChange}
+                placeholder="Nhập số điện thoại"
+              />
+            ) : (
+              user.phone || "Chưa cập nhật"
+            )}
+          </div>
+        </div>
+      </AccountLayout>
     </>
   );
 }

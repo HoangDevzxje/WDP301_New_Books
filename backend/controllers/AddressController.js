@@ -1,19 +1,19 @@
+// controllers/addressController.js
 const mongoose = require("mongoose");
 const User = require("../models/User");
-
-// helper: validate ObjectId
 const isId = (v) => mongoose.Types.ObjectId.isValid(v);
 
-/**
- * GET /users/:userId/addresses
- */
+/* -------------------------------------------------- *
+ * 1. LẤY DANH SÁCH ĐỊA CHỈ
+ * -------------------------------------------------- */
 exports.getAll = async (req, res, next) => {
   try {
     const { userId } = req.params;
     if (!isId(userId))
       return res.status(400).json({ message: "userId invalid" });
 
-    const user = await User.findById(userId, "address"); // chỉ lấy address
+    // chỉ trả về mảng address
+    const user = await User.findById(userId, "address");
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json(user.address);
@@ -22,9 +22,12 @@ exports.getAll = async (req, res, next) => {
   }
 };
 
-/**
- * POST /users/:userId/addresses
- */
+/* -------------------------------------------------- *
+ * 2. TẠO ĐỊA CHỈ MỚI
+ *    – Luôn push với isDefault = false,
+ *      rồi, nếu client chọn mặc định, gọi setDefaultAddress().
+ *    – Như vậy không bao giờ vướng duplicate-key.
+ * -------------------------------------------------- */
 exports.create = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -42,11 +45,10 @@ exports.create = async (req, res, next) => {
       isDefault = false,
     } = req.body;
 
-    // simple required check
     if (![address, provinceId, districtId, wardCode].every(Boolean))
       return res.status(400).json({ message: "Thiếu trường bắt buộc" });
 
-    // push vào mảng
+    // 1. push với isDefault = false
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -58,35 +60,38 @@ exports.create = async (req, res, next) => {
       districtName,
       wardCode,
       wardName,
-      isDefault,
+      isDefault: false,
     });
+    await user.save();
 
-    // nếu đánh dấu mặc định, đảm bảo duy nhất
+    // 2. nếu cần mặc định → chuyển cờ
     if (isDefault) {
-      const newAddrId = user.address[user.address.length - 1]._id;
-      // lưu rồi setDefault để xài update pipeline
-      await user.save();
+      const newAddrId = user.address.at(-1)._id;
       await User.setDefaultAddress(userId, newAddrId);
-    } else {
-      await user.save();
     }
 
     res.status(201).json(user.address);
   } catch (err) {
+    // Bắt lỗi duplicate key (hiếm khi xảy ra, nhưng trả message đẹp)
+    if (err.code === 11000)
+      return res.status(409).json({ message: "Đã có địa chỉ mặc định khác" });
     next(err);
   }
 };
 
-/**
- * PUT /users/:userId/addresses/:addrId
- */
+/* -------------------------------------------------- *
+ * 3. CẬP NHẬT ĐỊA CHỈ
+ *    – Không đụng tới isDefault trong $set.
+ *    – Sau khi cập nhật xong, nếu client truyền isDefault = true
+ *      thì mới gọi setDefaultAddress().
+ * -------------------------------------------------- */
 exports.update = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
     if (![isId(userId), isId(addrId)].every(Boolean))
       return res.status(400).json({ message: "invalid id" });
 
-    const {
+    const payload = (({
       address,
       provinceId,
       provinceName,
@@ -94,30 +99,25 @@ exports.update = async (req, res, next) => {
       districtName,
       wardCode,
       wardName,
-      isDefault,
-    } = req.body;
+    }) => ({
+      "address.$.address": address,
+      "address.$.provinceId": provinceId,
+      "address.$.provinceName": provinceName,
+      "address.$.districtId": districtId,
+      "address.$.districtName": districtName,
+      "address.$.wardCode": wardCode,
+      "address.$.wardName": wardName,
+    }))(req.body);
 
-    // update bằng positional operator
     const user = await User.findOneAndUpdate(
       { _id: userId, "address._id": addrId },
-      {
-        $set: {
-          "address.$.address": address,
-          "address.$.provinceId": provinceId,
-          "address.$.provinceName": provinceName,
-          "address.$.districtId": districtId,
-          "address.$.districtName": districtName,
-          "address.$.wardCode": wardCode,
-          "address.$.wardName": wardName,
-          "address.$.isDefault": !!isDefault,
-        },
-      },
-      { new: true, runValidators: true, projection: { address: 1 } }
+      { $set: payload },
+      { new: true, projection: { address: 1 }, runValidators: true }
     );
     if (!user) return res.status(404).json({ message: "Address not found" });
 
-    // nếu đổi sang mặc định
-    if (isDefault) await User.setDefaultAddress(userId, addrId);
+    if (req.body.isDefault === true)
+      await User.setDefaultAddress(userId, addrId);
 
     res.json(user.address);
   } catch (err) {
@@ -125,16 +125,15 @@ exports.update = async (req, res, next) => {
   }
 };
 
-/**
- * PATCH /users/:userId/addresses/:addrId/default
- */
+/* -------------------------------------------------- *
+ * 4. ĐẶT MẶC ĐỊNH (endpoint riêng)
+ * -------------------------------------------------- */
 exports.setDefault = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
     if (![isId(userId), isId(addrId)].every(Boolean))
       return res.status(400).json({ message: "invalid id" });
 
-    // bảo đảm addrId tồn tại
     const ok = await User.exists({ _id: userId, "address._id": addrId });
     if (!ok) return res.status(404).json({ message: "Address not found" });
 
@@ -145,29 +144,38 @@ exports.setDefault = async (req, res, next) => {
   }
 };
 
-/**
- * DELETE /users/:userId/addresses/:addrId
- */
+/* -------------------------------------------------- *
+ * 5. XOÁ ĐỊA CHỈ
+ *    – Lấy trạng thái mặc định của địa chỉ cần xoá (projection).
+ *    – $pull ra khỏi mảng.
+ *    – Nếu nó từng là mặc định và vẫn còn địa chỉ khác,
+ *      setDefaultAddress() cho phần tử đầu.
+ * -------------------------------------------------- */
 exports.remove = async (req, res, next) => {
   try {
     const { userId, addrId } = req.params;
     if (![isId(userId), isId(addrId)].every(Boolean))
       return res.status(400).json({ message: "invalid id" });
 
-    // lấy user trước để biết có phải default không
-    const user = await User.findById(userId, "address");
-    if (!user) return res.status(404).json({ message: "User not found" });
+    // 1. Lấy địa chỉ để biết có phải default không
+    const doc = await User.findOne(
+      { _id: userId, "address._id": addrId },
+      { "address.$": 1 }
+    );
+    if (!doc) return res.status(404).json({ message: "Address not found" });
 
-    const addr = user.address.id(addrId);
-    if (!addr) return res.status(404).json({ message: "Address not found" });
+    const wasDefault = doc.address[0].isDefault;
 
-    const isDefault = addr.isDefault;
-    addr.remove(); // subdoc method
-    await user.save();
+    // 2. Xoá
+    const afterPull = await User.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { address: { _id: addrId } } },
+      { new: true, projection: { address: 1 } }
+    );
 
-    // nếu vừa xoá default & còn địa chỉ khác, đặt cái đầu tiên làm default
-    if (isDefault && user.address.length) {
-      await User.setDefaultAddress(userId, user.address[0]._id);
+    // 3. Nếu xoá default và còn địa chỉ khác → gán default mới
+    if (wasDefault && afterPull.address.length) {
+      await User.setDefaultAddress(userId, afterPull.address[0]._id);
     }
 
     res.json({ message: "Đã xoá địa chỉ" });

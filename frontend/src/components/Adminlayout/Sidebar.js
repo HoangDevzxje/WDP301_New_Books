@@ -16,11 +16,12 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import FeedbackIcon from "@mui/icons-material/Feedback";
 import RateReview from "@mui/icons-material/RateReview";
 import CategoryIcon from "@mui/icons-material/Category";
+import StarIcon from "@mui/icons-material/Star";
 import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
   const menuItems = [
-    // { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
+    { text: "Dashboard", icon: <HomeIcon />, link: "/admin/dashboard" },
     { text: "Quản lý người dùng", icon: <PeopleIcon />, link: "/admin/users" },
     { text: "Quản lý sách", icon: <MenuBookIcon />, link: "/admin/books" },
     {
@@ -38,15 +39,21 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <LocalOfferIcon />,
       link: "/admin/discounts",
     },
-    // {
-    //   text: "Quản lý các báo cáo",
-    //   icon: <RateReview />,
-    //   link: "/admin/reports",
-    // },
     {
       text: "Quản lý đánh giá",
-      icon: <FeedbackIcon />,
+      icon: <StarIcon />,
       link: "/admin/feedbacks",
+    },
+
+    {
+      text: "Quản lý khiếu nại",
+      icon: <FeedbackIcon />,
+      link: "/admin/complaints",
+    },
+    {
+      text: "Quản lý Blog",
+      icon: <RateReview />,
+      link: "/admin/reviews",
     },
   ];
 

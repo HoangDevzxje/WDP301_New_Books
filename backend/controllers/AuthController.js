@@ -32,18 +32,20 @@ const sendOtp = async (req, res) => {
         return res.status(400).json({ message: "Email không tồn tại!" });
     }
 
+    if (!(await verifyEmail(email))) {
+      return res.status(400).json({ message: "Email không tồn tại!" });
+    }
+
     const otp = otpGenerator.generate(6, {
       digits: true,
       lowerCaseAlphabets: false,
       upperCaseAlphabets: false,
       specialChars: false,
     });
-    const expiresAt = Date.now() + 1 * 60 * 1000; // OTP hết hạn sau 5 phút
+    const expiresAt = Date.now() + 5 * 60 * 1000; // OTP hết hạn sau 5 phút
     if (!otpStore[email]) otpStore[email] = {};
     otpStore[email][type] = { otp, isVerified: false, expiresAt }; // Lưu OTP kèm thời gian hết hạn
-    if (!(await verifyEmail(email))) {
-      return res.status(400).json({ message: "Email không tồn tại!" });
-    }
+
 
     try {
       await sendEmail(email, otp, type);
@@ -54,9 +56,8 @@ const sendOtp = async (req, res) => {
     }
 
     res.status(200).json({
-      message: `OTP đã được gửi để ${
-        type === "register" ? "đăng ký" : "đặt lại mật khẩu"
-      }!`,
+      message: `OTP đã được gửi để ${type === "register" ? "đăng ký" : "đặt lại mật khẩu"
+        }!`,
     });
   } catch (error) {
     res.status(500).json({ message: "Lỗi hệ thống!" });
@@ -249,11 +250,19 @@ const login = async (req, res) => {
 
 const changePassword = async (req, res) => {
   const { oldPassword, newPassword } = req.body;
+
   try {
-    const user = req.user;
-    const isMatch = await bcrypt.compare(oldPassword, user.password);
-    if (!isMatch)
+    // Lấy lại user từ DB và chỉ định lấy trường password
+    const userFromDB = await User.findById(req.user._id).select('+password');
+
+    if (!userFromDB) {
+      return res.status(404).json({ message: "Người dùng không tồn tại!" });
+    }
+
+    const isMatch = await bcrypt.compare(oldPassword, userFromDB.password);
+    if (!isMatch) {
       return res.status(400).json({ message: "Mật khẩu cũ không đúng!" });
+    }
 
     const errMsg = validateUtils.validatePassword(newPassword);
     if (errMsg !== null) {
@@ -261,8 +270,8 @@ const changePassword = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-    await user.save();
+    userFromDB.password = hashedPassword;
+    await userFromDB.save();
 
     res.status(200).json({ message: "Thay đổi mật khẩu thành công!" });
   } catch (error) {

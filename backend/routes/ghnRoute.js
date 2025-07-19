@@ -9,4 +9,7 @@ router.get("/ward", ghnController.getWard);
 
 router.get("/calculate-fee", ghnController.calculateFee);
 
+
+router.get("/tracking/:orderId", ghnController.getTrackingDetails);
+
 module.exports = router;
