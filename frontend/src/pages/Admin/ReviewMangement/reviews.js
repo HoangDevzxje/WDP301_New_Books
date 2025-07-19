@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import "./reviews.css";
 import {
   createReview,
@@ -20,6 +22,33 @@ export default function AdminReviews() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ title: "", content: "" });
+
+  const quillModules = {
+    toolbar: [
+      [{ font: [] }, { header: [1, 2, 3, false] }],
+      [{ size: ["small", false, "large", "huge"] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link", "image"],
+      [{ align: [] }],
+      ["clean"],
+    ],
+  };
+  const quillFormats = [
+    "font",
+    "header",
+    "size",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "bullet",
+    "link",
+    "image",
+    "align",
+    "clean",
+  ];
 
   useEffect(() => {
     fetchBooks();
@@ -50,12 +79,25 @@ export default function AdminReviews() {
     return m;
   }, [books]);
 
-  const handleChange = (setter) => (e) => {
-    const { name, value, files } = e.target;
-    if (name === "images") {
-      setter((p) => ({ ...p, images: files }));
+  // handle change cho cả form và editForm
+  const handleFormChange = (field) => (eOrHtml) => {
+    if (field === "content") {
+      setForm((p) => ({ ...p, content: eOrHtml }));
     } else {
-      setter((p) => ({ ...p, [name]: value }));
+      const { name, value, files } = eOrHtml.target;
+      if (name === "images") {
+        setForm((p) => ({ ...p, images: files }));
+      } else {
+        setForm((p) => ({ ...p, [name]: value }));
+      }
+    }
+  };
+  const handleEditChange = (field) => (eOrHtml) => {
+    if (field === "content") {
+      setEditForm((p) => ({ ...p, content: eOrHtml }));
+    } else {
+      const { name, value } = eOrHtml.target;
+      setEditForm((p) => ({ ...p, [name]: value }));
     }
   };
   const handleCreate = async (e) => {
@@ -134,13 +176,13 @@ export default function AdminReviews() {
             name="title"
             placeholder="Tiêu đề"
             value={form.title}
-            onChange={handleChange(setForm)}
+            onChange={handleFormChange("title")}
             required
           />
           <select
             name="bookId"
             value={form.bookId}
-            onChange={handleChange(setForm)}
+            onChange={handleFormChange("bookId")}
             required
           >
             <option value="">-- Chọn sách --</option>
@@ -150,20 +192,26 @@ export default function AdminReviews() {
               </option>
             ))}
           </select>
-          <textarea
-            name="content"
-            placeholder="Nội dung (HTML)"
-            value={form.content}
-            onChange={handleChange(setForm)}
-            required
-          />
+
+          <div className="quill-wrapper">
+            <ReactQuill
+              theme="snow"
+              value={form.content}
+              onChange={handleFormChange("content")}
+              modules={quillModules}
+              formats={quillFormats}
+              placeholder="Nội dung (HTML)…"
+            />
+          </div>
+
           <input
             type="file"
             name="images"
             multiple
             accept="image/*"
-            onChange={handleChange(setForm)}
+            onChange={handleFormChange("images")}
           />
+
           <div className="actions">
             <button type="submit">Lưu</button>
             <button type="button" onClick={() => setShowCreateForm(false)}>
@@ -192,15 +240,20 @@ export default function AdminReviews() {
                   type="text"
                   name="title"
                   value={editForm.title}
-                  onChange={handleChange(setEditForm)}
+                  onChange={handleEditChange("title")}
                   required
                 />
-                <textarea
-                  name="content"
-                  value={editForm.content}
-                  onChange={handleChange(setEditForm)}
-                  required
-                />
+
+                <div className="quill-wrapper">
+                  <ReactQuill
+                    theme="snow"
+                    value={editForm.content}
+                    onChange={handleEditChange("content")}
+                    modules={quillModules}
+                    formats={quillFormats}
+                  />
+                </div>
+
                 <div className="actions">
                   <button type="submit">Lưu</button>
                   <button type="button" onClick={cancelEdit}>

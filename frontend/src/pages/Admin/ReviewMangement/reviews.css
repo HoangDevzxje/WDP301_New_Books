@@ -164,3 +164,20 @@
 .review-footer .actions button:last-child:hover {
   background: #c9302c;
 }
+
+.quill-wrapper {
+  margin: 1rem 0;
+}
+
+.ql-snow .ql-picker.ql-font {
+  width: 140px;
+}
+.ql-snow .ql-picker.ql-size {
+  width: 100px;
+}
+
+.quill-wrapper .ql-container {
+  min-height: 180px;
+  border-radius: 6px;
+  border: 1px solid #bbb;
+}
