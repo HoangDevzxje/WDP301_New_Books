@@ -13,7 +13,6 @@ import { getBooks } from "../../../services/AdminService/bookService";
 export default function AdminReviews() {
   const [reviews, setReviews] = useState([]);
   const [books, setBooks] = useState([]);
-
   const [form, setForm] = useState({
     title: "",
     bookId: "",
@@ -101,7 +100,6 @@ export default function AdminReviews() {
       setEditForm((p) => ({ ...p, [name]: value }));
     }
   };
-
   const handleCreate = async (e) => {
     e.preventDefault();
     try {
@@ -127,7 +125,6 @@ export default function AdminReviews() {
     setEditForm({ title: r.title, content: r.content });
   };
   const cancelEdit = () => setEditingId(null);
-
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -148,9 +145,21 @@ export default function AdminReviews() {
     setReviews((p) => p.filter((r) => r._id !== id));
   };
 
+  const formatDate = (isoString) => {
+    return new Intl.DateTimeFormat("vi-VN", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }).format(new Date(isoString));
+  };
+
   return (
     <div className="admin-reviews">
-      <h1>Quản lý Reviews</h1>
+      <h1>Quản lý Blog</h1>
 
       <button
         className="btn-add-review"
@@ -273,7 +282,7 @@ export default function AdminReviews() {
                 </div>
               )}
               <div className="review-footer">
-                <span>Created: {new Date(r.createdAt).toLocaleString()}</span>
+                <span>Tạo {formatDate(r.createdAt)}</span>
                 <div className="actions">
                   <button onClick={() => startEdit(r)}>Sửa</button>
                   <button onClick={() => handleDelete(r._id)}>Xoá</button>
