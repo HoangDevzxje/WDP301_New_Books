@@ -1,21 +1,5 @@
-import React from "react";
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography,
-  Grid,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Chip,
-} from "@mui/material";
+import React, { Component } from "react";
+import "./OrderDetailsDialog.css";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -28,14 +12,18 @@ const formatDate = (dateString) => {
   });
 };
 
-const OrderDetailsDialog = ({ open, order, onClose }) => {
-  if (!order) return null;
+class OrderDetailsDialog extends Component {
+  calculateSubtotal = () => {
+    const { order } = this.props;
+    return order.items.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
+  };
 
-  const calculateSubtotal = () =>
-    order.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
+  calculateTotal = () => {
+    const { order } = this.props;
+    const subtotal = this.calculateSubtotal();
     let discount = 0;
 
     // Discount code
@@ -56,239 +44,252 @@ const OrderDetailsDialog = ({ open, order, onClose }) => {
     return subtotal - discount + shippingFee;
   };
 
-  // Amount from discount code only
-  const getDiscountAmount = () => {
+  getDiscountAmount = () => {
+    const { order } = this.props;
     if (!order.discountUsed) return 0;
-    const subtotal = calculateSubtotal();
+    const subtotal = this.calculateSubtotal();
     return order.discountUsed.type === "fixed"
       ? order.discountUsed.value
       : (subtotal * order.discountUsed.value) / 100;
   };
 
-  return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle>Chi tiết đơn hàng</DialogTitle>
-      <DialogContent dividers>
-        <Grid container spacing={3}>
-          {/* Thông tin khách hàng */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Thông tin khách hàng
-            </Typography>
-            <Typography>
-              <strong>Tên:</strong> {order.user?.name || "N/A"}
-            </Typography>
-            <Typography>
-              <strong>Email:</strong> {order.user?.email || "N/A"}
-            </Typography>
-          </Grid>
+  getPaymentStatusClass = (status) => {
+    return status === "Pending" ? "chip chip-warning" : "chip chip-success";
+  };
 
-          {/* Thông tin vận chuyển */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Thông tin vận chuyển
-            </Typography>
-            {order.trackingNumber && (
-              <Typography>
-                <strong>Mã vận đơn:</strong> {order.trackingNumber}
-              </Typography>
-            )}
-            <Typography>
-              <strong>Địa chỉ:</strong> {order.shippingInfo.address}
-            </Typography>
-            <Typography>
-              <strong>Tỉnh/TP:</strong> {order.shippingInfo.provineName}
-            </Typography>
-            <Typography>
-              <strong>Quận/Huyện:</strong> {order.shippingInfo.districtName}
-            </Typography>
-            <Typography>
-              <strong>Phường/Xã:</strong> {order.shippingInfo.wardName}
-            </Typography>
-            <Typography>
-              <strong>SĐT:</strong> {order.shippingInfo.phoneNumber}
-            </Typography>
-            {order.shippingInfo.note && (
-              <Typography>
-                <strong>Ghi chú:</strong> {order.shippingInfo.note}
-              </Typography>
-            )}
-            <Typography>
-              <strong>Phí ship:</strong>{" "}
-              {(order.shippingInfo.fee || 0).toLocaleString("vi-VN")} VNĐ
-            </Typography>
-          </Grid>
+  getOrderStatusClass = (status) => {
+    if (status === "Pending") return "chip chip-warning";
+    if (status === "Processing") return "chip chip-info";
+    return "chip chip-error";
+  };
 
-          {/* Thông tin thanh toán */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Thông tin thanh toán
-            </Typography>
-            <Typography>
-              <strong>Phương thức:</strong>{" "}
-              {order.paymentMethod === "COD" ? "COD" : "Online"}
-            </Typography>
-            <Typography>
-              <strong>Trạng thái thanh toán:</strong>{" "}
-              <Chip
-                label={
-                  order.paymentStatus === "Pending"
-                    ? "Chưa thanh toán"
-                    : "Đã thanh toán"
-                }
-                color={
-                  order.paymentStatus === "Pending" ? "warning" : "success"
-                }
-                size="small"
-                sx={{ ml: 1 }}
-              />
-            </Typography>
-            <Typography>
-              <strong>Trạng thái đơn hàng:</strong>{" "}
-              <Chip
-                label={order.orderStatus}
-                color={
-                  order.orderStatus === "Pending"
-                    ? "warning"
-                    : order.orderStatus === "Processing"
-                    ? "info"
-                    : "error"
-                }
-                size="small"
-                sx={{ ml: 1 }}
-              />
-            </Typography>
-          </Grid>
+  render() {
+    const { open, order, onClose } = this.props;
 
-          {/* Thông tin đơn hàng */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" gutterBottom>
-              Thông tin đơn hàng
-            </Typography>
-            <Typography>
-              <strong>Ngày đặt:</strong> {formatDate(order.createdAt)}
-            </Typography>
-            <Typography>
-              <strong>Tổng tiền:</strong>{" "}
-              {calculateTotal().toLocaleString("vi-VN")} VNĐ
-            </Typography>
-            {order.boxInfo && (
-              <>
-                <Typography>
-                  <strong>Kích thước (L×W×H):</strong> {order.boxInfo.length}×
-                  {order.boxInfo.width}×{order.boxInfo.height} cm
-                </Typography>
-                <Typography>
-                  <strong>Cân nặng:</strong> {order.boxInfo.weight} gram
-                </Typography>
-              </>
-            )}
-          </Grid>
+    if (!open || !order) return null;
 
-          {/* Danh sách sản phẩm */}
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Danh sách sản phẩm
-            </Typography>
-            <TableContainer component={Paper}>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Tên sản phẩm</TableCell>
-                    <TableCell>Số lượng</TableCell>
-                    <TableCell>Đơn giá</TableCell>
-                    <TableCell>Thành tiền</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {order.items.map((item, idx) => (
-                    <TableRow key={idx}>
-                      <TableCell>{item.book?.title || "N/A"}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>
-                        {item.price.toLocaleString("vi-VN")} VNĐ
-                      </TableCell>
-                      <TableCell>
-                        {(item.price * item.quantity).toLocaleString("vi-VN")}{" "}
-                        VNĐ
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {/* Tổng tiền sản phẩm */}
-                  <TableRow>
-                    <TableCell colSpan={3} align="right">
-                      <strong>Tổng tiền sản phẩm:</strong>
-                    </TableCell>
-                    <TableCell>
-                      {calculateSubtotal().toLocaleString("vi-VN")} VNĐ
-                    </TableCell>
-                  </TableRow>
+    return (
+      <div className="dialog-overlay">
+        <div className="dialog">
+          <div className="dialog-header">
+            <h2 className="dialog-title">Chi tiết đơn hàng</h2>
+          </div>
 
-                  {/* Phí ship */}
-                  <TableRow>
-                    <TableCell colSpan={3} align="right">
-                      <strong>Phí vận chuyển:</strong>
-                    </TableCell>
-                    <TableCell>
-                      {(order.shippingInfo.fee || 0).toLocaleString("vi-VN")}{" "}
-                      VNĐ
-                    </TableCell>
-                  </TableRow>
+          <div className="dialog-content">
+            <div className="grid">
+              {/* Thông tin khách hàng */}
+              <div className="grid-item">
+                <h3 className="section-title">Thông tin khách hàng</h3>
+                <div className="info-item">
+                  <strong>Tên:</strong> {order.user?.name || "N/A"}
+                </div>
+                <div className="info-item">
+                  <strong>Email:</strong> {order.user?.email || "N/A"}
+                </div>
+              </div>
 
-                  {/* Giảm giá mã */}
-                  {order.discountUsed && getDiscountAmount() > 0 && (
-                    <TableRow>
-                      <TableCell colSpan={3} align="right">
-                        <strong>
-                          Giảm giá mã{" "}
-                          {order.discountUsed.type === "percentage"
-                            ? `(${order.discountUsed.value}%)`
-                            : ""}
-                          :
-                        </strong>
-                      </TableCell>
-                      <TableCell>
-                        -{getDiscountAmount().toLocaleString("vi-VN")} VNĐ
-                      </TableCell>
-                    </TableRow>
-                  )}
+              {/* Thông tin vận chuyển */}
+              <div className="grid-item">
+                <h3 className="section-title">Thông tin vận chuyển</h3>
+                {order.trackingNumber && (
+                  <div className="info-item">
+                    <strong>Mã vận đơn:</strong> {order.trackingNumber}
+                  </div>
+                )}
+                <div className="info-item">
+                  <strong>Địa chỉ:</strong> {order.shippingInfo.address}
+                </div>
+                <div className="info-item">
+                  <strong>Tỉnh/TP:</strong> {order.shippingInfo.provineName}
+                </div>
+                <div className="info-item">
+                  <strong>Quận/Huyện:</strong> {order.shippingInfo.districtName}
+                </div>
+                <div className="info-item">
+                  <strong>Phường/Xã:</strong> {order.shippingInfo.wardName}
+                </div>
+                <div className="info-item">
+                  <strong>SĐT:</strong> {order.shippingInfo.phoneNumber}
+                </div>
+                {order.shippingInfo.note && (
+                  <div className="info-item">
+                    <strong>Ghi chú:</strong> {order.shippingInfo.note}
+                  </div>
+                )}
+                <div className="info-item">
+                  <strong>Phí ship:</strong>{" "}
+                  {(order.shippingInfo.fee || 0).toLocaleString("vi-VN")} VNĐ
+                </div>
+              </div>
 
-                  {/* Điểm sử dụng */}
-                  {order.pointUsed > 0 && (
-                    <TableRow>
-                      <TableCell colSpan={3} align="right">
-                        <strong>Điểm sử dụng:</strong>
-                      </TableCell>
-                      <TableCell>
-                        -{order.pointUsed.toLocaleString("vi-VN")} VNĐ
-                      </TableCell>
-                    </TableRow>
-                  )}
+              {/* Thông tin thanh toán */}
+              <div className="grid-item">
+                <h3 className="section-title">Thông tin thanh toán</h3>
+                <div className="info-item">
+                  <strong>Phương thức:</strong>{" "}
+                  {order.paymentMethod === "COD" ? "COD" : "Online"}
+                </div>
+                <div className="info-item">
+                  <strong>Trạng thái thanh toán:</strong>{" "}
+                  <span
+                    className={this.getPaymentStatusClass(order.paymentStatus)}
+                  >
+                    {order.paymentStatus === "Pending"
+                      ? "Chưa thanh toán"
+                      : "Đã thanh toán"}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <strong>Trạng thái đơn hàng:</strong>{" "}
+                  <span className={this.getOrderStatusClass(order.orderStatus)}>
+                    {order.orderStatus}
+                  </span>
+                </div>
+              </div>
 
-                  {/* Tổng cộng */}
-                  <TableRow>
-                    <TableCell colSpan={3} align="right">
-                      <strong>Tổng cộng:</strong>
-                    </TableCell>
-                    <TableCell>
-                      <strong>
-                        {calculateTotal().toLocaleString("vi-VN")} VNĐ
-                      </strong>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="primary">
-          Đóng
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+              {/* Thông tin đơn hàng */}
+              <div className="grid-item">
+                <h3 className="section-title">Thông tin đơn hàng</h3>
+                <div className="info-item">
+                  <strong>Ngày đặt:</strong> {formatDate(order.createdAt)}
+                </div>
+                <div className="info-item">
+                  <strong>Tổng tiền:</strong>{" "}
+                  {this.calculateTotal().toLocaleString("vi-VN")} VNĐ
+                </div>
+                {order.boxInfo && (
+                  <>
+                    <div className="info-item">
+                      <strong>Kích thước (L×W×H):</strong>{" "}
+                      {order.boxInfo.length}×{order.boxInfo.width}×
+                      {order.boxInfo.height} cm
+                    </div>
+                    <div className="info-item">
+                      <strong>Cân nặng:</strong> {order.boxInfo.weight} gram
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Danh sách sản phẩm */}
+              <div className="grid-item full-width">
+                <h3 className="section-title">Danh sách sản phẩm</h3>
+                <div className="table-container">
+                  <table className="table">
+                    <thead>
+                      <tr>
+                        <th>Tên sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                        <th>Thành tiền</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {order.items.map((item, idx) => (
+                        <tr key={idx}>
+                          <td>{item.book?.title || "N/A"}</td>
+                          <td>{item.quantity}</td>
+                          <td>{item.price.toLocaleString("vi-VN")} VNĐ</td>
+                          <td>
+                            {(item.price * item.quantity).toLocaleString(
+                              "vi-VN"
+                            )}{" "}
+                            VNĐ
+                          </td>
+                        </tr>
+                      ))}
+
+                      {/* Tổng tiền sản phẩm */}
+                      <tr className="summary-row">
+                        <td colSpan="3" className="text-right">
+                          <strong>Tổng tiền sản phẩm:</strong>
+                        </td>
+                        <td>
+                          <strong>
+                            {this.calculateSubtotal().toLocaleString("vi-VN")}{" "}
+                            VNĐ
+                          </strong>
+                        </td>
+                      </tr>
+
+                      {/* Phí ship */}
+                      <tr className="summary-row">
+                        <td colSpan="3" className="text-right">
+                          <strong>Phí vận chuyển:</strong>
+                        </td>
+                        <td>
+                          <strong>
+                            {(order.shippingInfo.fee || 0).toLocaleString(
+                              "vi-VN"
+                            )}{" "}
+                            VNĐ
+                          </strong>
+                        </td>
+                      </tr>
+
+                      {/* Giảm giá mã */}
+                      {order.discountUsed && this.getDiscountAmount() > 0 && (
+                        <tr className="summary-row">
+                          <td colSpan="3" className="text-right">
+                            <strong>
+                              Giảm giá mã{" "}
+                              {order.discountUsed.type === "percentage"
+                                ? `(${order.discountUsed.value}%)`
+                                : ""}
+                              :
+                            </strong>
+                          </td>
+                          <td className="discount-amount">
+                            <strong>
+                              -
+                              {this.getDiscountAmount().toLocaleString("vi-VN")}{" "}
+                              VNĐ
+                            </strong>
+                          </td>
+                        </tr>
+                      )}
+
+                      {/* Điểm sử dụng */}
+                      {order.pointUsed > 0 && (
+                        <tr className="summary-row">
+                          <td colSpan="3" className="text-right">
+                            <strong>Điểm sử dụng:</strong>
+                          </td>
+                          <td className="discount-amount">
+                            <strong>
+                              -{order.pointUsed.toLocaleString("vi-VN")} VNĐ
+                            </strong>
+                          </td>
+                        </tr>
+                      )}
+
+                      {/* Tổng cộng */}
+                      <tr className="total-row">
+                        <td colSpan="3" className="text-right">
+                          <strong>Tổng cộng:</strong>
+                        </td>
+                        <td>
+                          <strong className="total-amount">
+                            {this.calculateTotal().toLocaleString("vi-VN")} VNĐ
+                          </strong>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="dialog-actions">
+            <button className="btn btn-primary" onClick={onClose}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
 
 export default OrderDetailsDialog;
