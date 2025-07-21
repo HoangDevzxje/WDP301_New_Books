@@ -179,12 +179,12 @@ function Cart({ updateCartData }) {
                       {cartItems.map((item) => (
                         <TableRow key={item.book._id} className="cart-table-row">
                           <TableCell className="product-cell">
-                            <Box className="product-info">
+                            <Box className="product-info2">
                               <Link to={`/book/${item.book._id}`} className="product-image-link">
                                 <img
                                   src={item.book.images}
                                   alt={item.book.title}
-                                  className="product-image"
+                                  className="product-image1"
                                 />
                               </Link>
                               <Box className="product-details">

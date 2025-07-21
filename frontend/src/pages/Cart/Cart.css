@@ -115,7 +115,7 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.product-info {
+.product-info2 {
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -125,7 +125,7 @@
   text-decoration: none;
 }
 
-.product-image {
+.product-image1 {
   width: 120px;
   object-fit: cover;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

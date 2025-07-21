@@ -901,7 +901,7 @@ function OrderPage() {
                           name="name"
                           value={shippingAddress.name}
                           onChange={handleInputChange}
-                          disabled={!useNewAddress}
+                         
                         />
                       </Grid>
                       <Grid  size= {{xs: 12, sm: 6}}>
@@ -912,7 +912,7 @@ function OrderPage() {
                           name="phoneNumber"
                           value={shippingAddress.phoneNumber}
                           onChange={handleInputChange}
-                          disabled={!useNewAddress}
+                         
                         />
                       </Grid>
                       <Grid  size= {12}>
@@ -923,11 +923,11 @@ function OrderPage() {
                           name="address"
                           value={shippingAddress.address}
                           onChange={handleInputChange}
-                          disabled={!useNewAddress}
+                         
                         />
                       </Grid>
                       <Grid size= {{xs: 12, sm: 4}}>
-                        <FormControl fullWidth disabled={!useNewAddress}>
+                        <FormControl fullWidth>
                           <InputLabel>Tỉnh/Thành phố</InputLabel>
                           <Select
                             name="province"
@@ -986,7 +986,7 @@ function OrderPage() {
                           onChange={handleInputChange}
                           multiline
                           rows={2}
-                          disabled={!useNewAddress}
+                         
                         />
                       </Grid>
                     </Grid>
