@@ -3,7 +3,7 @@
 /* Base styles */
 .dashboardContainer {
   padding: 24px;
-  background-color: #f5f7fa;
+  /* background-color: #f5f7fa; */
   min-height: 100vh;
 }
 

@@ -182,7 +182,7 @@ const AdminDashboard = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
+        <Grid item size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <AttachMoney className="statIcon revenue" />
             <Typography variant="h6" className="statTitle">
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid  item size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <People className="statIcon users" />
             <Typography variant="h6" className="statTitle">
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item xs={12} md={4}>
+        <Grid  item size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <MenuBook className="statIcon books" />
             <Typography variant="h6" className="statTitle">
@@ -226,7 +226,7 @@ const AdminDashboard = () => {
         {stats.orderStatusCount && stats.orderStatusCount.length > 0 ? (
           <Grid container spacing={2}>
             {stats.orderStatusCount.map((item) => (
-              <Grid item xs={12} sm={4} key={item.status}>
+              <Grid  item size={{ xs: 12, md: 4 }} key={item.status}>
                 <Paper className="statusCard">
                   {statusIcons[item.status] || null}
                   <Typography variant="subtitle1" className="statusTitle">
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
                     <TableCell align="right">Số Lượng Bán</TableCell>
                     <TableCell align="right">Tổng Doanh Thu</TableCell>
                   </TableRow>
-                </TableHead>
+                </TableHead>fTop 10 Sản Phẩm Bán Chạy
                 <TableBody>
                   {stats.topSellingProducts.map((product, index) => (
                     <TableRow key={product.bookId}>

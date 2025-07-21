@@ -194,7 +194,7 @@ function App() {
         />
         <Route
           path="/book/:id"
-          element={<BookDetail updateWishlistCount={fetchWishlistCount} />}
+          element={<BookDetail updateWishlistCount={fetchWishlistCount} updateCartData={fetchCartData} />}
         />
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
@@ -221,7 +221,7 @@ function App() {
           path="/user/cart"
           element={
             <UserOnlyRoute>
-              <Cart />
+              <Cart  updateCartData={fetchCartData}/>
             </UserOnlyRoute>
           }
         />
