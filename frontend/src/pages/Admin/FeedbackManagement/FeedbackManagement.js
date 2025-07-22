@@ -18,6 +18,7 @@ import {
   FormControl,
   InputLabel,
   Tooltip,
+  Rating,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -96,6 +97,7 @@ export default function FeedbackManagement() {
         Quản lý đánh giá
       </Typography>
 
+      {/* Filter/Search Bar */}
       <Box
         mb={3}
         p={2}
@@ -161,6 +163,7 @@ export default function FeedbackManagement() {
         )}
       </Box>
 
+      {/* Table */}
       <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 1 }}>
         <Table>
           <TableHead sx={{ background: "#2c3e50" }}>
@@ -186,6 +189,7 @@ export default function FeedbackManagement() {
               </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {feedbacks
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -202,7 +206,18 @@ export default function FeedbackManagement() {
                   <TableCell>
                     {fb.user?.name || "Người dùng đã bị xóa"}
                   </TableCell>
-                  <TableCell>{fb.rating || 0} / 5</TableCell>
+
+                  {/* Hiển thị sao */}
+                  <TableCell>
+                    <Rating
+                      name="read-only"
+                      value={fb.rating || 0}
+                      readOnly
+                      size="small"
+                      precision={1}
+                    />
+                  </TableCell>
+
                   <TableCell>{fb.comment || "Không có bình luận"}</TableCell>
                   <TableCell>
                     {fb.createdAt
@@ -224,6 +239,7 @@ export default function FeedbackManagement() {
           </TableBody>
         </Table>
 
+        {/* Phân trang */}
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"

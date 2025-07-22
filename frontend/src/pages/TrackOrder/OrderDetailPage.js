@@ -101,10 +101,7 @@ export default function OrderDetailPage() {
       </button>
 
       <div className="order-detail-header">
-        <h2>
-          Chi tiết đơn hàng:
-          <span className="order-id"> #{order._id}</span>
-        </h2>
+        <h2>Chi tiết đơn hàng</h2>
         <h3 className="order-date">
           Ngày đặt: {dayjs(order.createdAt).format("DD/MM/YYYY HH:mm")}
         </h3>
@@ -161,7 +158,7 @@ export default function OrderDetailPage() {
             </div>
           ) : (
             <div className="tracking-loading">
-              <p>Đang tải trạng thái vận chuyển...</p>
+              <p>Đơn vị vận chuyển đang chờ lấy hàng</p>
             </div>
           )}
         </div>
