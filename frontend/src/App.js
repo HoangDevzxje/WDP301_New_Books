@@ -35,6 +35,8 @@ import * as WishlistService from "./services/WishlistService";
 import * as CartService from "./services/CartService";
 import ScrollToTop from "./utils/ScrollToTop.js";
 import AdminReviews from "./pages/Admin/ReviewMangement/reviews.js";
+import CampaignListPage from "./pages/Admin/DiscountCampaign/CampaignListPage.js";
+import CampaignFormPage from "./pages/Admin/DiscountCampaign/CampaignFormPage.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -173,6 +175,12 @@ function App() {
             <Route path="add" element={<DiscountFormPage />} />
             <Route path=":id/edit" element={<DiscountFormPage />} />
           </Route>
+          <Route path="discount-campaigns">
+            <Route index element={<CampaignListPage />} />
+            <Route path="add" element={<CampaignFormPage />} />
+            <Route path=":id/edit" element={<CampaignFormPage />} />
+          </Route>
+
           <Route path="orders" element={<OrderManagement />} />
           <Route path="complaints" element={<ComplaintManagement />} />
           <Route path="feedbacks" element={<FeedbackManagement />} />
@@ -194,7 +202,12 @@ function App() {
         />
         <Route
           path="/book/:id"
-          element={<BookDetail updateWishlistCount={fetchWishlistCount} updateCartData={fetchCartData} />}
+          element={
+            <BookDetail
+              updateWishlistCount={fetchWishlistCount}
+              updateCartData={fetchCartData}
+            />
+          }
         />
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
@@ -221,7 +234,7 @@ function App() {
           path="/user/cart"
           element={
             <UserOnlyRoute>
-              <Cart  updateCartData={fetchCartData}/>
+              <Cart updateCartData={fetchCartData} />
             </UserOnlyRoute>
           }
         />

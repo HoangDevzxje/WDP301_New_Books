@@ -1,11 +1,12 @@
 const Book = require("../models/Book");
 const Category = require("../models/Category");
-
+const { applyDiscountCampaignsToBooks } = require("../utils/applyDiscount");
 // Lấy danh sách tất cả sách
 exports.getAllBooks = async (req, res) => {
   try {
     const books = await Book.find().populate("categories");
-    res.status(200).json(books);
+    const booksWithDiscount = await applyDiscountCampaignsToBooks(books);
+    res.status(200).json(booksWithDiscount);
   } catch (error) {
     res
       .status(500)

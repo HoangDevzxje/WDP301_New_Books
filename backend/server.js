@@ -6,6 +6,10 @@ const routes = require('./routes');
 const cookieParser = require("cookie-parser");
 const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
+const cron = require("node-cron");
+const {
+  autoDeactivateExpiredCampaigns,
+} = require("./controllers/AdminDiscountCampaignController");
 
 const DB = require("./config/db");
 
@@ -58,6 +62,13 @@ routes(app);
 
 // Start server
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-    DB.connectDB();
+  console.log(`Server is running on port ${port}`);
+  DB.connectDB();
+
+  
+  cron.schedule("0 0 * * *", () => {
+    console.log("[CRON] Checking and deactivating expired campaigns...");
+    autoDeactivateExpiredCampaigns();
+  });
 });
+
