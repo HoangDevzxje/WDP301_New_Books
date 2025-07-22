@@ -38,11 +38,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  PieChart,
-  Pie,
-  Cell,
-} from "recharts";
+import { PieChart, Pie, Cell } from "recharts";
 import "./AdminDashboard.css";
 import { getDashboardStats } from "../../../services/AdminService/dashboardService";
 
@@ -61,7 +57,7 @@ const AdminDashboard = () => {
     "#FF4444",
     "#AA66CC",
     "#33B5E5",
-    "#0099CC"
+    "#0099CC",
   ];
 
   useEffect(() => {
@@ -193,7 +189,7 @@ const AdminDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid  item size={{ xs: 12, md: 4 }}>
+        <Grid item size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <People className="statIcon users" />
             <Typography variant="h6" className="statTitle">
@@ -205,7 +201,7 @@ const AdminDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid  item size={{ xs: 12, md: 4 }}>
+        <Grid item size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <MenuBook className="statIcon books" />
             <Typography variant="h6" className="statTitle">
@@ -226,7 +222,7 @@ const AdminDashboard = () => {
         {stats.orderStatusCount && stats.orderStatusCount.length > 0 ? (
           <Grid container spacing={2}>
             {stats.orderStatusCount.map((item) => (
-              <Grid  item size={{ xs: 12, md: 4 }} key={item.status}>
+              <Grid item size={{ xs: 12, md: 4 }} key={item.status}>
                 <Paper className="statusCard">
                   {statusIcons[item.status] || null}
                   <Typography variant="subtitle1" className="statusTitle">
@@ -249,102 +245,117 @@ const AdminDashboard = () => {
       </Box>
 
       <Box className="productsRevenueContainer">
-        {/* Left side: Tables */}
+        {/* Left side: Products Tables */}
         <Box className="productsContainer">
           <Typography variant="h6" className="sectionTitle">
-            Top 10 Sản Phẩm Bán Chạy
+            Sản Phẩm Bán Chạy & Ít Lượt Mua
           </Typography>
 
-          {/* Top Selling Products Table */}
-          {stats.topSellingProducts && stats.topSellingProducts.length > 0 ? (
-            <TableContainer component={Paper} className="productsTable">
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Stt</TableCell>
-                    <TableCell>Ảnh</TableCell>
-                    <TableCell>Tên Sách</TableCell>
-                    <TableCell align="right">Số Lượng Bán</TableCell>
-                    <TableCell align="right">Tổng Doanh Thu</TableCell>
-                  </TableRow>
-                </TableHead>fTop 10 Sản Phẩm Bán Chạy
-                <TableBody>
-                  {stats.topSellingProducts.map((product, index) => (
-                    <TableRow key={product.bookId}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="square"
-                          src={product.bookImages?.[0]}
-                          alt={product.bookName}
-                        />
-                      </TableCell>
-                      <TableCell>{product.bookName || "N/A"}</TableCell>
-                      <TableCell align="right">
-                        {product.totalQuantity?.toLocaleString("vi-VN") || 0}
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatCurrency(product.totalRevenue)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Alert severity="info">Không có dữ liệu sản phẩm bán chạy</Alert>
-          )}
+          <Box className="tablesSection">
+            {/* Top Selling Products */}
+            <Box className="tableContainer">
+              <Typography variant="h6" className="tableTitle">
+                Top 10 Bán Chạy
+              </Typography>
+              {stats.topSellingProducts &&
+              stats.topSellingProducts.length > 0 ? (
+                <TableContainer component={Paper} className="productsTable">
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Stt</TableCell>
+                        <TableCell>Ảnh</TableCell>
+                        <TableCell>Tên Sách</TableCell>
+                        <TableCell align="right">SL Bán</TableCell>
+                        <TableCell align="right">Doanh Thu</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {stats.topSellingProducts.map((product, index) => (
+                        <TableRow key={product.bookId}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            <Avatar
+                              variant="square"
+                              src={product.bookImages?.[0]}
+                              alt={product.bookName}
+                            />
+                          </TableCell>
+                          <TableCell>{product.bookName || "N/A"}</TableCell>
+                          <TableCell align="right">
+                            {product.totalQuantity?.toLocaleString("vi-VN") ||
+                              0}
+                          </TableCell>
+                          <TableCell align="right">
+                            {formatCurrency(product.totalRevenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Alert severity="info">
+                  Không có dữ liệu sản phẩm bán chạy
+                </Alert>
+              )}
+            </Box>
 
-          {/* Least Selling Products Table */}
-          <Typography variant="h6" className="sectionTitle" sx={{ mt: 4 }}>
-            Top 10 Sản Phẩm Ít Lượt Mua
-          </Typography>
-
-          {stats.leastSellingProducts && stats.leastSellingProducts.length > 0 ? (
-            <TableContainer component={Paper} className="productsTable">
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Stt</TableCell>
-                    <TableCell>Ảnh</TableCell>
-                    <TableCell>Tên Sách</TableCell>
-                    <TableCell align="right">Số Lượng Bán</TableCell>
-                    <TableCell align="right">Tổng Doanh Thu</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {stats.leastSellingProducts.map((product, index) => (
-                    <TableRow key={product.bookId}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>
-                        <Avatar
-                          variant="square"
-                          src={product.bookImages?.[0]}
-                          alt={product.bookName}
-                        />
-                      </TableCell>
-                      <TableCell>{product.bookName || "N/A"}</TableCell>
-                      <TableCell align="right">
-                        {product.totalQuantity?.toLocaleString("vi-VN") || 0}
-                      </TableCell>
-                      <TableCell align="right">
-                        {formatCurrency(product.totalRevenue)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          ) : (
-            <Alert severity="info">Không có dữ liệu sản phẩm ít bán</Alert>
-          )}
+            {/* Least Selling Products */}
+            <Box className="tableContainer">
+              <Typography variant="h6" className="tableTitle">
+                Top 10 Ít Lượt Mua
+              </Typography>
+              {stats.leastSellingProducts &&
+              stats.leastSellingProducts.length > 0 ? (
+                <TableContainer component={Paper} className="productsTable">
+                  <Table stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Stt</TableCell>
+                        <TableCell>Ảnh</TableCell>
+                        <TableCell>Tên Sách</TableCell>
+                        <TableCell align="right">SL Bán</TableCell>
+                        <TableCell align="right">Doanh Thu</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {stats.leastSellingProducts.map((product, index) => (
+                        <TableRow key={product.bookId}>
+                          <TableCell>{index + 1}</TableCell>
+                          <TableCell>
+                            <Avatar
+                              variant="square"
+                              src={product.bookImages?.[0]}
+                              alt={product.bookName}
+                            />
+                          </TableCell>
+                          <TableCell>{product.bookName || "N/A"}</TableCell>
+                          <TableCell align="right">
+                            {product.totalQuantity?.toLocaleString("vi-VN") ||
+                              0}
+                          </TableCell>
+                          <TableCell align="right">
+                            {formatCurrency(product.totalRevenue)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Alert severity="info">Không có dữ liệu sản phẩm ít bán</Alert>
+              )}
+            </Box>
+          </Box>
         </Box>
 
-        {/* Right side: Revenue LineChart + PieChart */}
+        {/* Right side: Revenue Analysis Charts */}
         <Box className="revenueContainer">
           <Typography variant="h6" className="sectionTitle">
-            Phân Tích Doanh Thu
+            Phân Tích Doanh Thu & Biểu Đồ
           </Typography>
+
           <Tabs
             value={revenueTab}
             onChange={handleRevenueTabChange}
@@ -353,63 +364,99 @@ const AdminDashboard = () => {
           >
             <Tab label="Ngày" icon={<TodayIcon />} iconPosition="start" />
             <Tab label="Tuần" icon={<DateRangeIcon />} iconPosition="start" />
-            <Tab label="Tháng" icon={<CalendarMonthIcon />} iconPosition="start" />
+            <Tab
+              label="Tháng"
+              icon={<CalendarMonthIcon />}
+              iconPosition="start"
+            />
             <Tab label="Năm" icon={<EventNoteIcon />} iconPosition="start" />
           </Tabs>
-          <Paper className="chartContainer" sx={{ height: 300 }}>
-            {revenueData[revenueTab] && revenueData[revenueTab].length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                  data={revenueData[revenueTab]}
-                  margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip formatter={(value) => [formatCurrency(value), "Doanh Thu"]} />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="revenue"
-                    name="Doanh Thu"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <Box sx={{ p: 3, textAlign: "center" }}>
-                <Alert severity="info">
-                  Không có dữ liệu doanh thu cho khoảng thời gian này
-                </Alert>
-              </Box>
-            )}
-          </Paper>
 
-          {/* Pie Chart: Top 10 bán chạy */}
-          <Paper className="chartContainer" sx={{ height: 300, mt: 3 }}>
-            <Typography variant="subtitle1" align="center" sx={{ pt: 1 }}>
-              Biểu Đồ Tỉ Lệ Doanh Thu – Top 10 Bán Chạy
-            </Typography>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={stats.topSellingProducts}
-                  dataKey="totalRevenue"
-                  nameKey="bookName"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label
+          <Box className="chartsSection">
+            {/* Line Chart */}
+            <Paper className="chartContainer">
+              <Typography
+                variant="subtitle1"
+                align="center"
+                sx={{ mb: 1, fontWeight: 600 }}
+              >
+                Biểu Đồ Doanh Thu Theo Thời Gian
+              </Typography>
+              {revenueData[revenueTab] && revenueData[revenueTab].length > 0 ? (
+                <ResponsiveContainer width="100%" height="85%">
+                  <LineChart
+                    data={revenueData[revenueTab]}
+                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip
+                      formatter={(value) => [
+                        formatCurrency(value),
+                        "Doanh Thu",
+                      ]}
+                    />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="revenue"
+                      name="Doanh Thu"
+                      stroke="#8884d8"
+                      activeDot={{ r: 8 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <Box
+                  sx={{
+                    p: 3,
+                    textAlign: "center",
+                    height: "85%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
                 >
-                  {stats.topSellingProducts.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={pieColors[index % pieColors.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatCurrency(value)} />
-              </PieChart>
-            </ResponsiveContainer>
-          </Paper>
+                  <Alert severity="info">
+                    Không có dữ liệu doanh thu cho khoảng thời gian này
+                  </Alert>
+                </Box>
+              )}
+            </Paper>
+
+            {/* Pie Chart */}
+            <Paper className="pieChartContainer">
+              <Typography
+                variant="subtitle1"
+                align="center"
+                sx={{ mb: 1, fontWeight: 600 }}
+              >
+                Tỉ Lệ Doanh Thu – Top 10 Bán Chạy
+              </Typography>
+              <ResponsiveContainer width="100%" height="85%">
+                <PieChart>
+                  <Pie
+                    data={stats.topSellingProducts}
+                    dataKey="totalRevenue"
+                    nameKey="bookName"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                  >
+                    {stats.topSellingProducts.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={pieColors[index % pieColors.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatCurrency(value)} />
+                </PieChart>
+              </ResponsiveContainer>
+            </Paper>
+          </Box>
         </Box>
       </Box>
     </Box>

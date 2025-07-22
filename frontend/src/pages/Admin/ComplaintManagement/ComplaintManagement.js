@@ -35,6 +35,7 @@ import {
   updateComplaintStatus,
 } from "../../../services/AdminService/complaintService";
 import "./ComplaintManagement.css";
+
 const ComplaintManagement = () => {
   const [complaints, setComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
@@ -63,8 +64,12 @@ const ComplaintManagement = () => {
   const fetchComplaints = async () => {
     try {
       const data = await getComplaints();
-      setComplaints(data);
-      setFilteredComplaints(data);
+      // Sort complaints by creation date (newest first)
+      const sortedData = data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setComplaints(sortedData);
+      setFilteredComplaints(sortedData);
     } catch (error) {
       console.error("Error fetching complaints", error);
     }
@@ -83,6 +88,10 @@ const ComplaintManagement = () => {
     if (statusFilter) {
       result = result.filter((c) => c.status === statusFilter);
     }
+    // Maintain sorting after filtering
+    result = result.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
     setFilteredComplaints(result);
   };
 
@@ -90,6 +99,7 @@ const ComplaintManagement = () => {
     setCurrentComplaint({ _id: complaint._id, status: complaint.status });
     setOpen(true);
   };
+
   const handleClose = () => setOpen(false);
 
   const handleStatusChange = (e) => {
@@ -149,41 +159,40 @@ const ComplaintManagement = () => {
           Quản lý khiếu nại
         </Typography>
       </Box>
-      {/* Filters */}{" "}
+      {/* Filters */}
       <div className="cm-filter-section">
         <button className="cm-button" onClick={resetFilters}>
-          Đặt lại bộ lọc{" "}
-        </button>{" "}
+          Đặt lại bộ lọc
+        </button>
         <div className="cm-filters">
-          {" "}
           <input
             type="text"
             placeholder="Tìm theo khách hàng"
             className="cm-input"
             value={customerFilter}
             onChange={(e) => setCustomerFilter(e.target.value)}
-          />{" "}
+          />
           <select
             className="cm-select"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
           >
-            <option value="">Tất cả loại khiếu nại</option> {" "}
-            <option value="Web">Web</option>{" "}
-            <option value="Đơn hàng">Đơn hàng</option>{" "}
-            <option value="Khác">Khác</option>{" "}
-          </select>{" "}
+            <option value="">Tất cả loại khiếu nại</option>
+            <option value="Web">Web</option>
+            <option value="Đơn hàng">Đơn hàng</option>
+            <option value="Khác">Khác</option>
+          </select>
           <select
             className="cm-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">Tất cả trạng thái</option>{" "}
-            <option value="Đang chờ xử lý">Đang chờ xử lý</option>{" "}
-            <option value="Đã tiếp nhận">Đã tiếp nhận</option>{" "}
-            <option value="Đã giải quyết">Đã giải quyết</option>{" "}
-            <option value="Đã hủy">Đã hủy</option>{" "}
-          </select>{" "}
+            <option value="">Tất cả trạng thái</option>
+            <option value="Đang chờ xử lý">Đang chờ xử lý</option>
+            <option value="Đã tiếp nhận">Đã tiếp nhận</option>
+            <option value="Đã giải quyết">Đã giải quyết</option>
+            <option value="Đã hủy">Đã hủy</option>
+          </select>
         </div>
       </div>
       {/* Table */}

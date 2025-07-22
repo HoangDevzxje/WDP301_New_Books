@@ -1,9 +1,5 @@
-/* AdminDashboard.css */
-
-/* Base styles */
 .dashboardContainer {
   padding: 24px;
-  /* background-color: #f5f7fa; */
   min-height: 100vh;
 }
 
@@ -144,38 +140,60 @@
   font-weight: 800 !important;
 }
 
-/* Layout for products and revenue */
+/* Updated layout for products and revenue - main container */
 .productsRevenueContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 cột bằng nhau */
+  grid-auto-rows: min-content; /* hàng auto cao theo nội dung */
+  gap: 32px;
+}
+/* Products container - left side */
+.productsContainer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* loại bỏ height:100% nếu có */
+}
+
+/* Tables section - horizontal layout for the two tables */
+.tablesSection {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 24px;
-  margin-top: 32px;
+  margin-top: 16px;
 }
 
-@media (max-width: 1200px) {
-  .productsRevenueContainer {
-    grid-template-columns: 1fr;
-  }
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableTitle {
+  font-weight: 700 !important;
+  color: #2d3748;
+  margin-bottom: 16px !important;
+  font-size: 1.1rem !important;
 }
 
 /* Products tables */
-.productsContainer {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
 .productsTable {
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
 }
 
-/* Revenue container */
+/* Revenue container - right side */
 .revenueContainer {
-  display: flex;
-  flex-direction: column;
+  grid-column: 1 / -1;
+  /* grid-row tự động được đặt là row tiếp theo */
+}
+
+/* Charts section - horizontal layout for the two charts */
+.chartsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 24px;
+  margin-top: 16px;
 }
 
 /* Chart containers */
@@ -184,6 +202,15 @@
   border-radius: 12px;
   background: white;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  height: 350px;
+}
+
+.pieChartContainer {
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  height: 350px;
 }
 
 /* Tabs styling */
@@ -257,6 +284,33 @@
 }
 
 /* Responsive adjustments */
+@media (max-width: 1400px) {
+  .productsRevenueContainer {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .tablesSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .chartsSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tablesSection {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsSection {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .dashboardContainer {
     padding: 16px;
@@ -274,6 +328,18 @@
     font-size: 2rem !important;
     padding: 8px;
   }
+
+  .productsRevenueContainer {
+    gap: 16px;
+  }
+
+  .tablesSection {
+    gap: 16px;
+  }
+
+  .chartsSection {
+    gap: 16px;
+  }
 }
 
 /* Animation for cards */
@@ -290,7 +356,8 @@
 
 .statCard,
 .sectionContainer,
-.chartContainer {
+.chartContainer,
+.pieChartContainer {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
@@ -311,6 +378,7 @@
   animation-delay: 0.4s;
 }
 
-.chartContainer {
+.chartContainer,
+.pieChartContainer {
   animation-delay: 0.5s;
 }
