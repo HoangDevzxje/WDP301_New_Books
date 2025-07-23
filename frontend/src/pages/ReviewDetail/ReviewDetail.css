@@ -1,0 +1,5 @@
+.review-book-card{
+    position: sticky !important;
+    top: 110px;
+    z-index: 10;
+}

@@ -182,7 +182,7 @@
   position: relative;
   flex: 0 0 410px;
   height: 300px;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.3s ease;
@@ -208,16 +208,32 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.3);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
+  padding: 20px;
 }
 
 .category-title2 {
   color: #fff !important;
   font-size: 2rem !important;
   font-weight: 700 !important;
-  text-align: center;
   text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.category-title2::after{
+  content: "";
+  display: block;
+  width: 100px;
+  height: 3px;
+  background-color: #c49a6c;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+.category-description{
+  color: #fff !important;
+  font-size: 1rem !important;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
 .categories-scroll {
