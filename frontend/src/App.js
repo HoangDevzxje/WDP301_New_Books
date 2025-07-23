@@ -37,6 +37,8 @@ import ScrollToTop from "./utils/ScrollToTop.js";
 import AdminReviews from "./pages/Admin/ReviewMangement/reviews.js";
 import CampaignListPage from "./pages/Admin/DiscountCampaign/CampaignListPage.js";
 import CampaignFormPage from "./pages/Admin/DiscountCampaign/CampaignFormPage.js";
+import BlogReview from "./pages/BlogReview/BlogReview.js";
+import ReviewDetail from "./pages/ReviewDetail/ReviewDetail.js";
 
 const AdminRoute = ({ children }) => {
   const userRole =
@@ -209,6 +211,8 @@ function App() {
             />
           }
         />
+        <Route path="/blog" element={<BlogReview />} />
+        <Route path="/reviewDetail/:id" element={<ReviewDetail />} />
         <Route path="/user/profile" element={<Profile />} />
         <Route path="/user/addresses" element={<AddressPage />} />
         <Route path="/account/forgotpassword" element={<ForgotPassword />} />

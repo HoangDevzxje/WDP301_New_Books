@@ -389,9 +389,16 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
                 alt={category.name}
               />
               <Box className="category-overlay">
-                <Typography className="category-title2">
-                  {category.name}
-                </Typography>
+                <Box>
+                  <Typography className="category-title2">
+                    {category.name}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography className="category-description">
+                    {category.description}
+                  </Typography>
+                </Box>
               </Box>
             </Box>
 
