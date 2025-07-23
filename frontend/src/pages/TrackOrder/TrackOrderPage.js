@@ -40,15 +40,10 @@ const TrackOrderPage = () => {
         <div className="loading-spinner"></div>
       ) : orders.length === 0 ? (
         <div className="empty-orders">
-          <img
-            src="/images/empty-order.svg"
-            alt="No orders"
-            className="empty-order-image"
-          />
           <p className="empty-order-text">Bạn chưa có đơn hàng nào.</p>
           <button
             className="primary-button"
-            onClick={() => navigate("/products")}
+            onClick={() => navigate("/")}
           >
             Mua sắm ngay
           </button>
@@ -74,10 +69,39 @@ const TrackOrderPage = () => {
                   <td>{dayjs(o.createdAt).format("DD/MM/YYYY HH:mm")}</td>
 
                   <td className="product-cell">
-                    {o.items.map((item) => {
+                    {o.items.map((item, i) => {
                       const book = item.book;
+                      if (!book) {
+                        return (
+                          <div
+                            key={`${o._id}-missing-${i}`}
+                            className="product-item"
+                          >
+                            <div className="product-left">
+                              <img
+                                src="/placeholder-book.png"
+                                alt="Sản phẩm không tồn tại"
+                                className="product-image"
+                              />
+                              <div className="product-info">
+                                <p className="product-title">
+                                  Sản phẩm đã bị xóa
+                                </p>
+                              </div>
+                            </div>
+                            <div className="product-right">
+                              <p className="product-qty">x{item.quantity}</p>
+                              <p className="product-price">
+                                {item.price.toLocaleString()}₫
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      }
+
                       const imgUrl =
-                        book.images?.[0] || "/images/placeholder-book.png";
+                        book.images?.[0] ||
+                        "../../../public/placeholder-book.png";
                       return (
                         <div
                           key={`${o._id}-${book._id}`}
@@ -91,7 +115,6 @@ const TrackOrderPage = () => {
                             />
                             <div className="product-info">
                               <p className="product-title">{book.title}</p>
-                              {/* Nếu cần: <p className="product-extra">Phân loại: ...</p> */}
                             </div>
                           </div>
                           <div className="product-right">

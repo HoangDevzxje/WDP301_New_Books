@@ -185,42 +185,46 @@ export default function OrderDetailPage() {
         </div>
 
         {/* Danh sách sản phẩm */}
-        <div className="order-items-card">
-          <h3 className="card-title">Sản phẩm đã đặt</h3>
-          <div className="items-header">
-            <span>Sản phẩm</span>
-            <span>Số lượng</span>
-            <span>Giá</span>
-          </div>
-          <div className="items-list">
-            {order.items.map((item) => {
-              const book = item.book;
-              const img = book.images?.[0] || "/images/placeholder-book.png";
-              return (
-                <div key={book._id} className="order-item">
-                  <div className="item-info">
-                    <img
-                      src={img}
-                      alt={book.title}
-                      className="detail-product-image"
-                    />
-                    <span className="item-title">{book.title}</span>
-                  </div>
-                  <div className="item-quantity">x{item.quantity}</div>
-                  <div className="item-price">
-                    {(item.price * item.quantity).toLocaleString()} ₫
-                  </div>
+        {order.items.map((item, i) => {
+          const book = item.book;
+          const img = book?.images?.[0] || "/placeholder-book.png";
+
+          if (!book) {
+            return (
+              <div key={`missing-${i}`} className="order-item">
+                <div className="item-info">
+                  <img
+                    src={img}
+                    alt="Sản phẩm đã bị xóa"
+                    className="detail-product-image"
+                  />
+                  <span className="item-title">Sản phẩm đã bị xóa</span>
                 </div>
-              );
-            })}
-          </div>
-          <div className="order-total">
-            <span>Tổng cộng:</span>
-            <span className="total-amount">
-              {calcTotal().toLocaleString()} ₫
-            </span>
-          </div>
-        </div>
+                <div className="item-quantity">x{item.quantity}</div>
+                <div className="item-price">
+                  {(item.price * item.quantity).toLocaleString()} ₫
+                </div>
+              </div>
+            );
+          }
+
+          return (
+            <div key={book._id} className="order-item">
+              <div className="item-info">
+                <img
+                  src={img}
+                  alt={book.title}
+                  className="detail-product-image"
+                />
+                <span className="item-title">{book.title}</span>
+              </div>
+              <div className="item-quantity">x{item.quantity}</div>
+              <div className="item-price">
+                {(item.price * item.quantity).toLocaleString()} ₫
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
