@@ -123,6 +123,14 @@ export default function OrderDetailPage() {
                 {order.paymentStatus}
               </span>
             </div>
+            <div className="info-item">
+              <span className="info-label">Trạng thái đơn hàng:</span>
+              <span
+                className={`info-value payment-status-${order.orderStatus.toLowerCase()}`}
+              >
+                {order.orderStatus}
+              </span>
+            </div>
             {order.trackingNumber && (
               <div className="info-item">
                 <span className="info-label">Mã vận đơn:</span>
@@ -158,7 +166,7 @@ export default function OrderDetailPage() {
             </div>
           ) : (
             <div className="tracking-loading">
-              <p>Đơn vị vận chuyển đang chờ lấy hàng</p>
+              <p>Chưa có mã vận đơn.</p>
             </div>
           )}
         </div>

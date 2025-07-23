@@ -241,6 +241,50 @@ const getTrackingDetails = async (req, res) => {
   }
 };
 
+const returnOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const order = await Order.findById(orderId);
+    if (!order || !order.trackingNumber) {
+      return res
+        .status(400)
+        .json({ message: "Đơn hàng không hợp lệ hoặc chưa có mã GHN." });
+    }
+
+    const response = await axios.post(
+      "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/switch-status",
+      {
+        order_codes: [order.trackingNumber],
+        status: "return",
+      },
+      {
+        headers: {
+          Token: process.env.GHN_TOKEN,
+          ShopId: process.env.GHN_SHOP_ID,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    order.shippingStatus = "Đã gửi yêu cầu hoàn";
+    order.isReturned = true;
+    await order.save();
+
+    return res.json({
+      success: true,
+      message: "Yêu cầu hoàn đơn GHN đã được gửi thành công",
+      data: response.data,
+    });
+  } catch (error) {
+    console.error("GHN return error:", error.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      message: "Lỗi khi gửi yêu cầu hoàn đơn hàng",
+    });
+  }
+};
+
 const ghnController = {
   getProvince,
   getDistrict,
@@ -248,5 +292,6 @@ const ghnController = {
   calculateFee,
   confirmOrder,
   getTrackingDetails,
+  returnOrder,
 };
 module.exports = ghnController;
