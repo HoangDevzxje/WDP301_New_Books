@@ -95,7 +95,7 @@ function App() {
     setUserEmail(storedEmail);
     setUserRole(storedRole);
 
-    if (storedEmail) {
+    if (storedEmail && storedRole !== "admin") {
       fetchWishlistCount();
       fetchCartData();
     }
