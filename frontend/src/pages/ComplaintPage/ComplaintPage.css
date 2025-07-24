@@ -53,7 +53,7 @@ textarea {
   align-items: center;
   gap: 6px;
   padding: 10px 16px;
-  background-color: #1976d2;
+  background-color: #c49a6c;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -63,7 +63,7 @@ textarea {
 }
 
 .button:hover {
-  background-color: #115293;
+  background-color: #c49a6c;
 }
 
 .status-row {

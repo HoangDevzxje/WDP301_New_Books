@@ -64,7 +64,10 @@ function Login({ onLoginSuccess }) {
       const response = await axios.post("http://localhost:9999/auth/login", {
         email: formData.email,
         password: formData.password,
-      });
+      },
+        {
+          withCredentials: true,
+        });
 
       const token = response.data.accessToken;
       const userRole = response.data.role;
@@ -83,10 +86,9 @@ function Login({ onLoginSuccess }) {
 
       setFormData({ email: "", password: "", rememberMe: false });
 
-      console.log("User role:", userRole);
       setTimeout(() => {
         if (userRole === "admin") {
-          navigate("/admin/users");
+          navigate("/admin/dashboard");
         } else {
           navigate("/");
         }
@@ -157,7 +159,9 @@ function Login({ onLoginSuccess }) {
 
           // Gửi accessToken về server để xác thực
           axios
-            .post("http://localhost:9999/auth/facebook-auth", { accessToken })
+            .post("http://localhost:9999/auth/facebook-auth", { accessToken }, {
+              withCredentials: true
+            })
             .then((res) => {
               const { accessTokenLogin: token, email, role } = res.data;
               const storageMethod = formData.rememberMe
@@ -193,7 +197,7 @@ function Login({ onLoginSuccess }) {
     );
   };
   return (
-    <Box className="login-container">
+    <Box className="login-container" sx={{ backgroundImage: `url('/loginbg.jpeg')` }}>
       <Box className="login-form-container">
         <Typography variant="h4" className="login-title" gutterBottom>
           Đăng nhập

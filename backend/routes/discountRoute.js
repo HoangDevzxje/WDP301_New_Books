@@ -22,6 +22,13 @@ const discountController = require("../controllers/DiscountController");
  *         schema:
  *           type: number
  *           example: 500000
+ *       - in: query
+ *         name: productId
+ *         required: false
+ *         description: ID sách cụ thể (nếu có) để lọc thêm giảm giá áp dụng cho sách
+ *         schema:
+ *           type: string
+ *           example: 66ffe7e91a9babc123456789
  *     responses:
  *       200:
  *         description: Danh sách mã giảm giá phù hợp
@@ -39,6 +46,7 @@ const discountController = require("../controllers/DiscountController");
  *       500:
  *         description: Lỗi server
  */
+
 router.get("/suitable", discountController.getDiscountSuitable);
 
 module.exports = router;

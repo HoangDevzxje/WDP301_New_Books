@@ -1,0 +1,384 @@
+.dashboardContainer {
+  padding: 24px;
+  min-height: 100vh;
+}
+
+/* Header */
+.dashboardTitle {
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+/* Loading state */
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+/* Stat cards */
+.statCard {
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  transition: all 0.3s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background: white;
+}
+
+.statCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.statIcon {
+  font-size: 2.5rem !important;
+  margin-bottom: 16px;
+  padding: 12px;
+  border-radius: 50%;
+}
+
+.statIcon.revenue {
+  color: #4c51bf;
+  background-color: #ebf4ff;
+}
+
+.statIcon.users {
+  color: #38a169;
+  background-color: #f0fff4;
+}
+
+.statIcon.books {
+  color: #9f7aea;
+  background-color: #faf5ff;
+}
+
+.statTitle {
+  color: #718096;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+.statValue {
+  font-weight: 800 !important;
+  color: #2d3748;
+}
+
+.statValue.revenue {
+  color: #4c51bf;
+}
+
+.statValue.users {
+  color: #38a169;
+}
+
+.statValue.books {
+  color: #9f7aea;
+}
+
+/* Section styles */
+.sectionContainer {
+  margin-top: 32px;
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.sectionTitle {
+  font-weight: 700 !important;
+  color: #2d3748;
+  margin-bottom: 24px !important;
+  display: flex;
+  align-items: center;
+}
+
+/* Status cards */
+.statusCard {
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+  height: 100%;
+  background: white;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+}
+
+.statusIcon {
+  font-size: 2rem !important;
+  margin-bottom: 12px;
+}
+
+.statusIcon.pending {
+  color: #f39c12;
+}
+
+.statusIcon.confirmed {
+  color: #2ecc71;
+}
+
+.statusIcon.cancelled {
+  color: #e74c3c;
+}
+
+.statusTitle {
+  font-weight: 600 !important;
+  color: #4a5568;
+  margin-bottom: 8px !important;
+}
+
+.statusValue {
+  font-weight: 800 !important;
+}
+
+/* Updated layout for products and revenue - main container */
+.productsRevenueContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* 2 cột bằng nhau */
+  grid-auto-rows: min-content; /* hàng auto cao theo nội dung */
+  gap: 32px;
+}
+/* Products container - left side */
+.productsContainer {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  /* loại bỏ height:100% nếu có */
+}
+
+/* Tables section - horizontal layout for the two tables */
+.tablesSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.tableContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.tableTitle {
+  font-weight: 700 !important;
+  color: #2d3748;
+  margin-bottom: 16px !important;
+  font-size: 1.1rem !important;
+}
+
+/* Products tables */
+.productsTable {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Revenue container - right side */
+.revenueContainer {
+  grid-column: 1 / -1;
+  /* grid-row tự động được đặt là row tiếp theo */
+}
+
+/* Charts section - horizontal layout for the two charts */
+.chartsSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+/* Chart containers */
+.chartContainer {
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  height: 350px;
+}
+
+.pieChartContainer {
+  padding: 16px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  height: 350px;
+}
+
+/* Tabs styling */
+.revenueTabs {
+  margin-bottom: 16px;
+}
+
+.revenueTabs .MuiTabs-indicator {
+  background-color: #4c51bf;
+  height: 3px;
+}
+
+.revenueTabs .MuiTab-root {
+  text-transform: none;
+  font-weight: 600;
+  color: #718096;
+  min-height: 48px;
+}
+
+.revenueTabs .Mui-selected {
+  color: #4c51bf !important;
+}
+
+/* Table styling */
+.MuiTableCell-root {
+  font-family: "Inter", sans-serif !important;
+}
+
+.MuiTableCell-head {
+  font-weight: 700 !important;
+  background-color: #f7fafc !important;
+  color: #2d3748 !important;
+}
+
+.MuiTableCell-body {
+  color: #4a5568 !important;
+}
+
+/* Avatar in tables */
+.MuiAvatar-root {
+  width: 50px;
+  height: 60px;
+  border-radius: 4px !important;
+}
+
+/* Tooltip styling */
+.recharts-tooltip {
+  background: white !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  padding: 12px !important;
+}
+
+.recharts-tooltip-label {
+  color: #4c51bf !important;
+  font-weight: 600 !important;
+  margin-bottom: 8px !important;
+}
+
+.recharts-default-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Legend styling */
+.recharts-legend-item-text {
+  color: #4a5568 !important;
+  font-weight: 500 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .productsRevenueContainer {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .tablesSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .chartsSection {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .tablesSection {
+    grid-template-columns: 1fr;
+  }
+
+  .chartsSection {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboardContainer {
+    padding: 16px;
+  }
+
+  .sectionContainer {
+    padding: 16px;
+  }
+
+  .statCard {
+    padding: 16px;
+  }
+
+  .statIcon {
+    font-size: 2rem !important;
+    padding: 8px;
+  }
+
+  .productsRevenueContainer {
+    gap: 16px;
+  }
+
+  .tablesSection {
+    gap: 16px;
+  }
+
+  .chartsSection {
+    gap: 16px;
+  }
+}
+
+/* Animation for cards */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.statCard,
+.sectionContainer,
+.chartContainer,
+.pieChartContainer {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Delay animations for better visual effect */
+.statCard:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.statCard:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.statCard:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.sectionContainer {
+  animation-delay: 0.4s;
+}
+
+.chartContainer,
+.pieChartContainer {
+  animation-delay: 0.5s;
+}

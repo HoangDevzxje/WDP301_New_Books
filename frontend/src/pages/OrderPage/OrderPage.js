@@ -22,6 +22,10 @@ import {
   ListItem,
   Collapse,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -30,7 +34,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import "./OrderPage.css"; 
+import "./OrderPage.css";
 import * as CartService from "../../services/CartService";
 import * as OrderService from "../../services/OrderService";
 import * as DiscountService from "../../services/DiscountService";
@@ -70,6 +74,30 @@ function OrderPage() {
   const [showDiscountList, setShowDiscountList] = useState(false);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [useNewAddress, setUseNewAddress] = useState(false);
+  const [openSelectModal, setOpenSelectModal] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState(user?.address[0] || null);
+  const initialShippingAddress = {
+    name: "",
+    phoneNumber: "",
+    address: "",
+    province: "",
+    district: "",
+    ward: "",
+    notes: ""
+  };
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const response = await UserService.getProfile();
+        setUser(response.data.user);
+        setSelectedAddress(response.data.user.address[0]);
+      } catch (error) {
+        console.error("Error fetching user info:", error);
+      }
+    }
+    fetchUserInfo();
+  }, [])
 
   const checkAuthentication = useCallback(async () => {
     try {
@@ -100,7 +128,7 @@ function OrderPage() {
     }
   }, []);
 
-   const fetchProvinces = useCallback(async () => {
+  const fetchProvinces = useCallback(async () => {
     try {
       const response = await GHNService.getProvinces();
       setProvinces(response.data.map(province => ({
@@ -183,13 +211,11 @@ function OrderPage() {
 
       const userResponse = await UserService.getProfile();
       const userData = userResponse.data.user || userResponse.data;
-      console.log("User data received:", userData);
 
       if (userData.address && userData.address.length > 0) {
         const defaultAddress = userData.address.find(addr => addr.isDefault);
 
         if (defaultAddress) {
-          console.log("Default address:", defaultAddress);
           setSelectedAddressId(defaultAddress._id);
 
           await fetchDistricts(defaultAddress.provinceId);
@@ -219,7 +245,6 @@ function OrderPage() {
         }));
       }
 
-      // 7. Set điểm thưởng
       setAvailablePoints(userData.points || 0);
       setLoading(false);
     } catch (error) {
@@ -240,8 +265,7 @@ function OrderPage() {
 
     try {
       setCalculatingFee(true);
-
-      const totalWeight = cartItems.reduce((total, item) => total + (item.quantity * 500), 0);
+      const totalWeight = cartItems.reduce((total, item) => total + (item.quantity * item.book.weight), 0);
       const totalValue = cartItems.reduce((total, item) => total + (item.book.price * item.quantity), 0);
 
       const response = await GHNService.calculateFee({
@@ -251,8 +275,9 @@ function OrderPage() {
         weight: totalWeight
       });
 
-      if (response.data && response.data.data) {
-        const calculatedFee = response.data.data.total;
+
+      if (response.data) {
+        const calculatedFee = response.data.total;
         setShippingFee(calculatedFee);
       } else {
         setShippingFee(35000);
@@ -338,8 +363,8 @@ function OrderPage() {
       const selectedAddress = user.address.find(addr => addr._id === addressId);
       if (selectedAddress) {
         try {
-          await fetchDistricts(selectedAddress.provinceId); 
-          await fetchWards(selectedAddress.districtId);    
+          await fetchDistricts(selectedAddress.provinceId);
+          await fetchWards(selectedAddress.districtId);
 
           setShippingAddress({
             name: user.name || "",
@@ -682,7 +707,6 @@ function OrderPage() {
     );
   };
 
-  // Login page component with CSS classes
   const LoginPrompt = () => (
     <Container maxWidth="sm" className="login-prompt-container">
       <Paper elevation={3} className="login-prompt-paper">
@@ -706,7 +730,6 @@ function OrderPage() {
     </Container>
   );
 
-  // Show loading state
   if (isLoading) {
     return (
       <Container className="loading-container">
@@ -728,16 +751,16 @@ function OrderPage() {
         </Alert>
       </Snackbar>
 
-      <Box maxWidth={"xl"} className="order-container" sx={{mx: "auto", padding: 2}}>
+      <Box maxWidth={"xl"} className="order-container" sx={{ mx: "auto", padding: 2 }}>
         {!isAuthenticated ? (
           <LoginPrompt />
         ) : (
           <>
             <Box className="order-header">
               <Typography variant="h4" className="order-main-title">
-                 Thanh toán đơn hàng
+                Thanh toán đơn hàng
               </Typography>
-            </Box>                     
+            </Box>
             {loading ? (
               <Box className="centered-loading">
                 <CircularProgress />
@@ -759,99 +782,148 @@ function OrderPage() {
               </Paper>
             ) : (
               <Grid container spacing={3}>
-                {/* Shipping Information */}
                 <Grid size={8}>
                   <Box className="shipping-paper">
                     <Typography variant="h6" gutterBottom className="shipping-title">
                       Thông tin giao hàng
                     </Typography>
 
-                   <Box className="address-selection-paper">
+                    <Box className="address-selection-paper">
                       <Typography variant="h6" gutterBottom className="address-selection-title">
                         <LocationOnIcon className="shipping-icon" /> Chọn địa chỉ giao hàng
                       </Typography>
-                      
-                      <RadioGroup
-                        className="address-radio-group"
-                        value={useNewAddress ? "new" : selectedAddressId}
-                        onChange={handleAddressSelection}
+                    </Box>
+
+                    {selectedAddress && (
+                      <Box className="address-summary">
+                        <Box>
+                          <Typography sx={{ fontWeight: "bold", color: "#333" }}>
+                            {selectedAddress.address}, {selectedAddress.wardName}, {selectedAddress.districtName}, {selectedAddress.provinceName}
+                          </Typography>
+                          <Typography variant="body2">
+                            {user.name} - {user.phone}
+                          </Typography>
+                        </Box>
+                        {selectedAddress.isDefault && <Box className="default-label">Mặc định</Box>}
+                      </Box>
+                    )}
+
+                    <Box className="address-button-container">
+                      <Button onClick={() => setOpenSelectModal(true)} className="change-address-button">
+                        Thay đổi địa chỉ
+                      </Button>
+
+                      <Button
+                        onClick={() => {
+                          setUseNewAddress(true);
+                          setSelectedAddress(null);
+                          setSelectedAddressId(null);
+                          setShippingAddress(initialShippingAddress);
+                        }}
+                        className="use-different-address-button"
                       >
-                        {user?.address && user.address.length > 0 && user.address.map((addr) => (
-                          <FormControlLabel
-                            key={addr._id}
-                            value={addr._id}
-                            control={<Radio />}
-                            label={
-                              <Box className="address-label-content">
-                                <Box className="address-header">
-                                  <Typography variant="body1" className="address-name-phone">
-                                    {user.name} - {user.phone}
-                                  </Typography>
+                        Sử dụng địa chỉ khác
+                      </Button>
+                    </Box>
 
-                                  {addr.isDefault && (
-                                    <Box className="default-label">
-                                      Mặc định
-                                    </Box>
-                                  )}
+                    <Dialog
+                      open={openSelectModal}
+                      onClose={() => setOpenSelectModal(false)}
+                      fullWidth
+                      maxWidth="xs"
+                      className="select-address-dialog"
+                    >
+                      <DialogTitle className="select-address-title">Chọn địa chỉ giao hàng</DialogTitle>
+
+                      <DialogContent className="select-address-content">
+                        <RadioGroup
+                          value={selectedAddressId}
+                          onChange={handleAddressSelection}
+                        >
+                          {user?.address?.map((addr) => (
+                            <FormControlLabel
+                              key={addr._id}
+                              value={addr._id}
+                              control={<Radio className="custom-radio" />}
+                              className={`address-item2 ${selectedAddressId === addr._id ? 'selected' : ''}`}
+                              label={
+                                <Box className="address-label-content">
+                                  <Box>
+                                    <Typography sx={{ fontWeight: "bold" }}>
+                                      {addr.address}, {addr.wardName}, {addr.districtName}, {addr.provinceName}
+                                    </Typography>
+                                    <Typography variant="body2">
+                                      {user.name} - {user.phone}
+                                    </Typography>
+                                  </Box>
+                                  {addr.isDefault && <Box className="default-label">Mặc định</Box>}
                                 </Box>
+                              }
+                            />
+                          ))}
+                        </RadioGroup>
+                      </DialogContent>
 
-                                <Typography variant="body2" className="address-full-text">
-                                  {addr.address}, {addr.wardName}, {addr.districtName}, {addr.provinceName}
-                                </Typography>
-                              </Box>
-                            }
-                            className={selectedAddressId === addr._id ? "address-option-check" : "address-option"}
-                          />
-                        ))}
-                        
-                        <FormControlLabel
-                          value="new"
-                          control={<Radio />}
-                          label={
-                            <Box>
-                              <Typography variant="body1">
-                                Sử dụng địa chỉ mới
-                              </Typography>
-                            </Box>
-                          }
-                          className="new-address-option"
-                        />
-                      </RadioGroup>    
-                    </Box> 
+                      <DialogActions className="select-address-actions">
+                        <Button onClick={() => setOpenSelectModal(false)} className="cancel-button">
+                          Hủy
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const selected = user.address.find(a => a._id === selectedAddressId);
+                            setSelectedAddress(selected);
+                            setUseNewAddress(false);
+                            setOpenSelectModal(false);
+                          }}
+                          variant="contained"
+                          className="confirm-button"
+                        >
+                          Xác nhận
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
 
+                    <Box className="address-selection-paper">
+                      <Typography variant="h6" gutterBottom className="address-selection-title">
+                        <LocationOnIcon className="shipping-icon" /> Nhập địa chỉ
+                      </Typography>
+                    </Box>
 
                     <Grid container spacing={2}>
-                      <Grid size= {{xs: 12, sm: 6}}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           fullWidth
                           label="Họ và tên"
                           name="name"
                           value={shippingAddress.name}
                           onChange={handleInputChange}
+
                         />
                       </Grid>
-                      <Grid  size= {{xs: 12, sm: 6}}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                          
+
                           fullWidth
                           label="Số điện thoại"
                           name="phoneNumber"
                           value={shippingAddress.phoneNumber}
                           onChange={handleInputChange}
+
                         />
                       </Grid>
-                      <Grid  size= {12}>
+                      <Grid size={12}>
                         <TextField
-                          
+
                           fullWidth
                           label="Địa chỉ"
                           name="address"
                           value={shippingAddress.address}
                           onChange={handleInputChange}
+
                         />
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
-                        <FormControl fullWidth >
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <FormControl fullWidth>
                           <InputLabel>Tỉnh/Thành phố</InputLabel>
                           <Select
                             name="province"
@@ -867,15 +939,14 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
-                        <FormControl fullWidth >
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <FormControl fullWidth disabled={!useNewAddress || !shippingAddress.province}>
                           <InputLabel>Quận/Huyện</InputLabel>
                           <Select
                             name="district"
                             value={shippingAddress.district}
                             onChange={handleInputChange}
                             label="Quận/Huyện *"
-                            disabled={!shippingAddress.province}
                           >
                             {districts.map(district => (
                               <MenuItem key={district.id} value={district.id}>
@@ -885,15 +956,14 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
-                        <FormControl fullWidth >
+                      <Grid size={{ xs: 12, sm: 4 }}>
+                        <FormControl fullWidth disabled={!useNewAddress || !shippingAddress.district}>
                           <InputLabel>Phường/Xã</InputLabel>
                           <Select
                             name="ward"
                             value={shippingAddress.ward}
                             onChange={handleInputChange}
                             label="Phường/Xã *"
-                            disabled={!shippingAddress.district}
                           >
                             {wards.map(ward => (
                               <MenuItem key={ward.id} value={ward.id}>
@@ -903,7 +973,7 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {12}>
+                      <Grid size={12}>
                         <TextField
                           fullWidth
                           label="Ghi chú (tùy chọn)"
@@ -912,6 +982,7 @@ function OrderPage() {
                           onChange={handleInputChange}
                           multiline
                           rows={2}
+
                         />
                       </Grid>
                     </Grid>
@@ -958,7 +1029,7 @@ function OrderPage() {
 
                     <Box className="order-items-container">
                       {cartItems.map(item => (
-                        <Box key={item.book._id} className="order-item">
+                        <Box key={item.book._id} className="order-item2">
                           <Box className="order-item-image">
                             <img
                               src={item.book.images}
@@ -1078,7 +1149,7 @@ function OrderPage() {
                         </Typography>
                         <Box className="points-content">
                           <Typography variant="body2" className="points-available">
-                            Điểm hiện có: 
+                            Điểm hiện có:
                             <Typography component="span" className="points-available-amount">
                               {availablePoints.toLocaleString()}
                             </Typography>

@@ -1,49 +1,49 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { getOrderDetails } from "../../services/OrderService";
 import { getTrackingDetails } from "../../services/GHNService";
 import "./OrderDetailPage.css";
 
-const POLL_INTERVAL = 15000; // 15 giây
+const POLL_INTERVAL = 15000;
 
-const OrderDetailPage = () => {
+export default function OrderDetailPage() {
   const { orderId } = useParams();
+  const navigate = useNavigate();
+
   const [order, setOrder] = useState(null);
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Lấy chi tiết đơn 1 lần
   useEffect(() => {
     (async () => {
       try {
         const res = await getOrderDetails(orderId);
-        setOrder(res.data);
-      } catch (error) {
-        console.error("Failed to fetch order details:", error);
+        const o = res.data?.data ?? res.data;
+        setOrder(o);
+      } catch (err) {
+        console.error("Failed to fetch order details:", err);
       } finally {
         setLoading(false);
       }
     })();
   }, [orderId]);
 
-  // Poll GHN
   useEffect(() => {
     if (!orderId) return;
     let timer;
-
     const fetchTracking = async () => {
       try {
         const res = await getTrackingDetails(orderId);
-        setTracking(res.data.data);
-        // nếu đã giao/hủy thì dừng polling
-        if (["delivered", "returned", "cancel"].includes(res.data.data.status))
+        const t = res.data?.data;
+        setTracking(t);
+        if (["delivered", "returned", "cancel"].includes(t.status)) {
           clearInterval(timer);
+        }
       } catch (err) {
-        console.error("Failed to fetch tracking details:", err);
+        console.error("Failed fetching tracking:", err);
       }
     };
-
     fetchTracking();
     timer = setInterval(fetchTracking, POLL_INTERVAL);
     return () => clearInterval(timer);
@@ -57,7 +57,6 @@ const OrderDetailPage = () => {
       </div>
     );
   }
-
   if (!order) {
     return (
       <div className="order-detail-error">
@@ -66,12 +65,11 @@ const OrderDetailPage = () => {
     );
   }
 
-  const code = order.trackingNumber;
+  const calcTotal = () =>
+    order.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  // Xác định class cho trạng thái đơn hàng
   const getStatusClass = () => {
     if (!tracking) return "tracking-status-default";
-
     switch (tracking.status) {
       case "delivered":
         return "tracking-status-success";
@@ -84,63 +82,67 @@ const OrderDetailPage = () => {
   };
 
   const getStatusText = (status) => {
-    const statusMap = {
+    const map = {
       ready_to_pick: "Đã tạo đơn, chờ lấy hàng",
       picking: "Shipper đang đến lấy hàng",
-      money_collect_picking: "Đang xử lý với người gửi",
       picked: "Đã lấy hàng",
-      storing: "Hàng đang được chuyển đến kho GHN",
-      transporting: "Hàng đang được luân chuyển",
-      sorting: "Hàng đang được phân loại tại kho",
+      transporting: "Đang luân chuyển",
       delivering: "Đang giao hàng",
-      money_collect_delivering: "Đang xử lý với người nhận",
       delivered: "Giao hàng thành công",
-      delivery_fail: "Giao hàng không thành công",
-      waiting_to_return: "Đang chờ giao lại (24/48h)",
-      return: "Giao thất bại, đang chờ hoàn về",
-      return_transporting: "Hàng hoàn đang trên đường về",
-      cancel: "Đơn hàng đã bị hủy",
+      cancel: "Đơn đã hủy",
     };
-    return statusMap[status] || "Đang xử lý";
+    return map[status] || "Đang xử lý";
   };
 
   return (
     <div className="order-detail-container">
-      <div className="order-detail-header">
-        <h2>Chi tiết đơn hàng #{order._id}</h2>
-        <p className="order-date">
-          Ngày đặt: {dayjs(order.createdAt).format("DD/MM/YYYY HH:mm")}
-        </p>
-      </div>
+      <button className="back-button" onClick={() => navigate("/track-order")}>
+        ← Quay lại
+      </button>
 
+      <div className="order-detail-header">
+        <h2>Chi tiết đơn hàng</h2>
+        <h3 className="order-date">
+          Ngày đặt: {dayjs(order.createdAt).format("DD/MM/YYYY HH:mm")}
+        </h3>
+      </div>
       <div className="order-detail-grid">
-        {/* Thông tin đơn hàng */}
+        {/* Thông tin đơn & vận đơn */}
         <div className="order-info-card">
           <h3 className="card-title">Thông tin đơn hàng</h3>
           <div className="info-grid">
             <div className="info-item">
-              <span className="info-label">Phương thức thanh toán:</span>
+              <span className="info-label">PT thanh toán:</span>
               <span className="info-value">{order.paymentMethod}</span>
             </div>
             <div className="info-item">
-              <span className="info-label">Trạng thái thanh toán:</span>
+              <span className="info-label">Trạng thái TT:</span>
               <span
                 className={`info-value payment-status-${order.paymentStatus.toLowerCase()}`}
               >
                 {order.paymentStatus}
               </span>
             </div>
-            {code && (
+            <div className="info-item">
+              <span className="info-label">Trạng thái đơn hàng:</span>
+              <span
+                className={`info-value payment-status-${order.orderStatus.toLowerCase()}`}
+              >
+                {order.orderStatus}
+              </span>
+            </div>
+            {order.trackingNumber && (
               <div className="info-item">
                 <span className="info-label">Mã vận đơn:</span>
                 <span className="info-value">
                   <a
-                    href={`https://donhang.ghn.vn/?order_code=${code}`}
+                    href={`https://donhang.ghn.vn/?order_code=${order.trackingNumber}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="tracking-link"
                   >
-                    {code} <span className="external-link-icon">↗</span>
+                    {order.trackingNumber}
+                    <span className="external-link-icon">↗</span>
                   </a>
                 </span>
               </div>
@@ -153,61 +155,85 @@ const OrderDetailPage = () => {
           <h3 className="card-title">Trạng thái vận chuyển</h3>
           {tracking ? (
             <div className="tracking-details">
-              <div className="status-main">
-                <p className="status-name">{getStatusText(tracking.status)}</p>
-                <p className="status-update">
-                  Cập nhật:{" "}
-                  {dayjs(tracking.updated_date).format("HH:mm DD/MM/YYYY")}
-                </p>
-              </div>
+              <p className="status-name">{getStatusText(tracking.status)}</p>
+              <p className="status-update">
+                Cập nhật:{" "}
+                {dayjs(tracking.updated_date).format("HH:mm DD/MM/YYYY")}
+              </p>
               {tracking.warehouse && (
-                <div className="status-location">
-                  <span className="location-icon">📍</span>
-                  <span>{tracking.warehouse}</span>
-                </div>
+                <p className="status-location">📍 {tracking.warehouse}</p>
               )}
             </div>
           ) : (
             <div className="tracking-loading">
-              <p>Đang tải trạng thái vận chuyển...</p>
+              <p>Chưa có mã vận đơn.</p>
             </div>
           )}
         </div>
 
+        {/* Thông tin giao hàng */}
+        <div className="shipping-info-card">
+          <h3 className="card-title">Thông tin giao hàng</h3>
+          <p>
+            <strong>Người nhận:</strong> {order.shippingInfo.name}
+          </p>
+          <p>
+            <strong>Địa chỉ:</strong> {order.shippingInfo.address},{" "}
+            {order.shippingInfo.wardName}, {order.shippingInfo.districtName},{" "}
+            {order.shippingInfo.provineName}
+          </p>
+          <p>
+            <strong>Điện thoại:</strong> {order.shippingInfo.phoneNumber}
+          </p>
+          {order.shippingInfo.note && (
+            <p>
+              <strong>Ghi chú:</strong> {order.shippingInfo.note}
+            </p>
+          )}
+        </div>
+
         {/* Danh sách sản phẩm */}
-        <div className="order-items-card">
-          <h3 className="card-title">Sản phẩm đã đặt</h3>
-          <div className="items-header">
-            <span>Sản phẩm</span>
-            <span>Số lượng</span>
-            <span>Giá</span>
-          </div>
-          <div className="items-list">
-            {order.items.map((item) => (
-              <div key={item._id} className="order-item">
+        {order.items.map((item, i) => {
+          const book = item.book;
+          const img = book?.images?.[0] || "/placeholder-book.png";
+
+          if (!book) {
+            return (
+              <div key={`missing-${i}`} className="order-item">
                 <div className="item-info">
-                  <span className="item-title">{item.book.title}</span>
+                  <img
+                    src={img}
+                    alt="Sản phẩm đã bị xóa"
+                    className="detail-product-image"
+                  />
+                  <span className="item-title">Sản phẩm đã bị xóa</span>
                 </div>
                 <div className="item-quantity">x{item.quantity}</div>
                 <div className="item-price">
-                  {item.price.toLocaleString()} ₫
+                  {(item.price * item.quantity).toLocaleString()} ₫
                 </div>
               </div>
-            ))}
-          </div>
-          <div className="order-total">
-            <span>Tổng cộng:</span>
-            <span className="total-amount">
-              {order.items
-                .reduce((sum, item) => sum + item.price * item.quantity, 0)
-                .toLocaleString()}{" "}
-              ₫
-            </span>
-          </div>
-        </div>
+            );
+          }
+
+          return (
+            <div key={book._id} className="order-item">
+              <div className="item-info">
+                <img
+                  src={img}
+                  alt={book.title}
+                  className="detail-product-image"
+                />
+                <span className="item-title">{book.title}</span>
+              </div>
+              <div className="item-quantity">x{item.quantity}</div>
+              <div className="item-price">
+                {(item.price * item.quantity).toLocaleString()} ₫
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
-};
-
-export default OrderDetailPage;
+}

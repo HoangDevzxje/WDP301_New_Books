@@ -102,6 +102,29 @@ router.get("/sales", bookController.getDiscountedBooks);
  *         description: Lỗi server
  */
 router.get("/new-book", bookController.getNewBooks);
+
+/**
+ * @swagger
+ * /book/best-seller:
+ *   get:
+ *     summary: Lấy danh sách best seller
+ *     tags: [Books]
+ *     responses:
+ *       200:
+ *         description: Danh sách best seller
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách mới
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/best-seller", bookController.getBestSellers);
+
 /**
  * @swagger
  * /book/{id}:
@@ -128,5 +151,59 @@ router.get("/new-book", bookController.getNewBooks);
  *         description: Lỗi server
  */
 router.get("/:id", bookController.getBookById);
+
+/**
+ * @swagger
+ * /book/author/{author}:
+ *   get:
+ *     summary: Lấy tất cả sách theo tác giả
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: author
+ *         required: true
+ *         description: Tên của tác giả
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Thông tin sách
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/author/:author", bookController.getBookByAuthor);
+
+/**
+ * @swagger
+ * /book/publisher/{publisher}:
+ *   get:
+ *     summary: Lấy tất cả sách theo nhà xuất bản
+ *     tags: [Books]
+ *     parameters:
+ *       - in: path
+ *         name: publisher
+ *         required: true
+ *         description: Tên nhà xuất bản
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Thông tin sách
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Book'
+ *       404:
+ *         description: Không tìm thấy sách
+ *       500:
+ *         description: Lỗi server
+ */
+router.get("/publisher/:publisher", bookController.getBookByPublisher);
 
 module.exports = router;

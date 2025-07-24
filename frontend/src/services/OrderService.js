@@ -20,10 +20,15 @@ export const createPayment = async (orderId) => {
   return response;
 };
 
-export const getPaymentReturn = async (queryString = '') => {
+export const getPaymentReturn = async (queryString = "") => {
   const params = Object.fromEntries(new URLSearchParams(queryString));
   const response = await axiosInstance.get("/payment/return", {
     params,
   });
   return response;
+};
+// Lấy chi tiết trạng thái GHN cho 1 đơn
+export const getGhnTracking = async (orderId) => {
+  const response = await axiosInstance.get(`/ghn/tracking/${orderId}`);
+  return response.data.data; 
 };

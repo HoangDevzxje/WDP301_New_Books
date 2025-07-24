@@ -27,9 +27,9 @@ const Refund = () => {
   };
 
   const renderRefundConditions = () => (
-    <Paper elevation={3} sx={{ p: 3, mb: 4, borderLeft: "6px solid #1976d2" }}>
+    <Paper elevation={3} sx={{ p: 3, mb: 4, borderLeft: "6px solid  #c49a6c" }}>
       <Box display="flex" alignItems="center" mb={2}>
-        <PolicyIcon color="primary" sx={{ mr: 1 }} />
+        <PolicyIcon color="#c49a6c" sx={{ mr: 1 }} />
         <Typography variant="h6" fontWeight="bold">
           Điều Kiện Hoàn Trả Sách
         </Typography>
@@ -55,11 +55,11 @@ const Refund = () => {
   const renderComplaintSection = () => (
     <Paper
       elevation={3}
-      sx={{ p: 3, backgroundColor: "#f9f9f9", borderLeft: "6px solid #ffa726" }}
+      sx={{ p: 3, backgroundColor: "#f9f9f9", borderLeft: "6px solid #c49a6c" }}
     >
       <Box display="flex" alignItems="center" mb={2}>
-        <ReportProblemIcon sx={{ color: "#ffa726", mr: 1 }} />
-        <Typography variant="h6" fontWeight="bold" color="warning.main">
+        <ReportProblemIcon />
+        <Typography variant="h6" fontWeight="bold">
           Thông Tin Trả Sách & Khiếu Nại
         </Typography>
       </Box>
@@ -71,7 +71,7 @@ const Refund = () => {
           onClick={handleComplaintNavigation}
           color="primary"
           underline="hover"
-          sx={{ fontWeight: "bold" }}
+          sx={{ fontWeight: "bold", color: "#c49a6c" }}
         >
           trang khiếu nại
         </Link>

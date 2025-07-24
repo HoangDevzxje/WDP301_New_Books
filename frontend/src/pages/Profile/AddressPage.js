@@ -44,7 +44,6 @@ export default function AddressesPage() {
     isDefault: false,
   });
 
-  // Lấy user từ token
   useEffect(() => {
     const token =
       localStorage.getItem("access_token") ||
@@ -62,7 +61,6 @@ export default function AddressesPage() {
     }
   }, []);
 
-  // Xác thực từ server
   useEffect(() => {
     (async () => {
       try {
@@ -380,7 +378,7 @@ export default function AddressesPage() {
             Đặt làm mặc định
           </label>
 
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn btn-secondary">
             {editingId ? "Cập nhật địa chỉ" : "Thêm địa chỉ"}
           </button>
           <button

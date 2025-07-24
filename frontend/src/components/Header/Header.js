@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./Header.css";
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Box,
-  IconButton,
   Container,
   Popper,
   Paper,
@@ -24,9 +21,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
-import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import NoBackpackIcon from "@mui/icons-material/NoBackpack";
 import FlagIcon from "@mui/icons-material/Flag";
 import RoomIcon from "@mui/icons-material/Room";
 import PhoneIcon from "@mui/icons-material/Phone";
@@ -34,10 +29,8 @@ import Badge from "@mui/material/Badge";
 import InputBase from "@mui/material/InputBase";
 import ImageIcon from "@mui/icons-material/Image";
 import { styled } from "@mui/material/styles";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import * as CategoryService from "../../services/CategoryService";
 import * as BookService from "../../services/BookService";
-import * as WishlistService from "../../services/WishlistService";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -96,7 +89,6 @@ const Header = ({
   updateUserEmail,
   wishlistCount = 0,
   cartCount = 0,
-  cartTotal = 0,
   updateCartCount,
   updateCartTotal,
   updateWishlistCount,
@@ -112,11 +104,7 @@ const Header = ({
   const [activeCategory, setActiveCategory] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const userMenuRef = useRef(null);
   const searchRef = useRef(null);
-
-  const [showBanner, setShowBanner] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   const [anchorEl2, setAnchorEl2] = useState(null);
 
@@ -130,20 +118,6 @@ const Header = ({
 
   useEffect(() => {
     fetchCategories();
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      if (currentScrollY > lastScrollY) {
-        setShowBanner(false);
-      } else {
-        setShowBanner(true);
-      }
-      setLastScrollY(currentScrollY);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
   }, []);
 
   const fetchCategories = async () => {
@@ -288,15 +262,17 @@ const Header = ({
   };
 
   const handleCategoryClick2 = (categoryId) => {
-    navigate(`/category/${categoryId}`);
+    navigate("/shopAll", {
+      state: { selectedCategoryId: categoryId },
+    });
     handleClose();
   };
+
   const handleSearchSubmit = () => {
     navigate(`/shopAll?query=${encodeURIComponent(searchTerm)}`);
   };
 
-  const displayWishlistText =
-    wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
+  const displayWishlistText = wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
 
   const open = Boolean(anchorEl);
   const userMenuOpen = Boolean(userMenuAnchorEl);
@@ -313,6 +289,15 @@ const Header = ({
           </div>
 
           <div className="nav-search">
+            <Button
+              className="custom-icon-button"
+              component={Link}
+              to="/blog"
+            >
+              <Typography variant="body2" className="custom-typography">
+                Blog
+              </Typography>
+            </Button>
             <Button
               className="custom-icon-button"
               onMouseEnter={handleCategoryMouseEnter}
@@ -410,20 +395,7 @@ const Header = ({
                         >
                           Tài khoản của tôi
                         </MenuItem>
-                        <MenuItem
-                          component={Link}
-                          to="/user/complaint"
-                          className="user-menu-item"
-                        >
-                          Phản ánh khiếu nại
-                        </MenuItem>
-                        <MenuItem
-                          component={Link}
-                          to="/user/refund"
-                          className="user-menu-item"
-                        >
-                          Chính Sách Hoàn Trả Sách
-                        </MenuItem>
+
                         <MenuItem
                           onClick={handleLogout}
                           className="user-menu-item"
@@ -456,7 +428,13 @@ const Header = ({
               component={Link}
               to="/user/cart"
             >
-              <AddShoppingCartIcon className="custom-icon" />
+              <Badge
+                badgeContent={userEmail ? cartCount : 0}
+                color="error"
+                showZero
+              >
+                <AddShoppingCartIcon className="custom-icon" />
+              </Badge>
             </Button>
 
             <Button
@@ -464,7 +442,13 @@ const Header = ({
               component={Link}
               to="/user/wishlist"
             >
-              <FavoriteBorderIcon className="custom-icon" />
+              <Badge
+                badgeContent={userEmail ? wishlistCount : 0}
+                color="error"
+                showZero
+              >
+                <FavoriteBorderIcon className="custom-icon" />
+              </Badge>
             </Button>
 
             <Box className="more-menu-container">
@@ -478,11 +462,21 @@ const Header = ({
                 onClose={handleCloseMenu}
                 className="more-menu"
               >
-                <MenuItem onClick={handleCloseMenu} className="more-menu-item">
-                  <NoBackpackIcon className="more-menu-icon" />
+                <MenuItem
+                  onClick={handleCloseMenu}
+                  component={Link}
+                  to="/user/refund"
+                  className="more-menu-item user-menu-item"
+                >
+                  <FlagIcon className="more-menu-icon" />
                   Hoàn trả sách
                 </MenuItem>
-                <MenuItem onClick={handleCloseMenu} className="more-menu-item">
+                <MenuItem
+                  onClick={handleCloseMenu}
+                  component={Link}
+                  to="/user/complaint"
+                  className="more-menu-item user-menu-item"
+                >
                   <FlagIcon className="more-menu-icon" />
                   Phản ánh khiếu nại
                 </MenuItem>
@@ -525,12 +519,11 @@ const Header = ({
                               key={category._id}
                               onClick={() => handleCategoryClick2(category._id)}
                               onMouseEnter={() => handleCategoryHover(category)}
-                              className={`category-menu-item ${
-                                activeCategory &&
-                                activeCategory._id === category._id
+                              className={`category-menu-item ${activeCategory &&
+                                  activeCategory._id === category._id
                                   ? "active"
                                   : ""
-                              }`}
+                                }`}
                             >
                               {category.name}
                             </MenuItem>
@@ -606,9 +599,7 @@ const Header = ({
                             <Box className="view-all-container">
                               <Button
                                 className="custom-icon-button"
-                                component={Link}
-                                to={`/category/${activeCategory._id}`}
-                                onClick={handleClose}
+                                onClick={() => handleCategoryClick2(activeCategory._id)}
                               >
                                 <Typography
                                   variant="body2"

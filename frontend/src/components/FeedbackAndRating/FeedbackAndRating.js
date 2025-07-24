@@ -13,7 +13,8 @@ import {
   Divider,
   Grid,
   Avatar,
-  TextField
+  TextField,
+  Alert
 } from '@mui/material';
 import {
   MoreVert as MoreVertIcon,
@@ -22,6 +23,7 @@ import {
   Star,
   StarBorder
 } from '@mui/icons-material';
+import { blackList, badWords } from '@vnphu/vn-badwords';
 import './FeedbackAndRating.css';
 
 const FeedbackAndRating = ({ 
@@ -47,6 +49,9 @@ const FeedbackAndRating = ({
   handleEdit,
   handleDelete
 }) => {
+  const [badWordsWarning, setBadWordsWarning] = React.useState('');
+  const [editBadWordsWarning, setEditBadWordsWarning] = React.useState('');
+
   const ratingDistribution = {
     5: 0,
     4: 0,
@@ -63,6 +68,70 @@ const FeedbackAndRating = ({
   });
 
   const totalReviews = reviews.length;
+  const containsBadWords = (text) => {
+    const lowerText = text.toLowerCase();
+    return blackList.some(bad => lowerText.includes(bad));
+  };
+
+  const validateComment = (text) => {
+    if (!text.trim()) {
+      return { isValid: false, message: 'Vui lòng nhập nhận xét' };
+    }
+
+    if (containsBadWords(text)) {
+      return {
+        isValid: false,
+        message: 'Nhận xét chứa từ ngữ không phù hợp. Vui lòng chỉnh sửa nội dung.'
+      };
+    }
+    
+    return { isValid: true, message: '' };
+  };
+
+  const handleValidatedSubmitReview = () => {
+    const validation = validateComment(comment);
+    
+    if (!validation.isValid) {
+      setBadWordsWarning(validation.message);
+      return;
+    }
+    
+    setBadWordsWarning('');
+    handleSubmitReview();
+  };
+
+  const handleValidatedSubmitEdit = () => {
+    if (!editingReview) return;
+    
+    const validation = validateComment(editingReview.comment);
+    
+    if (!validation.isValid) {
+      setEditBadWordsWarning(validation.message);
+      return;
+    }
+    
+    setEditBadWordsWarning('');
+    handleSubmitEdit();
+  };
+
+  const handleCommentChange = (value) => {
+    setComment(value);
+    
+    if (badWordsWarning) {
+      setBadWordsWarning('');
+    }
+  };
+
+  const handleEditCommentChange = (value) => {
+    setEditingReview({
+      ...editingReview,
+      comment: value,
+    });
+    
+    if (editBadWordsWarning) {
+      setEditBadWordsWarning('');
+    }
+  };
 
   return (
     <Box 
@@ -250,12 +319,18 @@ const FeedbackAndRating = ({
             </Grid>
           )}
 
-          {/* Edit Review Form */}
           {editingReview && (
             <Box className="review-form-container">
               <Typography variant="h6" className="form-title">
                 Chỉnh sửa đánh giá
               </Typography>
+              
+              {editBadWordsWarning && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  {editBadWordsWarning}
+                </Alert>
+              )}
+              
               <Box className="form-field">
                 <Typography className="form-label">
                   Đánh giá của bạn:
@@ -277,29 +352,28 @@ const FeedbackAndRating = ({
                   multiline
                   rows={4}
                   value={editingReview.comment}
-                  onChange={(e) =>
-                    setEditingReview({
-                      ...editingReview,
-                      comment: e.target.value,
-                    })
-                  }
+                  onChange={(e) => handleEditCommentChange(e.target.value)}
                   placeholder="Viết nhận xét của bạn..."
                   fullWidth
                   className="review-textarea"
+                  error={!!editBadWordsWarning}
                 />
               </Box>
               <Box className="form-buttons">
                 <Button
                   variant="outlined"
                   className="cancel-button"
-                  onClick={() => setEditingReview(null)}
+                  onClick={() => {
+                    setEditingReview(null);
+                    setEditBadWordsWarning('');
+                  }}
                 >
                   Hủy
                 </Button>
                 <Button
                   variant="contained"
                   className="review-button"
-                  onClick={handleSubmitEdit}
+                  onClick={handleValidatedSubmitEdit}
                 >
                   Lưu đánh giá
                 </Button>
@@ -324,6 +398,13 @@ const FeedbackAndRating = ({
               <Typography variant="h6" className="form-title">
                 Đánh giá sản phẩm
               </Typography>
+              
+              {badWordsWarning && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                  {badWordsWarning}
+                </Alert>
+              )}
+              
               <Box className="form-field">
                 <Typography className="form-label">
                   Đánh giá của bạn:
@@ -343,23 +424,27 @@ const FeedbackAndRating = ({
                   multiline
                   rows={4}
                   value={comment}
-                  onChange={(e) => setComment(e.target.value)}
+                  onChange={(e) => handleCommentChange(e.target.value)}
                   placeholder="Viết nhận xét của bạn..."
                   fullWidth
                   className="review-textarea"
+                  error={!!badWordsWarning}
                 />
               </Box>
               <Box className="form-buttons">
                 <Button
                   className="cancel-button"
-                  onClick={() => setShowReviewForm(false)}
+                  onClick={() => {
+                    setShowReviewForm(false);
+                    setBadWordsWarning('');
+                  }}
                 >
                   Hủy
                 </Button>
                 <Button
                   variant="contained"
                   className="review-button"
-                  onClick={handleSubmitReview}
+                  onClick={handleValidatedSubmitReview}
                 >
                   Gửi đánh giá
                 </Button>

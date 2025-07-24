@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import {
+  Container,
   Typography,
-  Button,
   Table,
+  Button,
   TableBody,
   TableCell,
   TableContainer,
@@ -35,6 +36,7 @@ import {
   updateComplaintStatus,
 } from "../../../services/AdminService/complaintService";
 import "./ComplaintManagement.css";
+
 const ComplaintManagement = () => {
   const [complaints, setComplaints] = useState([]);
   const [filteredComplaints, setFilteredComplaints] = useState([]);
@@ -44,7 +46,6 @@ const ComplaintManagement = () => {
     status: "",
   });
 
-  // Filter states
   const [customerFilter, setCustomerFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -63,8 +64,11 @@ const ComplaintManagement = () => {
   const fetchComplaints = async () => {
     try {
       const data = await getComplaints();
-      setComplaints(data);
-      setFilteredComplaints(data);
+      const sortedData = data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setComplaints(sortedData);
+      setFilteredComplaints(sortedData);
     } catch (error) {
       console.error("Error fetching complaints", error);
     }
@@ -83,6 +87,9 @@ const ComplaintManagement = () => {
     if (statusFilter) {
       result = result.filter((c) => c.status === statusFilter);
     }
+    result = result.sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
     setFilteredComplaints(result);
   };
 
@@ -90,6 +97,7 @@ const ComplaintManagement = () => {
     setCurrentComplaint({ _id: complaint._id, status: complaint.status });
     setOpen(true);
   };
+
   const handleClose = () => setOpen(false);
 
   const handleStatusChange = (e) => {
@@ -137,9 +145,7 @@ const ComplaintManagement = () => {
   };
 
   return (
-    <Box
-      sx={{ p: 2, width: "100%", maxWidth: "calc(100% - 250px)", mx: "auto" }}
-    >
+    <Container maxWidth="lg" sx={{ py: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 2 }}>
         <FeedbackIcon sx={{ fontSize: 40, color: "#2c3e50" }} />
         <Typography
@@ -149,44 +155,43 @@ const ComplaintManagement = () => {
           Quản lý khiếu nại
         </Typography>
       </Box>
-      {/* Filters */}{" "}
+
       <div className="cm-filter-section">
         <button className="cm-button" onClick={resetFilters}>
-          Đặt lại bộ lọc{" "}
-        </button>{" "}
+          Đặt lại bộ lọc
+        </button>
         <div className="cm-filters">
-          {" "}
           <input
             type="text"
             placeholder="Tìm theo khách hàng"
             className="cm-input"
             value={customerFilter}
             onChange={(e) => setCustomerFilter(e.target.value)}
-          />{" "}
+          />
           <select
             className="cm-select"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
           >
-            <option value="">Tất cả loại khiếu nại</option> {" "}
-            <option value="Web">Web</option>{" "}
-            <option value="Đơn hàng">Đơn hàng</option>{" "}
-            <option value="Khác">Khác</option>{" "}
-          </select>{" "}
+            <option value="">Tất cả loại khiếu nại</option>
+            <option value="Web">Web</option>
+            <option value="Đơn hàng">Đơn hàng</option>
+            <option value="Khác">Khác</option>
+          </select>
           <select
             className="cm-select"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
-            <option value="">Tất cả trạng thái</option>{" "}
-            <option value="Đang chờ xử lý">Đang chờ xử lý</option>{" "}
-            <option value="Đã tiếp nhận">Đã tiếp nhận</option>{" "}
-            <option value="Đã giải quyết">Đã giải quyết</option>{" "}
-            <option value="Đã hủy">Đã hủy</option>{" "}
-          </select>{" "}
+            <option value="">Tất cả trạng thái</option>
+            <option value="Đang chờ xử lý">Đang chờ xử lý</option>
+            <option value="Đã tiếp nhận">Đã tiếp nhận</option>
+            <option value="Đã giải quyết">Đã giải quyết</option>
+            <option value="Đã hủy">Đã hủy</option>
+          </select>
         </div>
       </div>
-      {/* Table */}
+
       <TableContainer
         component={Paper}
         sx={{ mt: 2, borderRadius: 2, boxShadow: 3 }}
@@ -252,7 +257,6 @@ const ComplaintManagement = () => {
           rowsPerPageOptions={[5, 10, 25]}
         />
       </TableContainer>
-      {/* Dialog cập nhật trạng thái */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Cập nhật trạng thái khiếu nại</DialogTitle>
         <DialogContent>
@@ -280,7 +284,7 @@ const ComplaintManagement = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 

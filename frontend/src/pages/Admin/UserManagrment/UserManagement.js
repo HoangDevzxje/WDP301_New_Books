@@ -58,6 +58,14 @@ const UserManagement = () => {
         const isActive = filterActive === "active";
         filtered = filtered.filter((u) => u.isActivated === isActive);
       }
+
+      // Sort users by name alphabetically (A-Z)
+      filtered = filtered.sort((a, b) => {
+        const nameA = a.name.toLowerCase();
+        const nameB = b.name.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
       setUsers(filtered);
     } catch (err) {
       console.error("Error fetching users:", err);
@@ -67,11 +75,17 @@ const UserManagement = () => {
   const handleActiveStatusChange = async (user) => {
     try {
       await changeUserStatus(user._id);
-      setUsers((prev) =>
-        prev.map((u) =>
+      setUsers((prev) => {
+        const updatedUsers = prev.map((u) =>
           u._id === user._id ? { ...u, isActivated: !u.isActivated } : u
-        )
-      );
+        );
+        // Maintain alphabetical sorting after status change
+        return updatedUsers.sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      });
     } catch (err) {
       console.error("Error changing user status:", err.response?.data || err);
     }
@@ -80,9 +94,17 @@ const UserManagement = () => {
   const handleRoleChange = async (userId, newRole) => {
     try {
       await updateUserRole(userId, newRole);
-      setUsers((prev) =>
-        prev.map((u) => (u._id === userId ? { ...u, role: newRole } : u))
-      );
+      setUsers((prev) => {
+        const updatedUsers = prev.map((u) =>
+          u._id === userId ? { ...u, role: newRole } : u
+        );
+        // Maintain alphabetical sorting after role change
+        return updatedUsers.sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      });
     } catch (err) {
       console.error("Error updating role:", err);
     }

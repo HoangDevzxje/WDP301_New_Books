@@ -14,7 +14,7 @@
 .track-order-header h1 {
   font-size: 2.2rem;
   font-weight: 700;
-  color: #2c3e50;
+  color: #c49a6c;
   margin-bottom: 0.5rem;
 }
 
@@ -23,6 +23,7 @@
   color: #7f8c8d;
 }
 
+/* Loading */
 .loading-spinner {
   display: flex;
   flex-direction: column;
@@ -42,14 +43,26 @@
 }
 
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
+  to {
     transform: rotate(360deg);
   }
 }
+.return-button {
+  background-color: #dc2626;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 
+.disabled-return {
+  color: gray;
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+/* Empty orders */
 .empty-orders {
   display: flex;
   flex-direction: column;
@@ -63,7 +76,6 @@
 
 .empty-order-image {
   width: 200px;
-  height: auto;
   margin-bottom: 1.5rem;
   opacity: 0.7;
 }
@@ -76,7 +88,7 @@
 
 .primary-button {
   background-color: #3498db;
-  color: white;
+  color: #fff;
   border: none;
   padding: 0.8rem 1.5rem;
   border-radius: 4px;
@@ -84,11 +96,11 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .primary-button:hover {
   background-color: #2980b9;
 }
 
+/* Table styles */
 .orders-table-container {
   overflow-x: auto;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -99,12 +111,12 @@
 .orders-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: white;
+  background-color: #fff;
 }
 
 .orders-table th {
   background-color: #2c3e50;
-  color: white;
+  color: #fff;
   padding: 1rem;
   text-align: left;
   font-weight: 600;
@@ -123,28 +135,27 @@
   border-bottom: none;
 }
 
+/* Payment Method */
 .payment-method {
   padding: 0.3rem 0.6rem;
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 500;
 }
-
 .payment-method.cod {
   background-color: #ffeaa7;
   color: #e17055;
 }
-
 .payment-method.bank {
   background-color: #a5d8ff;
   color: #1864ab;
 }
-
 .payment-method.momo {
   background-color: #ffc9ff;
   color: #862e9c;
 }
 
+/* Tracking link */
 .tracking-link {
   color: #3498db;
   text-decoration: none;
@@ -154,24 +165,22 @@
   font-weight: 500;
   transition: color 0.2s;
 }
-
 .tracking-link:hover {
   color: #1a5276;
   text-decoration: underline;
 }
-
 .external-icon {
   font-size: 0.8rem;
 }
-
 .no-tracking {
   color: #95a5a6;
   font-style: italic;
 }
 
+/* Detail button */
 .detail-button {
   background-color: #2ecc71;
-  color: white;
+  color: #fff;
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 4px;
@@ -179,24 +188,94 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
-
 .detail-button:hover {
   background-color: #27ae60;
 }
 
-/* Responsive styles */
+/* Responsive */
 @media (max-width: 768px) {
   .track-order-container {
     padding: 1rem;
   }
-
   .track-order-header h1 {
     font-size: 1.8rem;
   }
-
   .orders-table th,
   .orders-table td {
     padding: 0.75rem 0.5rem;
     font-size: 0.9rem;
   }
+}
+
+/* === Shopee-style product layout === */
+.product-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.product-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed #ccc;
+}
+
+.product-item:last-child {
+  border-bottom: none;
+}
+
+.product-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.product-image {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.product-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #212529;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.product-extra {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.product-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 80px;
+}
+
+.product-qty {
+  font-size: 0.875rem;
+  color: #6c757d;
+  margin: 0;
+}
+
+.product-price {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ee4d2d;
+  margin: 0;
 }

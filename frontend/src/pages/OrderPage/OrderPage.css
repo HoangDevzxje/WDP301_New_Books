@@ -110,6 +110,12 @@
   align-items: center;
 }
 
+.address-selection-title{
+  font-size: 16px !important;
+  display: flex;
+  gap: 8px;
+}
+
 .payment-paper {
   padding: 32px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -141,6 +147,119 @@
   padding: 12px 16px;
 }
 
+.address-button-container{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.select-address-dialog{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-height: 800px;
+  margin-top: 50px;
+}
+
+.select-address-title {
+  font-weight: bold;
+  font-size: 20px;
+  color: #C49A6C;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.select-address-content {
+  padding-top: 16px;
+}
+
+.address-item2 {
+  margin-bottom: 12px;
+}
+
+.address-label-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 4px;
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  transition: border 0.3s, background-color 0.3s;
+}
+
+.address-item2.selected .address-label-content {
+  border: 1px solid #C49A6C;
+  background-color: #fdf7f2;
+}
+
+.default-label {
+  background-color: #C49A6C;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.custom-radio.Mui-checked {
+  color: #C49A6C !important;
+}
+
+.select-address-actions {
+  padding: 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirm-button {
+  background-color: #C49A6C !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.confirm-button:hover {
+  background-color: #b88a60 !important;
+}
+
+.cancel-button {
+  color: #C49A6C !important;
+}
+
+.address-summary {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background-color: #fdf7f2;
+  display: flex;
+  justify-content: space-between;
+}
+
+.default-label {
+  background-color: #C49A6C;
+  color: white;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+.change-address-button {
+  color: #666 !important;
+  font-weight: 500;
+  margin-right: 12px;
+  text-transform: none !important;
+}
+
+.use-different-address-button {
+  color: #666 !important;
+  font-weight: 500;
+  text-transform: none !important;
+}
+
 .order-summary-paper {
   padding: 32px;
   position: sticky;
@@ -155,7 +274,7 @@
   color: #C49A6C;
 }
 
-.order-item {
+.order-item2 {
   display: flex;
   margin-bottom: 16px;
   padding: 16px;
@@ -323,7 +442,6 @@
   background-color: #e0e0e0;
 }
 
-/* Available discounts */
 .discount-toggle-container {
   margin-top: 16px;
   text-align: center;
@@ -358,7 +476,6 @@
   padding: 20px;
 }
 
-/* Discount list */
 .discount-list {
   width: 100%;
   margin-top: 12px;
@@ -440,7 +557,6 @@
   font-size: 0.8rem;
 }
 
-/* Points section */
 .points-paper {
   padding: 24px;
   margin-bottom: 24px;
@@ -501,7 +617,6 @@
   font-size: 0.9rem;
 }
 
-/* Order summary calculations */
 .summary-divider {
   margin: 20px 0;
   background-color: rgba(196, 154, 108, 0.2);
@@ -602,51 +717,6 @@
   margin-bottom: 20px;
 }
 
-.address-selection-title {
-  margin:0 0 10px 5px !important;
-  display: flex;
-  gap: 5px;
-  color: #2c3e50 !important;
-  font-weight: 500 !important;
-  font-size: 16px !important;
-}
-
-.address-radio-group {
-  margin-left: 20px;
-  gap: 12px;
-}
-
-.address-option, .address-option-check {
-  align-items: flex-start;
-  margin-bottom: 0;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 8px;
-  padding: 12px;
-  margin-right: 0 !important;
-  transition: all 0.2s ease;
-  background-color: #fff;
-}
-
-.address-option:hover {
-  border-color: #C49A6C;
-  background-color: rgba(196, 154, 108, 0.02);
-}
-
-.address-option-check {
-  border-color: #C49A6C !important;
-  background-color: rgba(196, 154, 108, 0.05);
-}
-
-.address-selection-paper .MuiRadio-root.Mui-checked {
-  color: #C49A6C;
-}
-
-.address-label-content {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
 .address-header {
   display: flex;
   justify-content: space-between;
@@ -655,7 +725,7 @@
 
 .address-name-phone {
   font-weight: 500;
-  color: #333;
+  color: #666;
   font-size: 14px;
 }
 
@@ -671,13 +741,11 @@
 }
 
 .address-full-text {
-  color: #666;
+  color: #333 ! important;
   font-size: 13px;
   line-height: 1.4;
 }
 
-
-/* Address Full Text */
 .address-full-text {
   color: #666;
   font-size: 13px;

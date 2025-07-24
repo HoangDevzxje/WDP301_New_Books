@@ -1,11 +1,12 @@
 .login-container {
-  min-height: 80vh;
-  background-image: url("https://www.lottecinemavn.com/LCHS/Image/Main/bg_pattern.png");
-  background-repeat: repeat;
+  min-height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
+  background-repeat: no-repeat;
+  background-size: cover;     
+  background-position: center; 
 }
 
 .login-form-container {
