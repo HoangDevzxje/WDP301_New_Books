@@ -5,14 +5,9 @@ import {
   Box,
   Snackbar,
   Alert,
-  Card,
-  CardMedia,
-  CardContent,
   IconButton,
   Grid,
-  Container,
   Button,
-  CardActions,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import "slick-carousel/slick/slick.css";

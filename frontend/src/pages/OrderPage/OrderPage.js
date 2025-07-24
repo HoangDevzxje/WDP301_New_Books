@@ -21,7 +21,6 @@ import {
   List,
   ListItem,
   Collapse,
-  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -32,7 +31,6 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import "./OrderPage.css";
 import * as CartService from "../../services/CartService";
