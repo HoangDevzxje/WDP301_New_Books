@@ -83,7 +83,6 @@ function Login({ onLoginSuccess }) {
 
       setFormData({ email: "", password: "", rememberMe: false });
 
-      console.log("User role:", userRole);
       setTimeout(() => {
         if (userRole === "admin") {
           navigate("/admin/dashboard");

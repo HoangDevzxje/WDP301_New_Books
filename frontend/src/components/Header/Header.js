@@ -118,7 +118,6 @@ const Header = ({
 
   useEffect(() => {
     fetchCategories();
-    console.log("userEmail", userEmail);
   }, []);
 
   const fetchCategories = async () => {
@@ -264,7 +263,7 @@ const Header = ({
 
   const handleCategoryClick2 = (categoryId) => {
     navigate("/shopAll", {
-      state: { selectedCategoryId: categoryId }, 
+      state: { selectedCategoryId: categoryId },
     });
     handleClose();
   };
@@ -290,7 +289,7 @@ const Header = ({
           </div>
 
           <div className="nav-search">
-             <Button
+            <Button
               className="custom-icon-button"
               component={Link}
               to="/blog"
@@ -430,10 +429,10 @@ const Header = ({
               to="/user/cart"
             >
               <Badge
-                  badgeContent={userEmail ? cartCount : 0}
-                  color="error"
-                  showZero
-                >
+                badgeContent={userEmail ? cartCount : 0}
+                color="error"
+                showZero
+              >
                 <AddShoppingCartIcon className="custom-icon" />
               </Badge>
             </Button>
@@ -444,12 +443,12 @@ const Header = ({
               to="/user/wishlist"
             >
               <Badge
-                  badgeContent={userEmail ? wishlistCount : 0}
-                  color="error"
-                  showZero
-                >
-                  <FavoriteBorderIcon  className="custom-icon"  />
-                </Badge>
+                badgeContent={userEmail ? wishlistCount : 0}
+                color="error"
+                showZero
+              >
+                <FavoriteBorderIcon className="custom-icon" />
+              </Badge>
             </Button>
 
             <Box className="more-menu-container">
@@ -520,12 +519,11 @@ const Header = ({
                               key={category._id}
                               onClick={() => handleCategoryClick2(category._id)}
                               onMouseEnter={() => handleCategoryHover(category)}
-                              className={`category-menu-item ${
-                                activeCategory &&
-                                activeCategory._id === category._id
+                              className={`category-menu-item ${activeCategory &&
+                                  activeCategory._id === category._id
                                   ? "active"
                                   : ""
-                              }`}
+                                }`}
                             >
                               {category.name}
                             </MenuItem>
@@ -601,7 +599,7 @@ const Header = ({
                             <Box className="view-all-container">
                               <Button
                                 className="custom-icon-button"
-                                 onClick={() => handleCategoryClick2(activeCategory._id)}
+                                onClick={() => handleCategoryClick2(activeCategory._id)}
                               >
                                 <Typography
                                   variant="body2"

@@ -34,7 +34,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import "./OrderPage.css"; 
+import "./OrderPage.css";
 import * as CartService from "../../services/CartService";
 import * as OrderService from "../../services/OrderService";
 import * as DiscountService from "../../services/DiscountService";
@@ -128,7 +128,7 @@ function OrderPage() {
     }
   }, []);
 
-   const fetchProvinces = useCallback(async () => {
+  const fetchProvinces = useCallback(async () => {
     try {
       const response = await GHNService.getProvinces();
       setProvinces(response.data.map(province => ({
@@ -211,13 +211,11 @@ function OrderPage() {
 
       const userResponse = await UserService.getProfile();
       const userData = userResponse.data.user || userResponse.data;
-      console.log("User data received:", userData);
 
       if (userData.address && userData.address.length > 0) {
         const defaultAddress = userData.address.find(addr => addr.isDefault);
 
         if (defaultAddress) {
-          console.log("Default address:", defaultAddress);
           setSelectedAddressId(defaultAddress._id);
 
           await fetchDistricts(defaultAddress.provinceId);
@@ -276,8 +274,6 @@ function OrderPage() {
         insurance_value: totalValue,
         weight: totalWeight
       });
-
-        console.log("Calculated shipping fee:", response.data );
 
 
       if (response.data) {
@@ -367,8 +363,8 @@ function OrderPage() {
       const selectedAddress = user.address.find(addr => addr._id === addressId);
       if (selectedAddress) {
         try {
-          await fetchDistricts(selectedAddress.provinceId); 
-          await fetchWards(selectedAddress.districtId);    
+          await fetchDistricts(selectedAddress.provinceId);
+          await fetchWards(selectedAddress.districtId);
 
           setShippingAddress({
             name: user.name || "",
@@ -755,16 +751,16 @@ function OrderPage() {
         </Alert>
       </Snackbar>
 
-      <Box maxWidth={"xl"} className="order-container" sx={{mx: "auto", padding: 2}}>
+      <Box maxWidth={"xl"} className="order-container" sx={{ mx: "auto", padding: 2 }}>
         {!isAuthenticated ? (
           <LoginPrompt />
         ) : (
           <>
             <Box className="order-header">
               <Typography variant="h4" className="order-main-title">
-                 Thanh toán đơn hàng
+                Thanh toán đơn hàng
               </Typography>
-            </Box>                     
+            </Box>
             {loading ? (
               <Box className="centered-loading">
                 <CircularProgress />
@@ -796,12 +792,12 @@ function OrderPage() {
                       <Typography variant="h6" gutterBottom className="address-selection-title">
                         <LocationOnIcon className="shipping-icon" /> Chọn địa chỉ giao hàng
                       </Typography>
-                    </Box> 
+                    </Box>
 
                     {selectedAddress && (
                       <Box className="address-summary">
                         <Box>
-                          <Typography sx={{ fontWeight: "bold", color:"#333" }}>
+                          <Typography sx={{ fontWeight: "bold", color: "#333" }}>
                             {selectedAddress.address}, {selectedAddress.wardName}, {selectedAddress.districtName}, {selectedAddress.provinceName}
                           </Typography>
                           <Typography variant="body2">
@@ -811,23 +807,23 @@ function OrderPage() {
                         {selectedAddress.isDefault && <Box className="default-label">Mặc định</Box>}
                       </Box>
                     )}
-                    
-                    <Box className="address-button-container">
-                        <Button onClick={() => setOpenSelectModal(true)} className="change-address-button">
-                          Thay đổi địa chỉ
-                        </Button>
 
-                        <Button
-                          onClick={() => {
-                            setUseNewAddress(true);
-                            setSelectedAddress(null);
-                            setSelectedAddressId(null);
-                            setShippingAddress(initialShippingAddress);
-                          }}
-                          className="use-different-address-button"
-                        >
-                          Sử dụng địa chỉ khác
-                        </Button>
+                    <Box className="address-button-container">
+                      <Button onClick={() => setOpenSelectModal(true)} className="change-address-button">
+                        Thay đổi địa chỉ
+                      </Button>
+
+                      <Button
+                        onClick={() => {
+                          setUseNewAddress(true);
+                          setSelectedAddress(null);
+                          setSelectedAddressId(null);
+                          setShippingAddress(initialShippingAddress);
+                        }}
+                        className="use-different-address-button"
+                      >
+                        Sử dụng địa chỉ khác
+                      </Button>
                     </Box>
 
                     <Dialog
@@ -853,7 +849,7 @@ function OrderPage() {
                               label={
                                 <Box className="address-label-content">
                                   <Box>
-                                    <Typography sx={{fontWeight: "bold"}}>
+                                    <Typography sx={{ fontWeight: "bold" }}>
                                       {addr.address}, {addr.wardName}, {addr.districtName}, {addr.provinceName}
                                     </Typography>
                                     <Typography variant="body2">
@@ -891,42 +887,42 @@ function OrderPage() {
                       <Typography variant="h6" gutterBottom className="address-selection-title">
                         <LocationOnIcon className="shipping-icon" /> Nhập địa chỉ
                       </Typography>
-                    </Box> 
+                    </Box>
 
                     <Grid container spacing={2}>
-                      <Grid size= {{xs: 12, sm: 6}}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
                           fullWidth
                           label="Họ và tên"
                           name="name"
                           value={shippingAddress.name}
                           onChange={handleInputChange}
-                         
+
                         />
                       </Grid>
-                      <Grid  size= {{xs: 12, sm: 6}}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <TextField
-                          
+
                           fullWidth
                           label="Số điện thoại"
                           name="phoneNumber"
                           value={shippingAddress.phoneNumber}
                           onChange={handleInputChange}
-                         
+
                         />
                       </Grid>
-                      <Grid  size= {12}>
+                      <Grid size={12}>
                         <TextField
-                          
+
                           fullWidth
                           label="Địa chỉ"
                           name="address"
                           value={shippingAddress.address}
                           onChange={handleInputChange}
-                         
+
                         />
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
+                      <Grid size={{ xs: 12, sm: 4 }}>
                         <FormControl fullWidth>
                           <InputLabel>Tỉnh/Thành phố</InputLabel>
                           <Select
@@ -943,7 +939,7 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
+                      <Grid size={{ xs: 12, sm: 4 }}>
                         <FormControl fullWidth disabled={!useNewAddress || !shippingAddress.province}>
                           <InputLabel>Quận/Huyện</InputLabel>
                           <Select
@@ -960,7 +956,7 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {{xs: 12, sm: 4}}>
+                      <Grid size={{ xs: 12, sm: 4 }}>
                         <FormControl fullWidth disabled={!useNewAddress || !shippingAddress.district}>
                           <InputLabel>Phường/Xã</InputLabel>
                           <Select
@@ -977,7 +973,7 @@ function OrderPage() {
                           </Select>
                         </FormControl>
                       </Grid>
-                      <Grid size= {12}>
+                      <Grid size={12}>
                         <TextField
                           fullWidth
                           label="Ghi chú (tùy chọn)"
@@ -986,7 +982,7 @@ function OrderPage() {
                           onChange={handleInputChange}
                           multiline
                           rows={2}
-                         
+
                         />
                       </Grid>
                     </Grid>
@@ -1153,7 +1149,7 @@ function OrderPage() {
                         </Typography>
                         <Box className="points-content">
                           <Typography variant="body2" className="points-available">
-                            Điểm hiện có: 
+                            Điểm hiện có:
                             <Typography component="span" className="points-available-amount">
                               {availablePoints.toLocaleString()}
                             </Typography>
