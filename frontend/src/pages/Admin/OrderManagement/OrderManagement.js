@@ -22,10 +22,10 @@ import {
 import {
   FilterList as FilterIcon,
   Sort as SortIcon,
-  Visibility as VisibilityIcon,
-  Check as CheckIcon,
+  Visibility as ViewIcon,
+  Check as ConfirmIcon,
   Edit as EditIcon,
-  Close as CloseIcon,
+  Close as CancelIcon,
   Person as PersonIcon,
   CalendarToday as DateIcon,
   AttachMoney as MoneyIcon,
@@ -48,21 +48,13 @@ const statusLabels = {
   Delivered: "Đã giao",
   Cancelled: "Đã hủy",
 };
-const paymentMethods = {
-  COD: "Thanh toán khi nhận hàng",
-  ONLINE: "Thanh toán online",
-};
-const paymentStatusLabels = {
-  Pending: "Chờ thanh toán",
-  Completed: "Đã thanh toán",
-};
+const methods = { COD: "Thanh toán khi nhận", ONLINE: "Thanh toán online" };
 const statusColors = {
   Pending: "#FFA500",
   Processing: "#1E90FF",
   Shipped: "#9370DB",
   Delivered: "#32CD32",
   Cancelled: "#DC143C",
-  Completed: "#32CD32",
 };
 
 export default function OrderManagement() {
@@ -82,7 +74,6 @@ export default function OrderManagement() {
     setAlert({ open: true, message: msg, severity: sev });
   const closeAlert = () => setAlert((a) => ({ ...a, open: false }));
 
-  // Fetch orders
   useEffect(() => {
     (async () => {
       try {
@@ -94,35 +85,30 @@ export default function OrderManagement() {
     })();
   }, []);
 
-  // Filter & sort
-  const filtered = useMemo(
-    () =>
-      orders
-        .filter((o) => filterStatus === "All" || o.orderStatus === filterStatus)
-        .sort((a, b) =>
-          sortOrder === "newest"
-            ? new Date(b.createdAt) - new Date(a.createdAt)
-            : new Date(a.createdAt) - new Date(b.createdAt)
-        ),
-    [orders, filterStatus, sortOrder]
-  );
+  const filtered = useMemo(() => {
+    return orders
+      .filter((o) => filterStatus === "All" || o.orderStatus === filterStatus)
+      .sort((a, b) =>
+        sortOrder === "newest"
+          ? new Date(b.createdAt) - new Date(a.createdAt)
+          : new Date(a.createdAt) - new Date(b.createdAt)
+      );
+  }, [orders, filterStatus, sortOrder]);
 
-  // Calculate total amount
-  const calcTotal = (order) => {
-    let total =
-      order.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) ||
-      0;
-    if (order.discountUsed) {
-      total -=
-        order.discountUsed.type === "fixed"
-          ? order.discountUsed.value
-          : (total * order.discountUsed.value) / 100;
+  const calcTotal = (o) => {
+    let sum = o.items.reduce((s, i) => s + i.price * i.quantity, 0);
+    if (o.discountUsed) {
+      sum -=
+        o.discountUsed.type === "fixed"
+          ? o.discountUsed.value
+          : (sum * o.discountUsed.value) / 100;
     }
-    total -= order.pointUsed || 0;
-    return Math.max(total + (order.shippingInfo?.fee || 0), 0);
+    sum -= o.pointUsed || 0;
+    const fee = o.shippingInfo?.fee || 0;
+    return Math.max(sum + fee, 0);
   };
 
-  const handleAction = async (type, order, info) => {
+  const doAction = async (type, order, info) => {
     try {
       if (type === "confirm") {
         const total = calcTotal(order);
@@ -147,33 +133,34 @@ export default function OrderManagement() {
   };
 
   return (
-    <Box p={2}>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Typography variant="h4" ml={1}>
-          Quản lý đơn hàng
-        </Typography>
-      </Box>
+    <Box maxWidth={1200} mx="auto" p={2}>
+      <Typography variant="h4" mb={2}>
+        Quản lý đơn hàng
+      </Typography>
 
-      {/* Filters */}
       <Box display="flex" gap={2} mb={2}>
-        <FormControl>
+        <FormControl size="small">
           <InputLabel>
             <FilterIcon /> Trạng thái
           </InputLabel>
           <Select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => {
+              setFilterStatus(e.target.value);
+              setPage(0);
+            }}
             label="Trạng thái"
           >
-            {["All", ...Object.keys(statusLabels)].map((s) => (
+            <MenuItem value="All">Tất cả</MenuItem>
+            {Object.keys(statusLabels).map((s) => (
               <MenuItem key={s} value={s}>
-                {s === "All" ? "Tất cả" : statusLabels[s]}
+                {statusLabels[s]}
               </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl>
+        <FormControl size="small">
           <InputLabel>
             <SortIcon /> Sắp xếp
           </InputLabel>
@@ -188,80 +175,92 @@ export default function OrderManagement() {
         </FormControl>
       </Box>
 
-      {/* Orders Table */}
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}
+      >
         <Table size="small">
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#2c3e50" }}>
             <TableRow>
-              <TableCell>
-                <PersonIcon fontSize="small" /> Ngày đặt
-              </TableCell>
-              <TableCell>
-                <DateIcon fontSize="small" /> Ngày đặt
-              </TableCell>
-              <TableCell>Phương thức thanh toán</TableCell>
-              <TableCell>
-                <MoneyIcon fontSize="small" /> Tổng tiền
-              </TableCell>
-              <TableCell>
-                <InfoIcon fontSize="small" /> Trạng thái
-              </TableCell>
-              <TableCell>
-                <BoxIcon fontSize="small" /> Vận chuyển
-              </TableCell>
-              <TableCell>Thao tác</TableCell>
+              {[
+                <>
+                  <PersonIcon fontSize="small" /> Khách
+                </>,
+                <>
+                  <DateIcon fontSize="small" /> Ngày
+                </>,
+                "Thanh toán",
+                <>
+                  <MoneyIcon fontSize="small" /> Tổng tiền
+                </>,
+                <>
+                  <InfoIcon fontSize="small" /> Trạng thái
+                </>,
+                <>
+                  <BoxIcon fontSize="small" /> Đóng gói
+                </>,
+                "Thao tác",
+              ].map((h, i) => (
+                <TableCell key={i} sx={{ color: "#fff", fontWeight: 700 }}>
+                  {h}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
           <TableBody>
             {filtered
               .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-              .map((order) => {
-                const total = calcTotal(order);
+              .map((o) => {
+                const total = calcTotal(o);
                 return (
-                  <TableRow key={order._id}>
-                    <TableCell>{order.user?.name || "N/A"}</TableCell>
+                  <TableRow
+                    key={o._id}
+                    sx={{
+                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                      "&:hover": { backgroundColor: "#f0f0f0" },
+                    }}
+                  >
+                    <TableCell>{o.user?.name || "N/A"}</TableCell>
                     <TableCell>
-                      {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                      {new Date(o.createdAt).toLocaleDateString("vi-VN")}
                     </TableCell>
-                    <TableCell>{paymentMethods[order.paymentMethod]}</TableCell>
-                    <TableCell>{total.toLocaleString()} VNĐ</TableCell>
+                    <TableCell>{methods[o.paymentMethod]}</TableCell>
+                    <TableCell>{total.toLocaleString()} VNĐ</TableCell>
                     <TableCell>
                       <Box
                         fontWeight="bold"
-                        color={statusColors[order.orderStatus]}
+                        color={statusColors[o.orderStatus]}
                       >
-                        {statusLabels[order.orderStatus]}
+                        {statusLabels[o.orderStatus]}
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {order.boxInfo
-                        ? `${order.boxInfo.length}x${order.boxInfo.width}x${order.boxInfo.height}cm, ${order.boxInfo.weight}g`
+                      {o.boxInfo
+                        ? `${o.boxInfo.length}×${o.boxInfo.width}×${o.boxInfo.height}cm, ${o.boxInfo.weight}g`
                         : "Chưa có"}
                     </TableCell>
                     <TableCell>
                       <Tooltip title="Xem">
                         <IconButton
-                          onClick={() =>
-                            setDialogs((d) => ({ ...d, view: order }))
-                          }
+                          onClick={() => setDialogs((d) => ({ ...d, view: o }))}
                         >
-                          <VisibilityIcon />
+                          <ViewIcon />
                         </IconButton>
                       </Tooltip>
-                      {order.orderStatus === "Pending" && (
+                      {o.orderStatus === "Pending" && (
                         <>
                           <Tooltip title="Xác nhận">
                             <IconButton
-                              disabled={!order.boxInfo}
-                              onClick={() => handleAction("confirm", order)}
+                              disabled={!o.boxInfo}
+                              onClick={() => doAction("confirm", o)}
                             >
-                              <CheckIcon />
+                              <ConfirmIcon />
                             </IconButton>
                           </Tooltip>
                           <Tooltip title="Chỉnh sửa đóng gói">
                             <IconButton
                               onClick={() =>
-                                setDialogs((d) => ({ ...d, edit: order }))
+                                setDialogs((d) => ({ ...d, edit: o }))
                               }
                             >
                               <EditIcon />
@@ -271,10 +270,10 @@ export default function OrderManagement() {
                             <IconButton
                               onClick={() =>
                                 window.confirm("Xác nhận hủy?") &&
-                                handleAction("cancel", order)
+                                doAction("cancel", o)
                               }
                             >
-                              <CloseIcon />
+                              <CancelIcon />
                             </IconButton>
                           </Tooltip>
                         </>
@@ -286,19 +285,24 @@ export default function OrderManagement() {
           </TableBody>
         </Table>
         <TablePagination
-          rowsPerPageOptions={[5, 10]}
+          component="div"
           count={filtered.length}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={(_, newPage) => setPage(newPage)}
+          onPageChange={(_, p) => setPage(p)}
           onRowsPerPageChange={(e) => {
             setRowsPerPage(+e.target.value);
             setPage(0);
           }}
+          rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: "1px solid #e0e0e0",
+            "& .MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+              { fontWeight: 500 },
+          }}
         />
       </TableContainer>
 
-      {/* Dialogs & Alerts */}
       <OrderDetailsDialog
         open={!!dialogs.view}
         order={dialogs.view}
@@ -308,15 +312,16 @@ export default function OrderManagement() {
         open={!!dialogs.edit}
         order={dialogs.edit}
         onClose={() => setDialogs((d) => ({ ...d, edit: null }))}
-        onSave={(info) => handleAction("saveBox", dialogs.edit, info)}
+        onSave={(info) => doAction("saveBox", dialogs.edit, info)}
       />
+
       <Snackbar
         open={alert.open}
-        autoHideDuration={6000}
+        autoHideDuration={4000}
         onClose={closeAlert}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert onClose={closeAlert} severity={alert.severity}>
+        <Alert severity={alert.severity} onClose={closeAlert}>
           {alert.message}
         </Alert>
       </Snackbar>
