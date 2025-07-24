@@ -45,15 +45,13 @@ const createOrder = async (req, res) => {
       });
       itemsHtml += `
         <tr>
-          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${
-            book.title
-          }</td>
-          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${
-            item.quantity
-          }</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${book.title
+        }</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${item.quantity
+        }</td>
           <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${(
-            book.price * item.quantity
-          ).toLocaleString("vi-VN")} VND</td>
+          book.price * item.quantity
+        ).toLocaleString("vi-VN")} VND</td>
         </tr>`;
       // Cập nhập kho hàng
       book.stock -= item.quantity;
@@ -70,7 +68,7 @@ const createOrder = async (req, res) => {
     totalAmount -= pointUsed;
 
     if (paymentMethod === "COD" && totalAmount > 500000) {
-      return res.status(400).json({ message: "Đơn vượt quá giá trị cho phép" });
+      return res.status(400).json({ message: "Thanh toán khi nhận hàng khóa 500.000đ" });
     }
 
     const newOrder = new Order({

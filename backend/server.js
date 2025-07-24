@@ -8,7 +8,7 @@ const swaggerJsDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
 const cron = require("node-cron");
 const {
-  autoDeactivateExpiredCampaigns,
+    autoDeactivateExpiredCampaigns,
 } = require("./controllers/AdminDiscountCampaignController");
 
 const DB = require("./config/db");
@@ -54,7 +54,10 @@ app.get("/swagger.json", (req, res) => {
 });
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 app.use(express.json());
 app.use(cookieParser())
 // Routes
@@ -62,13 +65,13 @@ routes(app);
 
 // Start server
 app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-  DB.connectDB();
+    console.log(`Server is running on port ${port}`);
+    DB.connectDB();
 
-  
-  cron.schedule("0 0 * * *", () => {
-    console.log("[CRON] Checking and deactivating expired campaigns...");
-    autoDeactivateExpiredCampaigns();
-  });
+
+    cron.schedule("0 0 * * *", () => {
+        console.log("[CRON] Checking and deactivating expired campaigns...");
+        autoDeactivateExpiredCampaigns();
+    });
 });
 

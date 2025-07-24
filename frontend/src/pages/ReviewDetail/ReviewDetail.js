@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  Box, 
-  Typography, 
-  Paper, 
-  Container, 
-  Grid, 
+import {
+  Box,
+  Typography,
+  Paper,
+  Container,
+  Grid,
   Button,
   Chip,
   Rating,
@@ -15,9 +15,9 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { 
-  Favorite, 
-  FavoriteBorder, 
+import {
+  Favorite,
+  FavoriteBorder,
   Share,
   BookmarkBorder
 } from '@mui/icons-material';
@@ -36,7 +36,7 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
   const [reviewedBook, setReviewedBook] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // States for BookCard functionality (similar to HomePage)
   const [notifications, setNotifications] = useState([]);
   const [wishlist, setWishlist] = useState([]);
@@ -48,8 +48,6 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
         setLoading(true);
         const reviewResponse = await ReviewService.getReviewById(id);
         setReview(reviewResponse.data);
-        console.log('Review:', reviewResponse.data);
-
         if (reviewResponse.data.bookId) {
           const bookResponse = await BookService.getBookById(reviewResponse.data.bookId._id);
           setReviewedBook(bookResponse.data);
@@ -173,7 +171,7 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
             <Typography variant="h6" color="#c49a6c" fontWeight={"bold"} sx={{ mb: 1 }}>
               Chi tiết bài Review
             </Typography>
-            
+
             <Typography variant="h4" fontWeight="bold" sx={{ mb: 2 }}>
               {review.title}
             </Typography>
@@ -258,53 +256,53 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
 
         <Grid item size={{ xs: 12, md: 3 }} >
           <Box className="review-book-card">
-          {reviewedBook && (
-            <Box sx={{ mb: 3 }}>
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: '#c49a6c' }}>
-                Sách được review
-              </Typography>
-              <BookCard
-                book={reviewedBook}
-                hoveredId={hoveredId}
-                wishlist={wishlist}
-                onHover={handleMouseEnter}
-                onLeave={handleMouseLeave}
-                toggleWishlist={toggleWishlist}
-              />
-            </Box>
-          )}
+            {reviewedBook && (
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2, color: '#c49a6c' }}>
+                  Sách được review
+                </Typography>
+                <BookCard
+                  book={reviewedBook}
+                  hoveredId={hoveredId}
+                  wishlist={wishlist}
+                  onHover={handleMouseEnter}
+                  onLeave={handleMouseLeave}
+                  toggleWishlist={toggleWishlist}
+                />
+              </Box>
+            )}
 
-          {relatedBooks.length > 0 && (
-            <Paper sx={{ p: 3, borderRadius: '16px' }}>
-              <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
-                Sách liên quan
-              </Typography>
-              
-              <Grid container spacing={2}>
-                {relatedBooks.map((book) => (
-                  <Grid item xs={12} key={book._id}>
-                    <BookCard
-                      book={book}
-                      hoveredId={hoveredId}
-                      wishlist={wishlist}
-                      onHover={handleMouseEnter}
-                      onLeave={handleMouseLeave}
-                      toggleWishlist={toggleWishlist}
-                    />
-                  </Grid>
-                ))}
-              </Grid>
+            {relatedBooks.length > 0 && (
+              <Paper sx={{ p: 3, borderRadius: '16px' }}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 3 }}>
+                  Sách liên quan
+                </Typography>
 
-              <Button 
-                variant="outlined" 
-                fullWidth 
-                sx={{ mt: 2, borderRadius: '12px' }}
-                onClick={() => navigate('/shopAll')}
-              >
-                Xem thêm sách khác
-              </Button>
-            </Paper>
-          )}
+                <Grid container spacing={2}>
+                  {relatedBooks.map((book) => (
+                    <Grid item xs={12} key={book._id}>
+                      <BookCard
+                        book={book}
+                        hoveredId={hoveredId}
+                        wishlist={wishlist}
+                        onHover={handleMouseEnter}
+                        onLeave={handleMouseLeave}
+                        toggleWishlist={toggleWishlist}
+                      />
+                    </Grid>
+                  ))}
+                </Grid>
+
+                <Button
+                  variant="outlined"
+                  fullWidth
+                  sx={{ mt: 2, borderRadius: '12px' }}
+                  onClick={() => navigate('/shopAll')}
+                >
+                  Xem thêm sách khác
+                </Button>
+              </Paper>
+            )}
           </Box>
         </Grid>
       </Grid>
@@ -316,18 +314,18 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
           autoHideDuration={3000}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           onClose={() => setNotifications(prev =>
-              prev.filter(n => n.id !== notification.id)
+            prev.filter(n => n.id !== notification.id)
           )}
         >
-        <Alert                
-            severity={notification.severity || 'info'}                
-            onClose={() => setNotifications(prev =>                
-            prev.filter(n => n.id !== notification.id)
-            )}                   
-        >
-          {notification.message}
-         </Alert>
-         </Snackbar>
+          <Alert
+            severity={notification.severity || 'info'}
+            onClose={() => setNotifications(prev =>
+              prev.filter(n => n.id !== notification.id)
+            )}
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
       ))}
     </Container>
   );

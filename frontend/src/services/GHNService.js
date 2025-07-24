@@ -25,7 +25,6 @@ export const calculateFee = async (payload) => {
 // services/orderService.js
 export const getTrackingDetails = async (orderId) => {
   const response = await axiosInstance.get(`/ghn/tracking/${orderId}`);
-  console.log("Tracking response:", response.data);
   return response; // trả về {code, data: {...}, ...}
 };
 // Hoàn đơn hàng qua GHN
