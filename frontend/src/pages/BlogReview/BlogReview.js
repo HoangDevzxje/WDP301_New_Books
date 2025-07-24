@@ -13,7 +13,6 @@ const BlogReview = () => {
       try {
         const response = await ReviewService.getReviews();
         setReviews(response.data);
-        console.log(response.data);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -32,7 +31,7 @@ const BlogReview = () => {
           {reviews.length > 0 && (
             <Paper
               className="main-review"
-              sx={{ 
+              sx={{
                 backgroundImage: `url('${reviews[0]?.images?.[0]}')`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
@@ -42,10 +41,10 @@ const BlogReview = () => {
             >
               <Box className="overlay">
                 <span className="featured-badge">Nổi bật</span>
-                <Typography 
-                  variant="h4" 
-                  fontWeight="bold" 
-                  color="white" 
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  color="white"
                   mb={2}
                   sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.4)' }}
                 >
@@ -61,8 +60,8 @@ const BlogReview = () => {
                 />
 
                 <Box className="author-info">
-                  <Typography 
-                    variant="body2" 
+                  <Typography
+                    variant="body2"
                     color="white"
                     sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
                   >
@@ -79,26 +78,26 @@ const BlogReview = () => {
           <Grid container spacing={4}>
             {reviews.slice(1).map((review, i) => (
               <Grid item size={{ xs: 12, sm: 6, md: 4 }} key={i}>
-                <Paper 
+                <Paper
                   className="review-card-new"
                   onClick={() => handleClickReview(review._id)}
                 >
-                  <Box 
+                  <Box
                     className="card-image"
-                    sx={{ 
+                    sx={{
                       backgroundImage: `url('${review.images?.[0]}')`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center',
                       backgroundRepeat: 'no-repeat'
                     }}
                   />
-                  
+
                   <Box className="card-content">
-                    <Typography 
-                      variant="h6" 
+                    <Typography
+                      variant="h6"
                       fontWeight="bold"
                       color="#1f2937"
-                      sx={{ 
+                      sx={{
                         mb: 1,
                         fontSize: '1.2rem',
                         lineHeight: 1.6
@@ -110,7 +109,7 @@ const BlogReview = () => {
                       variant="caption"
                       color="#9ca3af"
                       className="text-truncate-2-dark"
-                      sx={{ 
+                      sx={{
                         fontSize: '0.875rem',
                         mb: 2,
                       }}
@@ -120,7 +119,7 @@ const BlogReview = () => {
                     <Typography
                       variant="caption"
                       color="#9ca3af"
-                      sx={{ 
+                      sx={{
                         fontSize: '0.875rem',
                       }}
                     >
@@ -136,7 +135,7 @@ const BlogReview = () => {
         <Grid item size={{ xs: 12, md: 4 }}>
           <Paper className="popular-box">
             <Typography variant="h6" mb={2} sx={{ fontWeight: 'bold', borderBottom: '2px solid #c49a6c', paddingBottom: '18px' }}>
-               Bài viết nổi bật
+              Bài viết nổi bật
             </Typography>
             {[
               { title: 'Atomic Habits', desc: 'Xây dựng thói quen tốt, phá bỏ thói quen xấu' },
@@ -145,26 +144,26 @@ const BlogReview = () => {
             ].map((book, i) => (
               <Box key={i} className="popular-item">
                 <Box className="popular-item-index">
-                    <Typography sx={{ fontWeight: 'bold', fontSize: '1.8rem' }}>
+                  <Typography sx={{ fontWeight: 'bold', fontSize: '1.8rem' }}>
                     {i + 1}
-                    </Typography>
+                  </Typography>
                 </Box>
-               <Box>
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
                     {book.title}
-                    </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
-                  {book.desc}
-                </Typography>
-               </Box>
-                
+                  </Typography>
+                  <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.5 }}>
+                    {book.desc}
+                  </Typography>
+                </Box>
+
               </Box>
             ))}
           </Paper>
 
           <Paper className="hot-lesson-box">
-            <Typography variant="h6" mb={2} sx={{ fontWeight: 'bold', borderBottom: '2px solid #c49a6c', paddingBottom: '18px'   }}>
-               Các sách hot
+            <Typography variant="h6" mb={2} sx={{ fontWeight: 'bold', borderBottom: '2px solid #c49a6c', paddingBottom: '18px' }}>
+              Các sách hot
             </Typography>
             {[
               'Atomic Habits: 1% mỗi ngày',

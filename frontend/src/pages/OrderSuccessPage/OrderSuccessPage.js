@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { 
-  Container, Typography, Button, Box, Paper, Grid, Divider, Card, CardContent, 
+import {
+  Container, Typography, Button, Box, Paper, Grid, Divider, Card, CardContent,
   Avatar, Chip, Alert, CircularProgress, Snackbar
 } from "@mui/material";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -43,12 +43,8 @@ function OrderSuccessPage({ updateCartData }) {
         const queryParams = new URLSearchParams(location.search);
         const vnpResponseCode = queryParams.get("vnp_ResponseCode");
         const orderId = queryParams.get("vnp_OrderInfo");
-        
-        console.log("Payment response:", { vnpResponseCode, orderId });
-        
+
         const orderData = loadOrderDetails();
-        console.log("Loaded order data:", orderData);
-        
         if (vnpResponseCode) {
           if (orderId) {
             await confirmPaymentWithBackend(vnpResponseCode, orderId, queryParams);
@@ -80,18 +76,18 @@ function OrderSuccessPage({ updateCartData }) {
         setSnackbarOpen(true);
       }
     };
-    
+
     if (typeof updateCartData === "function") {
       updateCartData();
     }
-    
+
     processPaymentResponse();
   }, [location.search, updateCartData]);
-  
+
   const confirmPaymentWithBackend = async (responseCode, orderId, queryParams) => {
     try {
       const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
-      
+
       if (access_token && orderId) {
         // const response = await axios.get(
         //   `http://localhost:9999/payment/return${location.search}`,
@@ -99,15 +95,14 @@ function OrderSuccessPage({ updateCartData }) {
         //     headers: { Authorization: `Bearer ${access_token}` }
         //   }
         // );
-        
+
         const response = OrderService.getPaymentReturn(location.search);
 
-        console.log("Payment return response:", response.data);
-        
+
         if (response.data.status === "success") {
           try {
             const orderResponse = await OrderService.getOrderDetails(orderId);
-            
+
             if (orderResponse.data) {
               setOrderDetails(orderResponse.data);
               localStorage.setItem("latestOrder", JSON.stringify(orderResponse.data));
@@ -115,10 +110,10 @@ function OrderSuccessPage({ updateCartData }) {
           } catch (orderError) {
             console.error("Error fetching order details:", orderError);
           }
-          
+
           setPaymentStatus({
             isProcessing: false,
-            success: true, 
+            success: true,
             message: "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận."
           });
         } else {
@@ -131,19 +126,18 @@ function OrderSuccessPage({ updateCartData }) {
         setSnackbarOpen(true);
         return;
       }
-      
+
       handlePaymentResponse(responseCode);
-      
+
     } catch (error) {
       console.error("Error confirming payment with backend:", error);
       handlePaymentResponse(responseCode);
     }
   };
-  
+
   const handlePaymentResponse = async (responseCode) => {
     try {
-      console.log("Processing payment with code:", responseCode);
-      
+
       if (responseCode === "00") {
         setPaymentStatus({
           isProcessing: false,
@@ -153,8 +147,8 @@ function OrderSuccessPage({ updateCartData }) {
         setSnackbarOpen(true);
       } else {
         let errorMessage = "Thanh toán không thành công. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.";
-        
-        switch(responseCode) {
+
+        switch (responseCode) {
           case "24":
             errorMessage = "Giao dịch không thành công do khách hàng hủy giao dịch";
             break;
@@ -173,7 +167,7 @@ function OrderSuccessPage({ updateCartData }) {
           default:
             errorMessage = `Thanh toán không thành công (Mã lỗi: ${responseCode})`;
         }
-        
+
         setPaymentStatus({
           isProcessing: false,
           success: false,
@@ -232,15 +226,15 @@ function OrderSuccessPage({ updateCartData }) {
         onClose={handleSnackbarClose}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert 
-          onClose={handleSnackbarClose} 
+        <Alert
+          onClose={handleSnackbarClose}
           severity={paymentStatus.success ? "success" : "error"}
           className={`snackbar-alert ${paymentStatus.success ? "success" : "error"}`}
         >
           {paymentStatus.message}
         </Alert>
       </Snackbar>
-      
+
       <Paper elevation={3} className="order-success-paper">
         {/* Success Header */}
         <Box className="order-success-header">
@@ -255,16 +249,16 @@ function OrderSuccessPage({ updateCartData }) {
             {paymentStatus.success ? 'Đặt hàng thành công!' : 'Xác nhận đơn hàng'}
           </Typography>
           <Typography variant="subtitle1" className="order-success-subtitle">
-            {paymentStatus.success 
+            {paymentStatus.success
               ? 'Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ với bạn sớm để xác nhận.'
               : 'Đơn hàng của bạn thanh toán chưa hoàn tất. Vui lòng thử lại.'}
           </Typography>
         </Box>
-        
+
         {/* Main Content - Two Column Layout */}
         <Grid container spacing={3}>
           {/* Left Column - Customer & Shipping Information */}
-          <Grid size={{ xs:12, md: 5 }}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card elevation={1} className="order-info-card">
               <Box className="order-info-header">
                 <PersonIcon className="icon" />
@@ -280,7 +274,7 @@ function OrderSuccessPage({ updateCartData }) {
                     {orderDetails.shippingInfo.name}
                   </Typography>
                 </Box>
-                
+
                 <Box className="order-info-field">
                   <Typography variant="body2" className="order-info-label">
                     Số điện thoại:
@@ -289,7 +283,7 @@ function OrderSuccessPage({ updateCartData }) {
                     {orderDetails.shippingInfo.phoneNumber}
                   </Typography>
                 </Box>
-                
+
                 <Box className="order-info-field">
                   <Typography variant="body2" className="order-info-label">
                     Địa chỉ giao hàng:
@@ -298,9 +292,9 @@ function OrderSuccessPage({ updateCartData }) {
                     {orderDetails.shippingInfo.address}, {orderDetails.shippingInfo.ward}, {orderDetails.shippingInfo.district}, {orderDetails.shippingInfo.province}
                   </Typography>
                 </Box>
-                
+
                 <Divider className="order-info-divider" />
-                
+
                 {/* Payment & Shipping Method */}
                 <Grid container spacing={2}>
                   <Grid>
@@ -312,19 +306,19 @@ function OrderSuccessPage({ updateCartData }) {
                     </Box>
                     <Box className="payment-method-content">
                       <Typography variant="body1" className="order-info-value">
-                        {orderDetails.paymentMethod === "Online" 
-                          ? "Thanh toán trực tuyến" 
+                        {orderDetails.paymentMethod === "Online"
+                          ? "Thanh toán trực tuyến"
                           : "COD (Thanh toán khi nhận hàng)"}
                       </Typography>
                       {orderDetails.paymentMethod === "Online" && (
-                        <Chip 
-                          label={paymentStatus.success ? "Đã thanh toán" : "Chưa thanh toán"} 
+                        <Chip
+                          label={paymentStatus.success ? "Đã thanh toán" : "Chưa thanh toán"}
                           className={`payment-status-chip ${paymentStatus.success ? "success" : "error"}`}
                         />
                       )}
                     </Box>
                   </Grid>
-                  
+
                   <Grid >
                     <Box className="shipping-method-section">
                       <LocalShippingIcon className="shipping-method-icon" />
@@ -334,8 +328,8 @@ function OrderSuccessPage({ updateCartData }) {
                     </Box>
                     <Box className="shipping-method-content">
                       <Typography variant="body1" className="order-info-value">
-                        {orderDetails.shippingInfo.fee > 0 
-                          ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫` 
+                        {orderDetails.shippingInfo.fee > 0
+                          ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫`
                           : "Miễn phí"}
                       </Typography>
                     </Box>
@@ -344,9 +338,9 @@ function OrderSuccessPage({ updateCartData }) {
               </CardContent>
             </Card>
           </Grid>
-          
+
           {/* Right Column - Order Summary with Products */}
-          <Grid size={{ xs:12, md: 7 }}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Card elevation={1} className="order-summary-card">
               <Box className="order-summary-header">
                 <ReceiptIcon className="icon" />
@@ -361,29 +355,29 @@ function OrderSuccessPage({ updateCartData }) {
                   {orderDetails.items && orderDetails.items.map((item, index) => (
                     <Box key={index} className="product-item">
                       <Box className="product-image2">
-                        <img 
-                          src={item.book.images} 
-                          alt={item.book.title} 
+                        <img
+                          src={item.book.images}
+                          alt={item.book.title}
                         />
                       </Box>
                       <Box className="product-content">
                         <Box className="product-details">
                           <Typography
-                              variant="body2"
-                              className="product-title"
-                              sx={{
-                                display: "-webkit-box",
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: "vertical",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {item.book.title}
+                            variant="body2"
+                            className="product-title"
+                            sx={{
+                              display: "-webkit-box",
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            }}
+                          >
+                            {item.book.title}
                           </Typography>
-                         
+
                           <Box className="product-quantity-chip">
-                              Số lượng: {item.quantity}
+                            Số lượng: {item.quantity}
                           </Box>
                         </Box>
                         <Typography variant="body2" className="product-price">
@@ -393,7 +387,7 @@ function OrderSuccessPage({ updateCartData }) {
                     </Box>
                   ))}
                 </Box>
-                
+
                 {/* Price Summary */}
                 <Box className="price-summary">
                   <div className="price-row">
@@ -402,16 +396,16 @@ function OrderSuccessPage({ updateCartData }) {
                       {subtotal.toLocaleString()}₫
                     </Typography>
                   </div>
-                  
+
                   <div className="price-row">
                     <Typography variant="body2" className="price-label">Phí vận chuyển:</Typography>
                     <Typography variant="body1" className="price-value">
-                      {orderDetails.shippingInfo.fee > 0 
-                        ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫` 
+                      {orderDetails.shippingInfo.fee > 0
+                        ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫`
                         : "Miễn phí"}
                     </Typography>
                   </div>
-                  
+
                   {orderDetails.totalDiscount > 0 && (
                     <div className="price-row">
                       <Typography variant="body2" className="price-label">Giảm giá:</Typography>
@@ -420,7 +414,7 @@ function OrderSuccessPage({ updateCartData }) {
                       </Typography>
                     </div>
                   )}
-                  
+
                   {orderDetails.pointUsed > 0 && (
                     <div className="price-row">
                       <Typography variant="body2" className="price-label">Điểm thưởng:</Typography>
@@ -429,7 +423,7 @@ function OrderSuccessPage({ updateCartData }) {
                       </Typography>
                     </div>
                   )}
-                  
+
                   <div className="total-row">
                     <Typography variant="subtitle1" className="total-label">Tổng cộng:</Typography>
                     <Typography variant="h5" className="total-amount">
@@ -443,15 +437,15 @@ function OrderSuccessPage({ updateCartData }) {
         </Grid>
 
         {/* Action Button - Centered */}
-        <Box className="action-button-container">  
-          <Button 
-            component={Link} 
-            to="/" 
-            variant="outlined" 
+        <Box className="action-button-container">
+          <Button
+            component={Link}
+            to="/"
+            variant="outlined"
             className="continue-btn"
-            >
-              Tiếp tục mua hàng
-          </Button>        
+          >
+            Tiếp tục mua hàng
+          </Button>
         </Box>
       </Paper>
     </Box>

@@ -29,8 +29,6 @@ exports.getBookById = async (req, res) => {
 exports.createBook = async (req, res) => {
   try {
     const { title, author } = req.body;
-    console.log("Body:", req.body);
-    console.log("Files:", req.files);
 
     if (!title || !author) {
       return res
