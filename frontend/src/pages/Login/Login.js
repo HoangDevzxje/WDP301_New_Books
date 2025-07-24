@@ -64,7 +64,10 @@ function Login({ onLoginSuccess }) {
       const response = await axios.post("http://localhost:9999/auth/login", {
         email: formData.email,
         password: formData.password,
-      });
+      },
+        {
+          withCredentials: true,
+        });
 
       const token = response.data.accessToken;
       const userRole = response.data.role;
@@ -156,7 +159,9 @@ function Login({ onLoginSuccess }) {
 
           // Gửi accessToken về server để xác thực
           axios
-            .post("http://localhost:9999/auth/facebook-auth", { accessToken })
+            .post("http://localhost:9999/auth/facebook-auth", { accessToken }, {
+              withCredentials: true
+            })
             .then((res) => {
               const { accessTokenLogin: token, email, role } = res.data;
               const storageMethod = formData.rememberMe

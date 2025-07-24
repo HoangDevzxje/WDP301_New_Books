@@ -91,14 +91,13 @@ const verifyOtp = (req, res) => {
 };
 const refreshToken = async (req, res) => {
   try {
-    // const token = req.cookies.refresh_token;
-    // if (!token) {
-    //     return res.status(404).json({
-    //         status: 'ERR',
-    //         message: 'Refresh token is required'
-    //     });
-    // }
-    const { token } = req.body;
+    const token = req.cookies.refresh_token;
+    if (!token) {
+      return res.status(404).json({
+        status: 'ERR',
+        message: 'Refresh token is required'
+      });
+    }
     const decoded = await new Promise((resolve, reject) => {
       jwt.verify(token, process.env.REFRESH_TOKEN, (err, decoded) => {
         if (err) return reject(err);
@@ -235,7 +234,8 @@ const login = async (req, res) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res.status(200).json({
@@ -325,7 +325,8 @@ const googleLogin = async (req, res) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
@@ -389,7 +390,8 @@ const facebookLogin = async (req, res) => {
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(200).json({
