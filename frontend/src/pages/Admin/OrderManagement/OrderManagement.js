@@ -50,7 +50,7 @@ const statusLabels = {
 };
 const paymentMethods = {
   COD: "Thanh toán khi nhận hàng",
-  ONLINE: "Thanh toán online",
+  Online: "Thanh toán online",
 };
 const paymentStatusLabels = {
   Pending: "Chờ thanh toán",

@@ -47,6 +47,20 @@
     transform: rotate(360deg);
   }
 }
+.return-button {
+  background-color: #dc2626;
+  color: white;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disabled-return {
+  color: gray;
+  font-size: 13px;
+  opacity: 0.7;
+}
 
 /* Empty orders */
 .empty-orders {

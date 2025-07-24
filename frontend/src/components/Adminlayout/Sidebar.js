@@ -17,6 +17,8 @@ import FeedbackIcon from "@mui/icons-material/Feedback";
 import RateReview from "@mui/icons-material/RateReview";
 import CategoryIcon from "@mui/icons-material/Category";
 import StarIcon from "@mui/icons-material/Star";
+import CampaignIcon from "@mui/icons-material/Campaign";
+
 import "./Sidebar.css";
 
 const Sidebar = ({ isSidebarOpen }) => {
@@ -38,6 +40,12 @@ const Sidebar = ({ isSidebarOpen }) => {
       text: "Quản lý mã giảm giá",
       icon: <LocalOfferIcon />,
       link: "/admin/discounts",
+    },
+    //f
+    {
+      text: "Chiến dịch giảm giá",
+      icon: <CampaignIcon />,
+      link: "/admin/discount-campaigns",
     },
     {
       text: "Quản lý đánh giá",

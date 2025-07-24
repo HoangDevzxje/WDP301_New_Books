@@ -1,6 +1,5 @@
 import axiosInstance from "../utils/axiosInstance";
 
-/* ========= GHN master-data ========= */
 
 // Lấy danh sách tỉnh
 export const getProvinces = async () => axiosInstance.get("/ghn/province");
@@ -29,3 +28,9 @@ export const getTrackingDetails = async (orderId) => {
   console.log("Tracking response:", response.data);
   return response; // trả về {code, data: {...}, ...}
 };
+// Hoàn đơn hàng qua GHN
+export const returnOrder = async (orderId) => {
+  const response = await axiosInstance.post(`/ghn/return/${orderId}`);
+  return response.data;
+};
+

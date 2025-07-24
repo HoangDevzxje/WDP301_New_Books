@@ -1,7 +1,7 @@
 .book-card {
   position: relative;
   height: 100%;
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
   display: flex;
   flex-direction: column;
 }
@@ -9,7 +9,7 @@
 .book-card:hover {
   /* box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px; */
   transform: scale(1.05);
-  transition: all 0.3s ease;
+  transition: all 0.3s ease !important;
 }
 
 .book-imagecontainer {
