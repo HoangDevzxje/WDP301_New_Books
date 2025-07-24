@@ -48,7 +48,14 @@ const statusLabels = {
   Delivered: "Đã giao",
   Cancelled: "Đã hủy",
 };
-const methods = { COD: "Thanh toán khi nhận", ONLINE: "Thanh toán online" };
+const paymentMethods = {
+  COD: "Thanh toán khi nhận hàng",
+  ONLINE: "Thanh toán online",
+};
+const paymentStatusLabels = {
+  Pending: "Chờ thanh toán",
+  Completed: "Đã thanh toán",
+};
 const statusColors = {
   Pending: "#FFA500",
   Processing: "#1E90FF",

@@ -51,7 +51,7 @@ const orderSchema = new mongoose.Schema(
     },
     shippingStatus: {
       type: String,
-      default: "Chưa lấy hàng", 
+      default: "Chưa lấy hàng",
     },
 
     shippingInfo: {
@@ -92,6 +92,10 @@ const orderSchema = new mongoose.Schema(
     trackingNumber: {
       type: String,
       default: null,
+    },
+    isReturned: {
+      type: Boolean,
+      default: false,
     },
     boxInfo: {
       type: {

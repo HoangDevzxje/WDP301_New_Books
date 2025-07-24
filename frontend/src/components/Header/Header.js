@@ -290,6 +290,15 @@ const Header = ({
           </div>
 
           <div className="nav-search">
+             <Button
+              className="custom-icon-button"
+              component={Link}
+              to="/blog"
+            >
+              <Typography variant="body2" className="custom-typography">
+                Blog
+              </Typography>
+            </Button>
             <Button
               className="custom-icon-button"
               onMouseEnter={handleCategoryMouseEnter}

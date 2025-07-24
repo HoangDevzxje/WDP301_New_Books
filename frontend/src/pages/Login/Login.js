@@ -193,7 +193,7 @@ function Login({ onLoginSuccess }) {
     );
   };
   return (
-    <Box className="login-container">
+    <Box className="login-container" sx={{ backgroundImage: `url('/loginbg.jpeg')` }}>
       <Box className="login-form-container">
         <Typography variant="h4" className="login-title" gutterBottom>
           Đăng nhập

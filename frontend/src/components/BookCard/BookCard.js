@@ -1,5 +1,13 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Box, Card, CardContent, Typography, IconButton, Rating, Skeleton } from "@mui/material";
+import {
+  Box,
+  Card,
+  CardContent,
+  Typography,
+  IconButton,
+  Rating,
+  Skeleton,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -9,14 +17,21 @@ import "./BookCard.css";
 
 const ratingsResults = new Map();
 
-const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist }) => {
+const BookCard = ({
+  book,
+  hoveredId,
+  wishlist,
+  onHover,
+  onLeave,
+  toggleWishlist,
+}) => {
   const [rating, setRating] = useState(book.averageRating || 0);
 
   const fetchRating = useCallback(async () => {
     try {
       const response = await FeedbackService.getAllFeedbacksForBook(book._id);
       const fetchedRating = response.data.averageRating || 0;
-      
+
       setRating(fetchedRating);
       ratingsResults.set(book._id, fetchedRating);
     } catch (error) {
@@ -26,10 +41,21 @@ const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist 
     }
   }, [book._id, book.averageRating]);
 
+  // Tính toán giá và phần trăm giảm dựa vào campaign
+  const hasCampaign = book.discountPercentage && book.discountPercentage > 0;
+  const finalPrice = hasCampaign
+    ? Math.round(book.originalPrice * (1 - book.discountPercentage / 100))
+    : book.price;
+
+  const discountPercent = hasCampaign
+    ? book.discountPercentage
+    : book.originalPrice > book.price
+    ? Math.round((1 - book.price / book.originalPrice) * 100)
+    : 0;
+
   useEffect(() => {
     fetchRating();
   }, [fetchRating]);
-  
 
   return (
     <Card
@@ -39,27 +65,28 @@ const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist 
       sx={{ boxShadow: "none", border: "none" }}
     >
       <Box>
-        {book.originalPrice > book.price && (
-          <Box className="book-discount">
-            -
-            {Math.round((1 - book.price / book.originalPrice) * 100)}%
-          </Box>
+        {discountPercent > 0 && (
+          <Box className="book-discount">-{discountPercent}%</Box>
         )}
 
         {book.stock === 0 && <Box className="book-stock">Hết hàng</Box>}
 
         {(hoveredId === book._id || wishlist.includes(book._id)) && (
-            <Box 
-                className={`book-wishlist-btn ${hoveredId === book._id && !wishlist.includes(book._id) ? 'animate-in' : ''}`}
-            >
-                <IconButton onClick={() => toggleWishlist(book._id)} size="small">
-                {wishlist.includes(book._id) ? (
-                    <FavoriteIcon sx={{ color: "#c49a6c" }} />
-                ) : (
-                    <FavoriteBorderIcon />
-                )}
-                </IconButton>
-            </Box>
+          <Box
+            className={`book-wishlist-btn ${
+              hoveredId === book._id && !wishlist.includes(book._id)
+                ? "animate-in"
+                : ""
+            }`}
+          >
+            <IconButton onClick={() => toggleWishlist(book._id)} size="small">
+              {wishlist.includes(book._id) ? (
+                <FavoriteIcon sx={{ color: "#c49a6c" }} />
+              ) : (
+                <FavoriteBorderIcon />
+              )}
+            </IconButton>
+          </Box>
         )}
 
         <Link to={`/book/${book._id}`} className="book-link">
@@ -82,23 +109,23 @@ const BookCard = ({ book, hoveredId, wishlist, onHover, onLeave, toggleWishlist 
         </Link>
 
         <Box>
-            <Rating
-              value={rating}
-              precision={0.1}
-              readOnly
-              size="small"
-              className="book-rating"
-            />
+          <Rating
+            value={rating}
+            precision={0.1}
+            readOnly
+            size="small"
+            className="book-rating"
+          />
         </Box>
 
         <Box className="book-price-container">
-          {book.originalPrice > book.price && (
+          {discountPercent > 0 && (
             <Typography variant="body2" className="book-original-price">
               {book.originalPrice.toLocaleString()}₫
             </Typography>
           )}
           <Typography variant="h6" className="book-price">
-            {book.price.toLocaleString()}₫
+            {finalPrice.toLocaleString()}₫
           </Typography>
         </Box>
       </CardContent>

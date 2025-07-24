@@ -4,6 +4,7 @@ const { uploadMultiple } = require("../config/cloudinary");
 const adminController = require("../controllers/AdminController");
 const adminBookController = require("../controllers/AdminBookController");
 const adminFeedbackController = require("../controllers/AdminFeedBackController");
+const adminDiscountCampaignController = require("../controllers/AdminDiscountCampaignController");
 const adminDiscountController = require("../controllers/AdminDiscountController");
 const adminDashboardController = require("../controllers/AdminDashBoardController");
 const adminComplaintController = require("../controllers/AdminComplaintController");
@@ -111,6 +112,40 @@ router.get(
   checkAuthorize(["admin"]),
   adminFeedbackController.getFeedbacksByUser
 );
+//Quản lý chiến dịch giảm giá
+router.get(
+  "/discount-campaigns",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.getAllCampaigns
+);
+router.delete(
+  "/discount-campaigns/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.deleteCampaign
+);
+router.post(
+  "/discount-campaigns",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.createCampaign
+);
+router.put(
+  "/discount-campaigns/:id",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.updateCampaign
+);
+
+router.post(
+  "/discount-campaigns/check-book-conflicts",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.checkBookConflicts
+);
+router.post(
+  "/discount-campaigns/check-book-conflicts-preview",
+  checkAuthorize(["admin"]),
+  adminDiscountCampaignController.checkBookConflictsPreview
+);
+
+
 
 //Quản lý discount
 router.get(
