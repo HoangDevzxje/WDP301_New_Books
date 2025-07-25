@@ -252,11 +252,25 @@ const returnOrder = async (req, res) => {
         .json({ message: "Đơn hàng không hợp lệ hoặc chưa có mã GHN." });
     }
 
+    const ghn = await getGhnOrderDetail(order.trackingNumber);
+    const status = ghn.status?.toLowerCase();
+
+    const ALLOWED_RETURN_STATUSES = [
+      "storing",
+      "ready_to_pick",
+      "ready_to_deliver",
+    ];
+    if (!ALLOWED_RETURN_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Không thể hoàn đơn. Trạng thái hiện tại: "${status}". Chỉ cho phép hoàn khi đơn đang ở kho hoặc chờ lấy.`,
+      });
+    }
+
     const response = await axios.post(
-      "https://dev-online-gateway.ghn.vn/shiip/public-api/v2/switch-status",
+      "https://online-gateway.ghn.vn/shiip/public-api/v2/switch-status/return",
       {
         order_codes: [order.trackingNumber],
-        status: "return",
       },
       {
         headers: {
@@ -280,9 +294,26 @@ const returnOrder = async (req, res) => {
     console.error("GHN return error:", error.response?.data || error.message);
     return res.status(500).json({
       success: false,
-      message: "Lỗi khi gửi yêu cầu hoàn đơn hàng",
+      message:
+        error.response?.data?.message || "Lỗi khi gửi yêu cầu hoàn đơn hàng",
     });
   }
+};
+const getGhnTracking = async (trackingNumber) => {
+  const response = await axios.get(
+    "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail",
+    {
+      headers: {
+        Token: process.env.GHN_TOKEN,
+        ShopId: process.env.GHN_SHOP_ID,
+      },
+      params: {
+        order_code: trackingNumber,
+      },
+    }
+  );
+
+  return response.data.data;
 };
 
 const ghnController = {
@@ -293,5 +324,6 @@ const ghnController = {
   confirmOrder,
   getTrackingDetails,
   returnOrder,
+  getGhnTracking,
 };
 module.exports = ghnController;

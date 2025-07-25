@@ -51,7 +51,17 @@ const orderSchema = new mongoose.Schema(
     },
     shippingStatus: {
       type: String,
-      default: "Chưa lấy hàng",
+      default: "pending",
+      enum: [
+        "pending",
+        "processing",
+        "delivering",
+        "delivered",
+        "returned",
+        "cancelled",
+        "waiting_to_return",
+        "lost",
+      ],
     },
 
     shippingInfo: {
@@ -105,6 +115,13 @@ const orderSchema = new mongoose.Schema(
         width: { type: Number, required: true, min: 0 },
       },
       default: null,
+    },
+    expireAt: {
+      type: Date,
+      default: function () {
+        // Mặc định 3 ngày sau thời điểm tạo đơn
+        return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+      },
     },
   },
   { timestamps: true }

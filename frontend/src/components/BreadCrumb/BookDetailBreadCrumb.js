@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Typography, Breadcrumbs, Box } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 function BookDetailBreadCrumb() {
     const { id } = useParams();
     const [book, setBook] = useState(null);
     const [bookCategories, setBookCategories] = useState([]);
+    const navigate = useNavigate();
 
+    const handleCategoryClick2 = (categoryId) => {
+        navigate("/shopAll", {
+        state: { selectedCategoryId: categoryId },
+        });
+    };
     useEffect(() => {
         // Fetch book details
         axios.get(`http://localhost:9999/book/${id}`)
@@ -44,15 +50,17 @@ function BookDetailBreadCrumb() {
                 </Link>
 
                 {bookCategories.map((category) => (
-                    <Link
+                    <Typography
                         key={category._id}
-                        to={`/category/${category._id}`}
+                        onClick={() => handleCategoryClick2(category._id)}
                         color="text.primary"
                         style={{ textDecoration: 'none', color: '#AAAAAA' }}
 
                     >
                         {category.name}
-                    </Link>
+                    </Typography>
+
+
                 ))}
 
                 {book && <Typography sx={{ color: '#AAAAAA', fontWeight: 'bold' }}>{book.title}</Typography>}

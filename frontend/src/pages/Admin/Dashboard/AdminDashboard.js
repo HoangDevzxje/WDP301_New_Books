@@ -178,18 +178,21 @@ const AdminDashboard = () => {
       </Typography>
 
       <Grid container spacing={3}>
-        <Grid item size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <AttachMoney className="statIcon revenue" />
             <Typography variant="h6" className="statTitle">
               Tổng Doanh Thu
+            </Typography>
+            <Typography variant="h7" className="statTitle">
+              (Chưa tính thuế)
             </Typography>
             <Typography variant="h5" className="statValue revenue">
               {formatCurrency(stats.totalRevenue)}
             </Typography>
           </Paper>
         </Grid>
-        <Grid item size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <People className="statIcon users" />
             <Typography variant="h6" className="statTitle">
@@ -201,7 +204,7 @@ const AdminDashboard = () => {
             </Typography>
           </Paper>
         </Grid>
-        <Grid item size={{ xs: 12, md: 4 }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
             <MenuBook className="statIcon books" />
             <Typography variant="h6" className="statTitle">
@@ -222,7 +225,7 @@ const AdminDashboard = () => {
         {stats.orderStatusCount && stats.orderStatusCount.length > 0 ? (
           <Grid container spacing={2}>
             {stats.orderStatusCount.map((item) => (
-              <Grid item size={{ xs: 12, md: 4 }} key={item.status}>
+              <Grid size={{ xs: 12, md: 4 }} key={item.status}>
                 <Paper className="statusCard">
                   {statusIcons[item.status] || null}
                   <Typography variant="subtitle1" className="statusTitle">
@@ -245,14 +248,12 @@ const AdminDashboard = () => {
       </Box>
 
       <Box className="productsRevenueContainer">
-        {/* Left side: Products Tables */}
         <Box className="productsContainer">
           <Typography variant="h6" className="sectionTitle">
             Sản Phẩm Bán Chạy & Ít Lượt Mua
           </Typography>
 
           <Box className="tablesSection">
-            {/* Top Selling Products */}
             <Box className="tableContainer">
               <Typography variant="h6" className="tableTitle">
                 Top 10 Bán Chạy
@@ -301,7 +302,6 @@ const AdminDashboard = () => {
               )}
             </Box>
 
-            {/* Least Selling Products */}
             <Box className="tableContainer">
               <Typography variant="h6" className="tableTitle">
                 Top 10 Ít Lượt Mua
@@ -350,7 +350,6 @@ const AdminDashboard = () => {
           </Box>
         </Box>
 
-        {/* Right side: Revenue Analysis Charts */}
         <Box className="revenueContainer">
           <Typography variant="h6" className="sectionTitle">
             Phân Tích Doanh Thu & Biểu Đồ
@@ -373,7 +372,6 @@ const AdminDashboard = () => {
           </Tabs>
 
           <Box className="chartsSection">
-            {/* Line Chart */}
             <Paper className="chartContainer">
               <Typography
                 variant="subtitle1"
@@ -425,7 +423,6 @@ const AdminDashboard = () => {
               )}
             </Paper>
 
-            {/* Pie Chart */}
             <Paper className="pieChartContainer">
               <Typography
                 variant="subtitle1"

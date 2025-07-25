@@ -3,26 +3,30 @@ import {
   Box,
   Typography,
   Button,
-  TextField,
-  Grid,
   Card,
   CardContent,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  IconButton,
-  TablePagination,
+  Grid,
+  TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
   Switch,
+  IconButton,
+  TablePagination,
   Snackbar,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   EventAvailable as StartDateIcon,
@@ -51,6 +55,10 @@ export default function DiscountListPage() {
     message: "",
     severity: "success",
   });
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    discountId: null,
+  });
 
   useEffect(() => {
     fetchDiscounts();
@@ -64,7 +72,7 @@ export default function DiscountListPage() {
     try {
       const data = await getDiscounts();
       setDiscounts(data);
-    } catch (e) {
+    } catch {
       openSnackbar("Lỗi khi lấy danh sách", "error");
     }
   };
@@ -110,21 +118,30 @@ export default function DiscountListPage() {
     setFiltered(res);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa mã này không?")) return;
+  const openDeleteConfirm = (discountId) => {
+    setDeleteDialog({ open: true, discountId });
+  };
+
+  const closeDeleteConfirm = () => {
+    setDeleteDialog({ open: false, discountId: null });
+  };
+
+  const handleDelete = async () => {
     try {
-      await deleteDiscount(id);
+      await deleteDiscount(deleteDialog.discountId);
       openSnackbar("Xóa thành công", "success");
       fetchDiscounts();
     } catch {
       openSnackbar("Lỗi khi xóa", "error");
+    } finally {
+      closeDeleteConfirm();
     }
   };
 
   const handleToggle = async (d) => {
     try {
       await changeStatusDiscount(d._id);
-      openSnackbar("Cập nhật trạng thái thành công");
+      openSnackbar("Cập nhật trạng thái thành công", "success");
       fetchDiscounts();
     } catch {
       openSnackbar("Lỗi khi cập nhật trạng thái", "error");
@@ -150,15 +167,12 @@ export default function DiscountListPage() {
     new Intl.NumberFormat("vi-VN").format(num) + " VNĐ";
 
   return (
-    <Box p={2}>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Typography variant="h4" ml={1}>
-          Quản lý mã giảm giá
-        </Typography>
-      </Box>
+    <Box maxWidth={1200} mx="auto" p={2}>
+      <Typography variant="h4" mb={2}>
+        Quản lý mã giảm giá
+      </Typography>
 
-      {/* Filter */}
-      <Card variant="outlined" sx={{ mb: 2 }}>
+      <Card variant="outlined" sx={{ mb: 2, borderRadius: 2, boxShadow: 1 }}>
         <CardContent>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={12} sm={3}>
@@ -223,26 +237,35 @@ export default function DiscountListPage() {
         </CardContent>
       </Card>
 
-      {/* Table */}
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}
+      >
         <Table size="small">
-          <TableHead>
+          <TableHead sx={{ backgroundColor: "#2c3e50" }}>
             <TableRow>
-              <TableCell>Mã</TableCell>
-              <TableCell>Giá trị</TableCell>
-              <TableCell>Giá tối thiểu</TableCell>
-              <TableCell>Sử dụng</TableCell>
-              <TableCell>
-                <StartDateIcon fontSize="small" /> Bắt đầu
-              </TableCell>
-              <TableCell>
-                <EndDateIcon fontSize="small" /> Kết thúc
-              </TableCell>
-              <TableCell>Trạng thái</TableCell>
-              <TableCell>Kích hoạt</TableCell>
-              <TableCell>Hành động</TableCell>
+              {[
+                "Mã",
+                "Giá trị",
+                "Giá tối thiểu",
+                "Sử dụng",
+                <StartDateIcon key="s" fontSize="small" />,
+                <EndDateIcon key="e" fontSize="small" />,
+                "Trạng thái",
+                "Kích hoạt",
+                "Hành động",
+              ].map((h, i) => (
+                <TableCell
+                  key={i}
+                  sx={{ color: "#fff", fontWeight: 700 }}
+                  align={typeof h === "string" ? "left" : "center"}
+                >
+                  {h}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
@@ -254,7 +277,13 @@ export default function DiscountListPage() {
               filtered
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((d) => (
-                  <TableRow key={d._id}>
+                  <TableRow
+                    key={d._id}
+                    sx={{
+                      "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                      "&:hover": { backgroundColor: "#f0f0f0" },
+                    }}
+                  >
                     <TableCell>{d.code}</TableCell>
                     <TableCell>
                       {d.type === "percentage"
@@ -272,17 +301,17 @@ export default function DiscountListPage() {
                       {new Date(d.endDate).toLocaleDateString("vi-VN")}
                     </TableCell>
                     <TableCell>{getStatus(d)}</TableCell>
-                    <TableCell>
+                    <TableCell align="center">
                       <Switch
                         checked={d.isActive}
                         onChange={() => handleToggle(d)}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell align="center">
                       <IconButton onClick={() => navigate(`${d._id}/edit`)}>
                         <Edit />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(d._id)}>
+                      <IconButton onClick={() => openDeleteConfirm(d._id)}>
                         <DeleteForever />
                       </IconButton>
                     </TableCell>
@@ -291,6 +320,7 @@ export default function DiscountListPage() {
             )}
           </TableBody>
         </Table>
+
         <TablePagination
           component="div"
           count={filtered.length}
@@ -302,19 +332,37 @@ export default function DiscountListPage() {
             setPage(0);
           }}
           rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: "1px solid #e0e0e0",
+            "& .MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+              {
+                fontWeight: 500,
+              },
+          }}
         />
       </TableContainer>
+
+      {/* Dialog xác nhận xóa */}
+      <Dialog open={deleteDialog.open} onClose={closeDeleteConfirm}>
+        <DialogTitle>Xác nhận xóa mã giảm giá</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa mã giảm giá này không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteConfirm}>Hủy</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}
         autoHideDuration={3000}
         onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >
-        <Alert
-          onClose={closeSnackbar}
-          severity={snackbar.severity}
-          sx={{ width: "100%" }}
-        >
+        <Alert severity={snackbar.severity} onClose={closeSnackbar}>
           {snackbar.message}
         </Alert>
       </Snackbar>

@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const orderController = require('../controllers/OrderController');
+const orderController = require("../controllers/OrderController");
 const { checkAuthorize } = require("../middleware/authMiddleware");
 
 /**
@@ -71,7 +71,11 @@ const { checkAuthorize } = require("../middleware/authMiddleware");
  *       500:
  *         description: Lỗi server
  */
-router.post('/create', checkAuthorize(['user', 'admin']), orderController.createOrder);
+router.post(
+  "/create",
+  checkAuthorize(["user", "admin"]),
+  orderController.createOrder
+);
 
 /**
  * @swagger
@@ -89,7 +93,7 @@ router.post('/create', checkAuthorize(['user', 'admin']), orderController.create
  *       500:
  *         description: Lỗi server
  */
-router.get('/my-orders', checkAuthorize(['user']), orderController.getMyOrders);
+router.get("/my-orders", checkAuthorize(["user"]), orderController.getMyOrders);
 
 /**
  * @swagger
@@ -116,6 +120,15 @@ router.get('/my-orders', checkAuthorize(['user']), orderController.getMyOrders);
  *       500:
  *         description: Lỗi server
  */
-router.get('/details/:id', checkAuthorize(['user', 'admin']), orderController.getOrderDetails);
+router.get(
+  "/details/:id",
+  checkAuthorize(["user", "admin"]),
+  orderController.getOrderDetails
+);
+router.put(
+  "/cancel/:id",
+  checkAuthorize(["user", "admin"]),
+  orderController.cancelOrder
+);
 
 module.exports = router;

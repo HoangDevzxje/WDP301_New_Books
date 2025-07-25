@@ -1,51 +1,80 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { getGhnTracking, getMyOrders } from "../../services/OrderService";
+import {
+  getGhnTracking,
+  getMyOrders,
+  createPayment,
+  cancelOrder,
+} from "../../services/OrderService";
 import "./TrackOrderPage.css";
 import { returnOrder } from "../../services/GHNService";
+import { Alert, Snackbar } from "@mui/material";
 
 const TrackOrderPage = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [ghnTrackingMap, setGhnTrackingMap] = useState({});
-
+  const [notifications, setNotifications] = useState([]);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
 
-  const canReturnOrder = (tracking) => {
-    if (!tracking) return false;
+  const handleReturnGHN = async (orderId, trackingStatus) => {
+    const status = trackingStatus?.status?.toLowerCase?.();
+    const returnableStatuses = ["storing", "ready_to_pick", "ready_to_deliver"];
 
-    const status = tracking.status?.toLowerCase() || "";
-    const deliveredAt = tracking.delivered_time
-      ? dayjs(tracking.delivered_time)
-      : null;
-
-    const now = dayjs();
-
-    if (status === "delivered" && deliveredAt) {
-      // GHN: không hoàn sau 30 ngày kể từ giao hàng
-      return now.diff(deliveredAt, "day") <= 30;
+    if (returnableStatuses.includes(status)) {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: "Đang gửi yêu cầu hoàn đơn...",
+          severity: "info",
+        },
+      ]);
+      try {
+        await returnOrder(orderId);
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            message: "Đã gửi yêu cầu hoàn hàng thành công.",
+            severity: "success",
+          },
+        ]);
+      } catch (err) {
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            message: err.response?.data?.message || "Không thể hoàn đơn.",
+            severity: "error",
+          },
+        ]);
+      }
+    } else if (status === "delivered") {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message:
+            "Đơn hàng đã được giao. Vui lòng liên hệ +84 866 052 283 để được hỗ trợ hoàn đơn.",
+          severity: "warning",
+        },
+      ]);
+    } else {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: `Không thể hoàn đơn ở trạng thái hiện tại: ${status}`,
+          severity: "warning",
+        },
+      ]);
     }
-
-    if (status === "waiting_to_return") {
-      // GHN: không hoàn nếu quá 72h sau khi chuyển sang chờ trả hàng
-      const waitingAt = dayjs(tracking.updated_at);
-      return now.diff(waitingAt, "hour") <= 72;
-    }
-
-    return false;
   };
-  const handleReturnGHN = async (orderId) => {
-    if (!window.confirm("Xác nhận hoàn đơn hàng này?")) return;
 
-    try {
-      const res = await returnOrder(orderId);
-      alert("Đã gửi yêu cầu hoàn hàng thành công.");
-      // Có thể gọi lại tracking để cập nhật UI
-    } catch (err) {
-      alert(err.response?.data?.message || "Không thể hoàn đơn.");
-    }
-  };
   useEffect(() => {
     (async () => {
       try {
@@ -108,11 +137,12 @@ const TrackOrderPage = () => {
               <tr>
                 <th>STT</th>
                 <th>Ngày đặt</th>
-
                 <th>Sản phẩm</th>
                 <th>Tổng giá (₫)</th>
                 <th>Mã vận đơn</th>
                 <th>Hoàn đơn</th>
+                <th>Thanh toán</th>
+                <th>Hủy đơn</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -194,21 +224,141 @@ const TrackOrderPage = () => {
                         <span className="external-icon">↗</span>
                       </a>
                     ) : (
-                      <span className="no-tracking">Chưa có mã</span>
+                      <span className="no-tracking2">Chưa có mã</span>
                     )}
                   </td>
                   <td>
-                    {canReturnOrder(ghnTrackingMap[o._id]) ? (
+                    {(() => {
+                      const tracking = ghnTrackingMap[o._id];
+                      const status = tracking?.status?.toLowerCase();
+                      const allowReturn = [
+                        "storing",
+                        "ready_to_pick",
+                        "ready_to_deliver",
+                        "delivered",
+                      ].includes(status);
+
+                      if (!status || !allowReturn) {
+                        return (
+                          <span className="disabled-return">
+                            Không thể hoàn
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <button
+                          className="return-button"
+                          onClick={() => handleReturnGHN(o._id, tracking)}
+                        >
+                          Hoàn đơn
+                        </button>
+                      );
+                    })()}
+                  </td>
+
+                  <td>
+                    {o.paymentMethod === "COD" ? (
+                      <span className="cod-label">
+                        Thanh toán khi nhận hàng
+                      </span>
+                    ) : o.paymentStatus === "Completed" ? (
+                      <span className="paid-label">Đã thanh toán</span>
+                    ) : o.paymentMethod === "Online" &&
+                      o.paymentStatus === "Pending" &&
+                      o.orderStatus === "Pending" &&
+                      new Date(o.expireAt) > new Date() ? (
                       <button
-                        className="return-button"
-                        onClick={() => handleReturnGHN(o._id)}
+                        className="pay-now-button2"
+                        onClick={async () => {
+                          try {
+                            localStorage.setItem("latestOrderId", o._id);
+                            const res = await createPayment(o._id);
+                            if (res.data.paymentUrl) {
+                              window.location.href = res.data.paymentUrl;
+                            }
+                          } catch (err) {
+                            setNotifications((prev) => [
+                              ...prev,
+                              {
+                                id: Date.now(),
+                                message: "Không thể tạo thanh toán.",
+                                severity: "error",
+                              },
+                            ]);
+                          }
+                        }}
                       >
-                        Hoàn đơn
+                        Thanh toán
                       </button>
                     ) : (
-                      <span className="disabled-return">Không thể hoàn</span>
+                      "-"
                     )}
                   </td>
+
+                  <td>
+                    {o.paymentStatus === "Pending" &&
+                    o.orderStatus === "Pending" ? (
+                      <button
+                        className="cancel-order-button2"
+                        onClick={() => {
+                          setSelectedOrderId(o._id);
+                          setShowCancelModal(true);
+                        }}
+                      >
+                        Hủy
+                      </button>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  {showCancelModal && (
+                    <div className="custom-modal-overlay">
+                      <div className="custom-modal">
+                        <h3>Xác nhận hủy đơn hàng</h3>
+                        <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
+                        <div className="modal-actions">
+                          <button
+                            className="cancel-btn"
+                            onClick={() => setShowCancelModal(false)}
+                          >
+                            Quay lại
+                          </button>
+                          <button
+                            className="confirm-btn"
+                            onClick={async () => {
+                              setShowCancelModal(false);
+                              try {
+                                await cancelOrder(selectedOrderId);
+                                setNotifications((prev) => [
+                                  ...prev,
+                                  {
+                                    id: Date.now(),
+                                    message: "Đơn hàng đã được hủy thành công.",
+                                    severity: "success",
+                                  },
+                                ]);
+                                window.location.reload();
+                              } catch (err) {
+                                setNotifications((prev) => [
+                                  ...prev,
+                                  {
+                                    id: Date.now(),
+                                    message: "Không thể hủy đơn hàng.",
+                                    severity: "error",
+                                  },
+                                ]);
+                              }
+                            }}
+                          >
+                            Xác nhận hủy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <td>
                     <button
                       className="detail-button"
@@ -223,6 +373,30 @@ const TrackOrderPage = () => {
           </table>
         </div>
       )}
+      {notifications.map((notification) => (
+        <Snackbar
+          key={notification.id}
+          open
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          onClose={() =>
+            setNotifications((prev) =>
+              prev.filter((n) => n.id !== notification.id)
+            )
+          }
+        >
+          <Alert
+            severity={notification.severity || "info"}
+            onClose={() =>
+              setNotifications((prev) =>
+                prev.filter((n) => n.id !== notification.id)
+              )
+            }
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </div>
   );
 };

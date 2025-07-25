@@ -1,5 +1,5 @@
 .track-order-container {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 2rem 1rem;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -22,6 +22,15 @@
   font-size: 1rem;
   color: #7f8c8d;
 }
+.cod-label {
+  color: #444;
+  font-weight: 500;
+}
+
+.paid-label {
+  color: green;
+  font-weight: 500;
+}
 
 /* Loading */
 .loading-spinner {
@@ -40,6 +49,37 @@
   border-radius: 50%;
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
+}
+.pay-now-button2 {
+  background-color: #1084ff;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.pay-now-button2:hover {
+  background-color: #004c9e;
+}
+
+.cancel-order-button2 {
+  background-color: #f50018;
+  color: white;
+  width: 100%;
+  border: none;
+  padding: 12px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.cancel-order-button2:hover {
+  background-color: #9c0010;
 }
 
 @keyframes spin {
@@ -172,9 +212,8 @@
 .external-icon {
   font-size: 0.8rem;
 }
-.no-tracking {
+.no-tracking2 {
   color: #95a5a6;
-  font-style: italic;
 }
 
 /* Detail button */
@@ -182,8 +221,8 @@
   background-color: #2ecc71;
   color: #fff;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  padding: 12px;
+  border-radius: 8px;
   font-size: 0.9rem;
   cursor: pointer;
   transition: background-color 0.3s;
@@ -249,8 +288,8 @@
   font-size: 1rem;
   font-weight: 500;
   color: #212529;
-  margin: 0;
   line-height: 1.2;
+  max-width: 200px;
 }
 
 .product-extra {
@@ -278,4 +317,72 @@
   font-weight: 600;
   color: #ee4d2d;
   margin: 0;
+}
+
+/* Custom Modal Styles */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.custom-modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.custom-modal h3 {
+  margin-top: 0;
+  color: #333;
+  font-size: 1.25rem;
+}
+
+.custom-modal p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancel-btn {
+  background: #f0f0f0;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.cancel-btn:hover {
+  background: #e0e0e0;
+}
+
+.confirm-btn {
+  background: #e74c3c;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.confirm-btn:hover {
+  background: #c0392b;
 }

@@ -45,17 +45,16 @@ const createOrder = async (req, res) => {
       });
       itemsHtml += `
         <tr>
-          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${book.title
-        }</td>
-          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${item.quantity
-        }</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${
+            book.title
+          }</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${
+            item.quantity
+          }</td>
           <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${(
-          book.price * item.quantity
-        ).toLocaleString("vi-VN")} VND</td>
+            book.price * item.quantity
+          ).toLocaleString("vi-VN")} VND</td>
         </tr>`;
-      // Cập nhập kho hàng
-      book.stock -= item.quantity;
-      await book.save();
     }
     // Áp dụng giảm giá
     if (discount) {
@@ -68,7 +67,9 @@ const createOrder = async (req, res) => {
     totalAmount -= pointUsed;
 
     if (paymentMethod === "COD" && totalAmount > 500000) {
-      return res.status(400).json({ message: "Thanh toán khi nhận hàng khóa 500.000đ" });
+      return res
+        .status(400)
+        .json({ message: "Thanh toán khi nhận hàng khóa 500.000đ" });
     }
 
     const newOrder = new Order({
@@ -78,7 +79,7 @@ const createOrder = async (req, res) => {
       paymentMethod,
       discountUsed,
       pointUsed,
-      paymentStatus: paymentMethod === "COD" ? "Pending" : "Completed",
+      paymentStatus: "Pending",
       orderStatus: "Pending",
     });
 
@@ -155,9 +156,28 @@ async function getOrderDetails(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+async function cancelOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order)
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+
+    if (order.paymentStatus !== "Pending" || order.orderStatus !== "Pending") {
+      return res.status(400).json({ message: "Đơn hàng không thể hủy" });
+    }
+
+    order.orderStatus = "Cancelled";
+    await order.save();
+
+    res.json({ message: "Đã hủy đơn hàng" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
 
 module.exports = {
   createOrder,
   getMyOrders,
   getOrderDetails,
+  cancelOrder,
 };

@@ -84,11 +84,11 @@ export default function BookFormPage() {
         type === "checkbox"
           ? checked
           : name === "images"
-            ? value
+          ? value
               .split(",")
               .map((s) => s.trim())
               .filter(Boolean)
-            : value,
+          : value,
     }));
     if (errors[name]) setErrors((err) => ({ ...err, [name]: null }));
   };
@@ -160,6 +160,7 @@ export default function BookFormPage() {
         </h2>
 
         <div className="book-form-grid">
+          {/* Thông tin cơ bản */}
           <div className="form-group">
             <label htmlFor="title">Tiêu đề</label>
             <input
@@ -201,6 +202,22 @@ export default function BookFormPage() {
             {errors.genre && <span className="error-text">{errors.genre}</span>}
           </div>
 
+          <div className="form-group form-group-full">
+            <label htmlFor="description">Mô tả</label>
+            <textarea
+              id="description"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              rows={1}
+              className={errors.description ? "error" : ""}
+            />
+            {errors.description && (
+              <span className="error-text">{errors.description}</span>
+            )}
+          </div>
+
+          {/* Thông tin xuất bản */}
           <div className="form-group">
             <label htmlFor="publisher">Nhà xuất bản</label>
             <input
@@ -217,17 +234,17 @@ export default function BookFormPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Mô tả</label>
-            <textarea
-              id="description"
-              name="description"
-              value={form.description}
+            <label htmlFor="publishDate">Ngày xuất bản</label>
+            <input
+              type="date"
+              id="publishDate"
+              name="publishDate"
+              value={form.publishDate}
               onChange={handleChange}
-              rows={2}
-              className={errors.description ? "error" : ""}
+              className={errors.publishDate ? "error" : ""}
             />
-            {errors.description && (
-              <span className="error-text">{errors.description}</span>
+            {errors.publishDate && (
+              <span className="error-text">{errors.publishDate}</span>
             )}
           </div>
 
@@ -253,23 +270,9 @@ export default function BookFormPage() {
             />
           </div>
 
+          {/* Thông tin giá và kho */}
           <div className="form-group">
-            <label htmlFor="publishDate">Ngày xuất bản</label>
-            <input
-              type="date"
-              id="publishDate"
-              name="publishDate"
-              value={form.publishDate}
-              onChange={handleChange}
-              className={errors.publishDate ? "error" : ""}
-            />
-            {errors.publishDate && (
-              <span className="error-text">{errors.publishDate}</span>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="price">Giá</label>
+            <label htmlFor="price">Giá bán</label>
             <input
               type="number"
               id="price"
@@ -280,6 +283,7 @@ export default function BookFormPage() {
             />
             {errors.price && <span className="error-text">{errors.price}</span>}
           </div>
+
           <div className="form-group">
             <label htmlFor="originalPrice">Giá gốc</label>
             <input
@@ -290,10 +294,13 @@ export default function BookFormPage() {
               onChange={handleChange}
               className={errors.originalPrice ? "error" : ""}
             />
-            {errors.originalPrice && <span className="error-text">{errors.originalPrice}</span>}
+            {errors.originalPrice && (
+              <span className="error-text">{errors.originalPrice}</span>
+            )}
           </div>
+
           <div className="form-group">
-            <label htmlFor="stock">Số lượng</label>
+            <label htmlFor="stock">Số lượng tồn kho</label>
             <input
               type="number"
               id="stock"
@@ -305,6 +312,7 @@ export default function BookFormPage() {
             {errors.stock && <span className="error-text">{errors.stock}</span>}
           </div>
 
+          {/* Thông tin vật lý */}
           <div className="form-group">
             <label htmlFor="totalPage">Số trang</label>
             <input
@@ -328,23 +336,12 @@ export default function BookFormPage() {
               value={form.cover}
               onChange={handleChange}
             >
-              <option value="hard">Cứng</option>
-              <option value="soft">Mềm</option>
+              <option value="hard">Bìa cứng</option>
+              <option value="soft">Bìa mềm</option>
             </select>
           </div>
 
           <div className="form-group">
-            <label htmlFor="dimensions">Kích thước (DxRxC)</label>
-            <input
-              type="text"
-              id="dimensions"
-              name="dimensions"
-              value={form.dimensions}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="form-group form-group-small">
             <label htmlFor="weight">Khối lượng (g)</label>
             <input
               type="number"
@@ -359,8 +356,19 @@ export default function BookFormPage() {
             )}
           </div>
 
-          <div className="form-group form-group-small">
-            <label htmlFor="minAge">Tuổi tối thiểu</label>
+          <div className="form-group">
+            <label htmlFor="dimensions">Kích thước (DxRxC)</label>
+            <input
+              type="text"
+              id="dimensions"
+              name="dimensions"
+              value={form.dimensions}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="minAge">Độ tuổi phù hợp</label>
             <input
               type="number"
               id="minAge"

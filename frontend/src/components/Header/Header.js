@@ -282,6 +282,10 @@ const Header = ({
     navigate(`/shopAll?query=${encodeURIComponent(searchTerm)}`);
   };
 
+  const goToDetailsPage = (bookId) => {
+    navigate(`/book/${bookId}`);
+  };
+
   const displayWishlistText = wishlistCount === 1 ? "1 Sản phẩm" : `${wishlistCount} Sản phẩm`;
 
   const open = Boolean(anchorEl);
@@ -299,15 +303,7 @@ const Header = ({
           </div>
 
           <div className="nav-search">
-            <Button
-              className="custom-icon-button"
-              component={Link}
-              to="/blog"
-            >
-              <Typography variant="body2" className="custom-typography">
-                Blog
-              </Typography>
-            </Button>
+           
             <Button
               className="custom-icon-button"
               onMouseEnter={handleCategoryMouseEnter}
@@ -337,13 +333,13 @@ const Header = ({
                 <SearchResults>
                   <List>
                     {searchResults.map((book) => (
-                      <ListItem button key={book._id}>
+                      <ListItem button key={book._id} onClick={() => goToDetailsPage(book._id)}>
                         {book.images.length > 0 ? (
                           <img
                             src={book.images[0]}
                             alt={book.title}
                             width="40"
-                            height="50"
+                            height="60"
                             className="search-result-image"
                           />
                         ) : (
@@ -360,6 +356,15 @@ const Header = ({
                 </SearchResults>
               )}
             </Search>
+             <Button
+              className="custom-icon-button"
+              component={Link}
+              to="/blog"
+            >
+              <Typography variant="body2" className="custom-typography">
+                Blog
+              </Typography>
+            </Button>
           </div>
 
           <div className="nav-buttons">
@@ -489,10 +494,6 @@ const Header = ({
                 >
                   <FlagIcon className="more-menu-icon" />
                   Phản ánh khiếu nại
-                </MenuItem>
-                <MenuItem onClick={handleCloseMenu} className="more-menu-item">
-                  <RoomIcon className="more-menu-icon" />
-                  Theo dõi đơn hàng
                 </MenuItem>
                 <MenuItem onClick={handleCloseMenu} className="more-menu-item">
                   <PhoneIcon />
