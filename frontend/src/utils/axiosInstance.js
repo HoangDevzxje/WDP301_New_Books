@@ -78,6 +78,11 @@ axiosInstance.interceptors.response.use(
         console.error("Refresh token thất bại hoặc đã hết hạn");
 
         toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        try {
+          await AuthService.logout();
+        } catch (logoutErr) {
+          console.error("Lỗi khi gọi logout backend:", logoutErr);
+        }
         setTimeout(() => {
           storage.clear();
           window.location.href = "/account/login";

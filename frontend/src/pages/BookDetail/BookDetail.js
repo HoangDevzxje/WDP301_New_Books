@@ -66,6 +66,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
     setLoading(true);
     getBookById(id).then((response) => {
       setBook(response.data);
+      console.log("Book data:", response.data);
       setMainImg(response.data.images[0]);
       setLoading(false);
 

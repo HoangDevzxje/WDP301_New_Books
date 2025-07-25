@@ -218,7 +218,7 @@ function Cart({ updateCartData }) {
                                   className="product-image-link"
                                 >
                                   <img
-                                    src={item.book.images}
+                                    src={item.book.images[0]}
                                     alt={item.book.title}
                                     className="product-image1"
                                   />

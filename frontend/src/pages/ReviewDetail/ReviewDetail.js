@@ -249,7 +249,6 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
             />
           </div>
 
-          <Comments reviewId={id} />
         </Grid>
 
         <Grid item size={{ xs: 12, md: 3 }} >
