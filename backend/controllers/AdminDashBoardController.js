@@ -158,12 +158,7 @@ const getAdminDashboardStats = async (req, res) => {
           totalRevenue: {
             $sum: {
               $subtract: [
-                {
-                  $add: [
-                    { $multiply: ["$items.quantity", "$items.price"] },
-                    "$shippingInfo.fee",
-                  ],
-                },
+                { $multiply: ["$items.quantity", "$items.price"] },
                 "$discountValue",
               ],
             },
@@ -213,12 +208,10 @@ const getAdminDashboardStats = async (req, res) => {
           discountTotal: { $sum: "$discountValue" },
           netRevenue: {
             $sum: {
-              $subtract: [
-                { $add: ["$itemRevenue", "$shippingInfo.fee"] },
-                "$discountValue",
-              ],
+              $subtract: ["$itemRevenue", "$discountValue"],
             },
           },
+
           itemCount: { $sum: "$items.quantity" },
           orderCount: { $sum: 1 },
         },

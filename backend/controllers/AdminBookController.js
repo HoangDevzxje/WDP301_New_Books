@@ -18,8 +18,10 @@ exports.getAllBooks = async (req, res) => {
 exports.getBookById = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id).populate("categories");
+
     if (!book) return res.status(404).json({ message: "Không tìm thấy sách" });
-    res.status(200).json(book);
+    const booksWithDiscount = await applyDiscountCampaignsToBooks([book]);
+    res.status(200).json(booksWithDiscount[0]);
   } catch (error) {
     res.status(500).json({ message: "Lỗi khi lấy sách", error: error.message });
   }
