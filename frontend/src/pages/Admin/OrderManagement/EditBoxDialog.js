@@ -56,7 +56,6 @@ const EditBoxDialog = ({ open, order, onClose, onSave }) => {
     setErrors(newErr);
     if (Object.values(newErr).some((msg) => msg)) return;
 
-    // convert to integers
     const payload = {
       weight: parseInt(boxInfo.weight, 10),
       length: parseInt(boxInfo.length, 10),

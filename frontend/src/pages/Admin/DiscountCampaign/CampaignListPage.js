@@ -1,4 +1,3 @@
-// src/pages/admin/CampaignListPage.jsx
 import React, { useEffect, useState } from "react";
 import {
   getAllCampaigns,
