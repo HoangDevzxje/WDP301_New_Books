@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 
 const getAdminDashboardStats = async (req, res) => {
   try {
-    // Existing order status count
     const orderStatusCount = await Order.aggregate([
       { $group: { _id: "$orderStatus", count: { $sum: 1 } } },
     ]);
@@ -21,8 +20,17 @@ const getAdminDashboardStats = async (req, res) => {
       count: item.count,
     }));
 
-    // Top 10 best-selling products
+    // Top 10 best-selling products (chỉ tính đơn đã thanh toán và không bị fail/cancel)
     const topSellingProducts = await Order.aggregate([
+      {
+        $match: {
+          paymentStatus: "Completed",
+          orderStatus: { $in: ["Pending", "Processing"] },
+          shippingStatus: {
+            $nin: ["cancel", "returned", "delivery_fail", "lost", "damage"],
+          },
+        },
+      },
       { $unwind: "$items" },
       {
         $group: {
@@ -50,17 +58,32 @@ const getAdminDashboardStats = async (req, res) => {
           bookName: "$bookDetails.title",
           totalQuantity: 1,
           totalRevenue: 1,
-          bookImages: "$bookDetails.images", // Add images to the projection
+          bookImages: "$bookDetails.images",
         },
       },
     ]);
-    // Top 10 least-selling products
+
     const leastSellingProducts = await Book.aggregate([
       {
         $lookup: {
           from: "orders",
           let: { bookId: "$_id" },
           pipeline: [
+            {
+              $match: {
+                paymentStatus: "Completed",
+                orderStatus: { $in: ["Pending", "Processing"] },
+                shippingStatus: {
+                  $nin: [
+                    "cancel",
+                    "returned",
+                    "delivery_fail",
+                    "lost",
+                    "damage",
+                  ],
+                },
+              },
+            },
             { $unwind: "$items" },
             {
               $match: {
@@ -90,12 +113,8 @@ const getAdminDashboardStats = async (req, res) => {
           },
         },
       },
-      {
-        $sort: { totalQuantity: 1 },
-      },
-      {
-        $limit: 10,
-      },
+      { $sort: { totalQuantity: 1 } },
+      { $limit: 10 },
       {
         $project: {
           bookId: "$_id",
@@ -107,13 +126,14 @@ const getAdminDashboardStats = async (req, res) => {
       },
     ]);
 
-    // Total Revenue Calculation
     const totalRevenueResult = await Order.aggregate([
       {
         $match: {
           paymentStatus: "Completed",
-          orderStatus: "Processing",
-          shippingStatus: "delivered",
+          orderStatus: { $in: ["Pending", "Processing"] },
+          shippingStatus: {
+            $nin: ["cancel", "returned", "delivery_fail", "lost", "damage"],
+          },
         },
       },
       { $unwind: "$items" },
@@ -152,13 +172,14 @@ const getAdminDashboardStats = async (req, res) => {
       },
     ]);
 
-    // Detailed Revenue Analysis
     const revenueAnalysis = await Order.aggregate([
       {
         $match: {
           paymentStatus: "Completed",
-          orderStatus: "Processing",
-          shippingStatus: "delivered",
+          orderStatus: { $in: ["Pending", "Processing"] },
+          shippingStatus: {
+            $nin: ["cancel", "returned", "delivery_fail", "lost", "damage"],
+          },
         },
       },
       { $unwind: "$items" },
@@ -227,7 +248,6 @@ const getAdminDashboardStats = async (req, res) => {
       { $limit: 50 },
     ]);
 
-    // Total statistics
     const totalBooks = await Book.countDocuments();
     const totalUsers = await User.countDocuments();
 

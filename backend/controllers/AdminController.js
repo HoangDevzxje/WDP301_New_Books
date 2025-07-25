@@ -1,3 +1,4 @@
+const Book = require("../models/Book");
 const Order = require("../models/Order");
 const User = require("../models/User");
 
@@ -84,6 +85,18 @@ exports.updateOrderStatus = async (req, res) => {
     );
     if (!updatedOrder)
       return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    if (
+      updatedOrder.paymentStatus === "Completed" &&
+      updatedOrder.orderStatus === "Cancelled"
+    ) {
+      for (const item of updatedOrder.items) {
+        const book = await Book.findById(item.book._id);
+        if (book) {
+          book.stock += item.quantity;
+          await book.save();
+        }
+      }
+    }
     res.status(200).json(updatedOrder);
   } catch (error) {
     res

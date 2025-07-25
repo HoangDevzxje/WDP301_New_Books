@@ -60,6 +60,25 @@ const syncShippingStatuses = async () => {
         await Order.findByIdAndUpdate(order._id, update);
 
         console.log(`Order ${order._id} ➜ ${status} (${statusDesc})`);
+        if (
+          order.paymentStatus === "Completed" &&
+          ["delivery_fail", "returned", "cancel", "lost", "damage"].includes(
+            status
+          )
+        ) {
+          console.log(
+            `→ Đơn ${order._id} đang thất bại, hoàn sách lại vào kho...`
+          );
+
+          for (const item of order.items) {
+            const book = await Book.findById(item.book._id);
+            if (book) {
+              book.stock += item.quantity;
+              await book.save();
+              console.log(`   ↳ +${item.quantity} sách: ${book.title}`);
+            }
+          }
+        }
       } catch (err) {
         console.warn(`Lỗi GHN cho Order ${order._id}: ${err.message}`);
       }
