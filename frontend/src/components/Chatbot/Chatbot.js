@@ -4,7 +4,7 @@ import * as ChatBotService from '../../services/ChatbotService';
 import { Box, Button, IconButton, Paper, TextField, Typography, Card, CardMedia, CardContent, CardActions } from '@mui/material';
 import { Send, Mic, PhotoCamera, Delete, Close, ChatBubbleOutline } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-
+import ReactMarkdown from 'react-markdown'
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState('');
