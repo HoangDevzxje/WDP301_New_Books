@@ -41,6 +41,25 @@
   animation: spin 1s linear infinite;
   margin-bottom: 1rem;
 }
+.pay-now-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.cancel-order-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 4px;
+}
 
 @keyframes spin {
   to {

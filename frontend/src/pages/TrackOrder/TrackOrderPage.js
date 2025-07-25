@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { getGhnTracking, getMyOrders } from "../../services/OrderService";
+import {
+  getGhnTracking,
+  getMyOrders,
+  createPayment,
+  cancelOrder,
+} from "../../services/OrderService";
 import "./TrackOrderPage.css";
 import { returnOrder } from "../../services/GHNService";
 
@@ -113,6 +118,8 @@ const TrackOrderPage = () => {
                 <th>Tổng giá (₫)</th>
                 <th>Mã vận đơn</th>
                 <th>Hoàn đơn</th>
+                <th>Thanh toán</th>
+                <th>Hủy đơn</th>
                 <th>Thao tác</th>
               </tr>
             </thead>
@@ -209,6 +216,58 @@ const TrackOrderPage = () => {
                       <span className="disabled-return">Không thể hoàn</span>
                     )}
                   </td>
+                  <td>
+                    {o.paymentMethod === "Online" &&
+                    o.paymentStatus === "Pending" &&
+                    o.orderStatus === "Pending" &&
+                    new Date(o.expireAt) > new Date() ? (
+                      <button
+                        className="pay-now-button"
+                        onClick={async () => {
+                          try {
+                            localStorage.setItem("latestOrderId", o._id);
+                            const res = await createPayment(o._id);
+                            if (res.data.paymentUrl) {
+                              window.location.href = res.data.paymentUrl;
+                            }
+                          } catch (err) {
+                            alert("Không thể tạo thanh toán.");
+                          }
+                        }}
+                      >
+                        Thanh toán
+                      </button>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td>
+                    {o.paymentStatus === "Pending" &&
+                    o.orderStatus === "Pending" ? (
+                      <button
+                        className="cancel-order-button"
+                        onClick={async () => {
+                          if (
+                            !window.confirm("Bạn chắc chắn muốn hủy đơn hàng?")
+                          )
+                            return;
+                          try {
+                            await cancelOrder(o._id);
+                            alert("Đã hủy đơn hàng.");
+                            window.location.reload();
+                          } catch (err) {
+                            alert("Không thể hủy đơn.");
+                          }
+                        }}
+                      >
+                        Hủy
+                      </button>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
                   <td>
                     <button
                       className="detail-button"

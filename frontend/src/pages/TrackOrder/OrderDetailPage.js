@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
-import { getOrderDetails } from "../../services/OrderService";
+import {
+  getOrderDetails,
+  createPayment,
+  cancelOrder,
+} from "../../services/OrderService";
 import { getTrackingDetails } from "../../services/GHNService";
 import "./OrderDetailPage.css";
 
@@ -107,6 +111,22 @@ export default function OrderDetailPage() {
         </h3>
       </div>
       <div className="order-detail-grid">
+        {order.paymentMethod === "Online" &&
+          order.paymentStatus === "Pending" &&
+          order.orderStatus === "Pending" &&
+          new Date(order.expireAt) > new Date() && (
+            <div className="order-warning-banner">
+              <p className="order-warning-text">
+                Đơn hàng của bạn vẫn đang chờ thanh toán. Vui lòng hoàn tất
+                thanh toán trước{" "}
+                <strong>
+                  {dayjs(order.expireAt).format("HH:mm DD/MM/YYYY")}
+                </strong>{" "}
+                để tránh bị hủy tự động.
+              </p>
+            </div>
+          )}
+
         {/* Thông tin đơn & vận đơn */}
         <div className="order-info-card">
           <h3 className="card-title">Thông tin đơn hàng</h3>
@@ -233,6 +253,53 @@ export default function OrderDetailPage() {
             </div>
           );
         })}
+        {/* Action buttons */}
+        {order.paymentMethod === "Online" &&
+          order.paymentStatus === "Pending" &&
+          order.orderStatus === "Pending" &&
+          new Date(order.expireAt) > new Date() && (
+            <div className="order-action-buttons">
+              <button
+                className="pay-now-button"
+                onClick={async () => {
+                  try {
+                    localStorage.setItem("latestOrderId", order._id);
+                    const res = await createPayment(order._id);
+                    if (res.data.paymentUrl) {
+                      window.location.href = res.data.paymentUrl;
+                    } else {
+                      alert("Không thể tạo liên kết thanh toán.");
+                    }
+                  } catch (err) {
+                    alert("Lỗi khi tạo thanh toán.");
+                  }
+                }}
+              >
+                Thanh toán ngay
+              </button>
+            </div>
+          )}
+
+        {order.orderStatus === "Pending" &&
+          order.paymentStatus === "Pending" && (
+            <div className="order-action-buttons">
+              <button
+                className="cancel-order-button"
+                onClick={async () => {
+                  if (!window.confirm("Xác nhận hủy đơn hàng này?")) return;
+                  try {
+                    await cancelOrder(order._id);
+                    alert("Đã hủy đơn hàng.");
+                    navigate("/track-order"); // hoặc reload lại trang
+                  } catch (err) {
+                    alert("Không thể hủy đơn. Vui lòng thử lại.");
+                  }
+                }}
+              >
+                Hủy đơn hàng
+              </button>
+            </div>
+          )}
       </div>
     </div>
   );

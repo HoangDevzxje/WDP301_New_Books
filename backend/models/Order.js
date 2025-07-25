@@ -106,6 +106,13 @@ const orderSchema = new mongoose.Schema(
       },
       default: null,
     },
+    expireAt: {
+      type: Date,
+      default: function () {
+        // Mặc định 3 ngày sau thời điểm tạo đơn
+        return new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+      },
+    },
   },
   { timestamps: true }
 );
