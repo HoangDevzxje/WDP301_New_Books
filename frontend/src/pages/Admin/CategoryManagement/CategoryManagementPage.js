@@ -50,7 +50,6 @@ export default function CategoryManagement() {
     }
   };
 
-  // Sửa ở đây: bọc fetchAll vào callback, không để useEffect trả về Promise
   useEffect(() => {
     fetchAll();
   }, []);
@@ -85,26 +84,26 @@ export default function CategoryManagement() {
 
   const handleSave = async () => {
     const err = validate(name);
-    if (err) return setError(err);
-    try {
-      if (dialog.mode === "add") await createCategory(name.trim());
-      else if (dialog.mode === "edit")
-        await updateCategory(dialog.id, name.trim());
-      else if (dialog.mode === "delete") await deleteCategory(dialog.id);
+    if (dialog.mode !== "delete" && err) return setError(err);
 
-      showAlert(
-        dialog.mode === "add"
-          ? "Thêm thành công"
-          : dialog.mode === "edit"
-          ? "Cập nhật thành công"
-          : "Xóa thành công",
-        "success"
-      );
-      fetchAll();
-      closeDialog();
-    } catch {
-      showAlert("Lỗi thao tác", "error");
+    if (dialog.mode === "add") {
+      await createCategory(name.trim());
+    } else if (dialog.mode === "edit") {
+      await updateCategory(dialog.id, name.trim());
+    } else if (dialog.mode === "delete") {
+      await deleteCategory(dialog.id);
     }
+
+    showAlert(
+      dialog.mode === "add"
+        ? "Thêm thành công"
+        : dialog.mode === "edit"
+        ? "Cập nhật thành công"
+        : "Xóa thành công",
+      "success"
+    );
+    fetchAll();
+    closeDialog();
   };
 
   return (
