@@ -17,7 +17,7 @@ import {
   Tab,
   Rating,
 } from "@mui/material";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import AddIcon from "@mui/icons-material/Add";
@@ -60,6 +60,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const [slideDirection, setSlideDirection] = useState('');
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+  const navigate = useNavigate();
   const fullDescRef = useRef(null);
   useEffect(() => {
     setLoading(true);
@@ -416,6 +417,11 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
+   const handleCategoryClick2 = (categoryId) => {
+    navigate("/shopAll", {
+      state: { selectedCategoryId: categoryId },
+    });
+  };
 
   if (loading) {
     return (
@@ -577,7 +583,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
             {/* Thông tin sách */}
             <Box className="highlights-section">
               <Typography className="highlights-title">
-                Highlights
+                Thông tin sách
               </Typography>
               <Table className="highlights-table">
                 <TableBody>
@@ -671,7 +677,7 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
                   onClick={() => toggleWishlist(id)}
                   className="wishlist-action-btn"
                 >
-                  <FavoriteIcon sx={{ color: "black" }} />
+                  <FavoriteIcon sx={{ color: "#c49a6c" }} />
                 </Button>
               </Box>
             </Box>
@@ -743,13 +749,13 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
             </Typography>
 
             {book.categories && book.categories.length > 0 && (
-              <Link
-                to={`/category/${book.categories[0]}`}
+              <Typography 
                 className="view-all-link"
+                onClick={() => handleCategoryClick2(book.categories[0])}
               >
                 Xem tất cả
                 <span className="view-all-arrow">→</span>
-              </Link>
+              </Typography>
             )}
           </Box>
           <Divider sx={{ my: 2 }} />
