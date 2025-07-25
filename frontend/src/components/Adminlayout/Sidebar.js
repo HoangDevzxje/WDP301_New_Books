@@ -41,7 +41,6 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <LocalOfferIcon />,
       link: "/admin/discounts",
     },
-    //f
     {
       text: "Chiến dịch giảm giá",
       icon: <CampaignIcon />,
@@ -52,7 +51,6 @@ const Sidebar = ({ isSidebarOpen }) => {
       icon: <StarIcon />,
       link: "/admin/feedbacks",
     },
-
     {
       text: "Quản lý khiếu nại",
       icon: <FeedbackIcon />,
@@ -98,8 +96,15 @@ const Sidebar = ({ isSidebarOpen }) => {
             <ListItem
               component={Link}
               to={item.link}
-              button
               className="sidebar-item"
+              sx={{
+                cursor: "pointer",
+                "&:hover": {
+                  backgroundColor: "#34495e",
+                },
+                paddingY: 1,
+                paddingX: isSidebarOpen ? 2 : 1,
+              }}
             >
               <ListItemIcon
                 sx={{

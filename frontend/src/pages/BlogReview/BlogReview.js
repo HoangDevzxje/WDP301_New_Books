@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Typography, Paper, Box, Grid, Avatar, Stack, Snackbar, Alert } from '@mui/material';
-import './BlogReview.css';
-import * as ReviewService from '../../services/ReviewService';
-import { useNavigate } from 'react-router-dom';
-import BookCard from '../../components/BookCard/BookCard';
-import { getWishlist, addToWishlist, deleteFromWishlist } from "../../services/WishlistService";
-import * as BookService from '../../services/BookService';
+import React, { useEffect, useState } from "react";
+import { Typography, Paper, Box, Grid, Snackbar, Alert } from "@mui/material";
+import "./BlogReview.css";
+import * as ReviewService from "../../services/ReviewService";
+import { useNavigate } from "react-router-dom";
+import BookCard from "../../components/BookCard/BookCard";
+import {
+  getWishlist,
+  addToWishlist,
+  deleteFromWishlist,
+} from "../../services/WishlistService";
+import * as BookService from "../../services/BookService";
 const BlogReview = () => {
   const [reviews, setReviews] = useState([]);
-  const [bookIds, setBookIds] = useState([]); 
+  const [bookIds, setBookIds] = useState([]);
   const [reviewedBooks, setReviewedBooks] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);
@@ -20,18 +24,23 @@ const BlogReview = () => {
       try {
         const response = await ReviewService.getReviews();
         setReviews(response.data);
-        const sortedReviews = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sortedReviews = response.data.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
         const extractedBookIds = sortedReviews
-          .map(review => review.bookId)
-          .filter(bookId => bookId);
+          .map((review) => review.bookId)
+          .filter((bookId) => bookId);
         const uniqueBookIds = extractedBookIds.filter((bookId, index, arr) => {
           const bookIdValue = bookId._id || bookId;
-          return arr.findIndex(item => (item._id || item) === bookIdValue) === index;
+          return (
+            arr.findIndex((item) => (item._id || item) === bookIdValue) ===
+            index
+          );
         });
 
         setBookIds(uniqueBookIds);
       } catch (error) {
-        console.error('Error fetching reviews:', error);
+        console.error("Error fetching reviews:", error);
       }
     };
     fetchReviews();
@@ -42,23 +51,27 @@ const BlogReview = () => {
       if (bookIds.length === 0) return;
 
       try {
-        const bookPromises = bookIds.map(bookId => 
+        const bookPromises = bookIds.map((bookId) =>
           BookService.getBookById(bookId._id || bookId)
         );
-        
+
         const bookResponses = await Promise.allSettled(bookPromises);
         const reviewedBooks = bookResponses
-          .filter(response => response.status === 'fulfilled')
-          .map(response => response.value.data)
-          .filter(book => book);
+          .filter((response) => response.status === "fulfilled")
+          .map((response) => response.value.data)
+          .filter((book) => book);
         setReviewedBooks(reviewedBooks);
 
-        const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+        const access_token =
+          localStorage.getItem("access_token") ||
+          sessionStorage.getItem("access_token");
         if (access_token) {
           try {
             const wishlistResponse = await getWishlist();
             if (wishlistResponse.data && wishlistResponse.data.wishlist) {
-              const wishlistIds = wishlistResponse.data.wishlist.map((book) => book._id);
+              const wishlistIds = wishlistResponse.data.wishlist.map(
+                (book) => book._id
+              );
               setWishlist(wishlistIds);
             }
           } catch (error) {
@@ -66,7 +79,7 @@ const BlogReview = () => {
           }
         }
       } catch (error) {
-        console.error('Error fetching reviewed books:', error);
+        console.error("Error fetching reviewed books:", error);
       }
     };
 
@@ -75,7 +88,8 @@ const BlogReview = () => {
 
   const toggleWishlist = async (bookId) => {
     const access_token =
-      localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+      localStorage.getItem("access_token") ||
+      sessionStorage.getItem("access_token");
     if (!access_token) {
       setNotifications((prev) => [
         ...prev,
@@ -135,15 +149,14 @@ const BlogReview = () => {
 
   const getBookIds = () => {
     return reviews
-      .map(review => review.bookId)
-      .filter(bookId => bookId)
+      .map((review) => review.bookId)
+      .filter((bookId) => bookId)
       .filter((bookId, index, arr) => arr.indexOf(bookId) === index);
   };
 
   const handleClickReview = (id) => {
     navigate(`/reviewDetail/${id}`);
   };
-  
 
   return (
     <Box className="blog-review-container">
@@ -154,9 +167,9 @@ const BlogReview = () => {
               className="main-review"
               sx={{
                 backgroundImage: `url('${reviews[0]?.images?.[0]}')`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
               }}
               onClick={() => handleClickReview(reviews[0]._id)}
             >
@@ -167,7 +180,7 @@ const BlogReview = () => {
                   fontWeight="bold"
                   color="white"
                   mb={2}
-                  sx={{ textShadow: '2px 2px 4px rgba(0,0,0,0.4)' }}
+                  sx={{ textShadow: "2px 2px 4px rgba(0,0,0,0.4)" }}
                 >
                   {reviews[0]?.title}
                 </Typography>
@@ -176,7 +189,7 @@ const BlogReview = () => {
                   variant="body1"
                   color="white"
                   className="text-truncate-3"
-                  sx={{ fontSize: '0.875rem', lineHeight: 1.6 }}
+                  sx={{ fontSize: "0.875rem", lineHeight: 1.6 }}
                   dangerouslySetInnerHTML={{ __html: reviews[0]?.content }}
                 />
 
@@ -184,7 +197,7 @@ const BlogReview = () => {
                   <Typography
                     variant="body2"
                     color="white"
-                    sx={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
+                    sx={{ textShadow: "1px 1px 2px rgba(0,0,0,0.5)" }}
                   >
                     Tác giả: {reviews[0]?.adminId?.name}
                   </Typography>
@@ -193,7 +206,11 @@ const BlogReview = () => {
             </Paper>
           )}
 
-          <Typography variant="h5" className="section-blog-title" sx={{ mt: 4, mb: 2 }}>
+          <Typography
+            variant="h5"
+            className="section-blog-title"
+            sx={{ mt: 4, mb: 2 }}
+          >
             Review sách mới nhất
           </Typography>
           <Grid container spacing={4}>
@@ -203,19 +220,19 @@ const BlogReview = () => {
                   className="review-card-new"
                   onClick={() => handleClickReview(review._id)}
                   sx={{
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
+                    cursor: "pointer",
+                    display: "flex",
+                    flexDirection: "column",
+                    height: "100%",
                   }}
                 >
                   <Box
                     className="card-image"
                     sx={{
                       backgroundImage: `url('${review.images?.[0]}')`,
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      backgroundRepeat: "no-repeat",
                     }}
                   />
 
@@ -226,8 +243,8 @@ const BlogReview = () => {
                       color="#1f2937"
                       sx={{
                         mb: 1,
-                        fontSize: '1.2rem',
-                        lineHeight: 1.6
+                        fontSize: "1.2rem",
+                        lineHeight: 1.6,
                       }}
                     >
                       {review.title}
@@ -237,17 +254,19 @@ const BlogReview = () => {
                       color="#9ca3af"
                       className="text-truncate-2-dark"
                       sx={{
-                        fontSize: '0.875rem',
+                        fontSize: "0.875rem",
                         mb: 2,
                       }}
                     >
-                      <div dangerouslySetInnerHTML={{ __html: review.content }} />
+                      <div
+                        dangerouslySetInnerHTML={{ __html: review.content }}
+                      />
                     </Typography>
                     <Typography
                       variant="caption"
                       color="#9ca3af"
                       sx={{
-                        fontSize: '0.875rem',
+                        fontSize: "0.875rem",
                       }}
                     >
                       Tác giả: {review.adminId?.name}
@@ -260,7 +279,7 @@ const BlogReview = () => {
         </Grid>
 
         <Grid item size={{ xs: 12, md: 4 }}>
-          <Box >
+          <Box>
             <Grid container spacing={2}>
               <Grid item size={{ xs: 12 }}>
                 <Typography variant="h5" className="section-blog-title">
@@ -282,7 +301,11 @@ const BlogReview = () => {
                 ))
               ) : (
                 <Grid item size={{ xs: 12 }}>
-                  <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ textAlign: "center", py: 2 }}
+                  >
                     Chưa có sách nào được review
                   </Typography>
                 </Grid>
@@ -297,16 +320,20 @@ const BlogReview = () => {
           key={notification.id}
           open
           autoHideDuration={3000}
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          onClose={() => setNotifications(prev =>
-            prev.filter(n => n.id !== notification.id)
-          )}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          onClose={() =>
+            setNotifications((prev) =>
+              prev.filter((n) => n.id !== notification.id)
+            )
+          }
         >
           <Alert
-            severity={notification.severity || 'info'}
-            onClose={() => setNotifications(prev =>
-              prev.filter(n => n.id !== notification.id)
-            )}
+            severity={notification.severity || "info"}
+            onClose={() =>
+              setNotifications((prev) =>
+                prev.filter((n) => n.id !== notification.id)
+              )
+            }
           >
             {notification.message}
           </Alert>
