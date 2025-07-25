@@ -84,11 +84,11 @@ export default function BookFormPage() {
         type === "checkbox"
           ? checked
           : name === "images"
-            ? value
+          ? value
               .split(",")
               .map((s) => s.trim())
               .filter(Boolean)
-            : value,
+          : value,
     }));
     if (errors[name]) setErrors((err) => ({ ...err, [name]: null }));
   };
@@ -290,7 +290,9 @@ export default function BookFormPage() {
               onChange={handleChange}
               className={errors.originalPrice ? "error" : ""}
             />
-            {errors.originalPrice && <span className="error-text">{errors.originalPrice}</span>}
+            {errors.originalPrice && (
+              <span className="error-text">{errors.originalPrice}</span>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="stock">Số lượng</label>
