@@ -4,6 +4,7 @@ const Cart = require("../models/Cart");
 const Discount = require("../models/Discount");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendMail");
+const { applyDiscountCampaignsToBooks } = require("../utils/applyDiscount");
 
 const createOrder = async (req, res) => {
   try {
@@ -14,18 +15,26 @@ const createOrder = async (req, res) => {
     }
 
     const items = [];
-
     const { shippingInfo, paymentMethod, discountUsed, pointUsed } = req.body;
 
-    const discount = await Discount.findById(discountUsed);
+    const discount = discountUsed
+      ? await Discount.findById(discountUsed)
+      : null;
+    const userId = req.user.id;
 
-    const userId = req.user.id; // Lấy user từ token
+    // Lấy sách và áp dụng giảm giá
+    const bookIds = cart.cartItems.map((item) => item.book);
+    const books = await Book.find({ _id: { $in: bookIds } });
+    const discountedBooks = await applyDiscountCampaignsToBooks(books);
 
-    // Tính tổng giá trị đơn hàng
+    // Tính tổng tiền
     let totalAmount = 0;
     let itemsHtml = "";
+
     for (const item of cart.cartItems) {
-      const book = await Book.findById(item.book);
+      const book = discountedBooks.find(
+        (b) => b._id.toString() === item.book.toString()
+      );
       if (!book) {
         return res
           .status(404)
@@ -36,13 +45,16 @@ const createOrder = async (req, res) => {
           .status(400)
           .json({ message: `Sách "${book.title}" không đủ hàng!` });
       }
-      totalAmount += book.price * item.quantity;
+
+      const itemTotal = book.price * item.quantity;
+      totalAmount += itemTotal;
 
       items.push({
         book: book._id,
         quantity: item.quantity,
-        price: book.price,
+        price: book.price, 
       });
+
       itemsHtml += `
         <tr>
           <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: left;">${
@@ -51,25 +63,29 @@ const createOrder = async (req, res) => {
           <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${
             item.quantity
           }</td>
-          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${(
-            book.price * item.quantity
-          ).toLocaleString("vi-VN")} VND</td>
+          <td style="padding: 10px; font-size: 14px; color: #2c3e50; text-align: right;">${itemTotal.toLocaleString(
+            "vi-VN"
+          )} VND</td>
         </tr>`;
     }
-    // Áp dụng giảm giá
+
+    // Áp dụng mã giảm giá
     if (discount) {
       if (discount.type === "fixed") {
         totalAmount -= discount.value;
-      } else if (discount.type === "percentage")
+      } else if (discount.type === "percentage") {
         totalAmount -= (totalAmount * discount.value) / 100;
+      }
     }
 
+    // Trừ điểm
     totalAmount -= pointUsed;
 
+    // Giới hạn COD
     if (paymentMethod === "COD" && totalAmount > 500000) {
-      return res
-        .status(400)
-        .json({ message: "Thanh toán khi nhận hàng khóa 500.000đ" });
+      return res.status(400).json({
+        message: "Thanh toán khi nhận hàng bị giới hạn ở đơn dưới 500.000đ",
+      });
     }
 
     const newOrder = new Order({
@@ -84,36 +100,38 @@ const createOrder = async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
+
+    // Xóa giỏ hàng sau khi tạo đơn
     await Cart.findOneAndUpdate(
       { user: userId },
-      { $set: { cartItems: [] } }, // Xóa toàn bộ cartItems nhưng giữ cart
+      { $set: { cartItems: [] } },
       { new: true }
     );
-    if (savedOrder) {
-      if (paymentMethod === "COD") {
-        if (discount) {
-          discount.usedCount = discount.usedCount + 1;
-          await discount.save();
-        }
-      }
-      // Gửi email xác nhận đơn hàng
-      const user = await User.findById(userId);
-      const shippingInfoStr = `${shippingInfo.address}, ${shippingInfo.provineName}, ${shippingInfo.districtName}, ${shippingInfo.wardName}`;
-      await sendEmail(
-        user.email,
-        {
-          orderId: savedOrder._id.toString(),
-          paymentMethod:
-            paymentMethod === "COD"
-              ? "Thanh toán khi nhận hàng"
-              : "Thanh toán trực tuyến",
-          totalAmount,
-          itemsHtml,
-          shippingInfo: shippingInfoStr,
-        },
-        "orderConfirmation"
-      );
+
+    // Nếu thanh toán COD thì tăng số lượt dùng mã giảm giá
+    if (savedOrder && paymentMethod === "COD" && discount) {
+      discount.usedCount = discount.usedCount + 1;
+      await discount.save();
     }
+
+    // Gửi email xác nhận
+    const user = await User.findById(userId);
+    const shippingInfoStr = `${shippingInfo.address}, ${shippingInfo.provineName}, ${shippingInfo.districtName}, ${shippingInfo.wardName}`;
+    await sendEmail(
+      user.email,
+      {
+        orderId: savedOrder._id.toString(),
+        paymentMethod:
+          paymentMethod === "COD"
+            ? "Thanh toán khi nhận hàng"
+            : "Thanh toán trực tuyến",
+        totalAmount,
+        itemsHtml,
+        shippingInfo: shippingInfoStr,
+      },
+      "orderConfirmation"
+    );
+
     res.status(201).json({ data: savedOrder, totalAmount });
   } catch (error) {
     res.status(500).json({ message: error.message });
