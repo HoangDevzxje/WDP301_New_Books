@@ -43,7 +43,15 @@ import {
 } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 
-// Custom styled components
+const formatDateDisplay = (isoDateStr) => {
+  if (!isoDateStr) return "";
+  const date = new Date(isoDateStr);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 const StyledDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialog-paper": {
     borderRadius: theme.spacing(2),
@@ -118,7 +126,9 @@ const CampaignFormPage = () => {
   }, [id]);
 
   useEffect(() => {
-    updateDisabledBooks();
+    if (form.startDate && form.endDate && bookList.length > 0) {
+      updateDisabledBooks();
+    }
   }, [form.startDate, form.endDate, bookList]);
 
   const handleChange = (e) => {
@@ -127,16 +137,24 @@ const CampaignFormPage = () => {
   };
 
   const updateDisabledBooks = async () => {
-    if (!form.startDate || !form.endDate) return;
+    if (!form.startDate || !form.endDate || bookList.length === 0) {
+      setDisabledBooks([]);
+      return;
+    }
 
-    const res = await previewBookConflicts({
-      books: bookList.map((b) => b._id),
-      startDate: form.startDate,
-      endDate: form.endDate,
-      campaignId: isEdit ? id : null,
-    });
+    try {
+      const res = await previewBookConflicts({
+        books: bookList.map((b) => b._id),
+        startDate: form.startDate,
+        endDate: form.endDate,
+        campaignId: isEdit ? id : null,
+      });
 
-    setDisabledBooks(res.conflictedBooks || []);
+      setDisabledBooks(res.conflictedBooks || []);
+    } catch (error) {
+      console.error("Error fetching book conflicts:", error);
+      setDisabledBooks([]);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -171,8 +189,13 @@ const CampaignFormPage = () => {
     navigate("/admin/discount-campaigns");
   };
 
-  const handleOpenBookDialog = () => {
+  const handleOpenBookDialog = async () => {
     setTempSelectedBooks([...form.books]);
+
+    if (form.startDate && form.endDate) {
+      await updateDisabledBooks();
+    }
+
     setBookDialogOpen(true);
   };
 
@@ -279,7 +302,7 @@ const CampaignFormPage = () => {
             required
             sx={{ mb: 2 }}
           />
-          <Box sx={{ display: "flex", gap: 2 }}>
+          <Box sx={{ mb: 2 }}>
             <TextField
               label="Ngày bắt đầu"
               name="startDate"
@@ -290,6 +313,16 @@ const CampaignFormPage = () => {
               InputLabelProps={{ shrink: true }}
               required
             />
+            {form.startDate && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              ></Typography>
+            )}
+          </Box>
+
+          <Box>
             <TextField
               label="Ngày kết thúc"
               name="endDate"
@@ -300,6 +333,13 @@ const CampaignFormPage = () => {
               InputLabelProps={{ shrink: true }}
               required
             />
+            {form.endDate && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              ></Typography>
+            )}
           </Box>
         </Grid>
       </Grid>
@@ -310,20 +350,32 @@ const CampaignFormPage = () => {
         <BookSelectionButton
           fullWidth
           onClick={handleOpenBookDialog}
+          disabled={!form.startDate || !form.endDate}
           startIcon={<AddIcon />}
           endIcon={
-            <Chip
-              label={`${form.books.length} sách đã chọn`}
-              size="small"
-              color="primary"
-            />
+            <Box
+              sx={{
+                px: 1,
+                py: 0.3,
+                bgcolor: "primary.main",
+                color: "white",
+                borderRadius: "16px",
+                fontSize: "0.75rem",
+                fontWeight: 500,
+              }}
+            >
+              {`${form.books.length} sách đã chọn`}
+            </Box>
           }
         >
           <Typography sx={{ flexGrow: 1, textAlign: "left" }}>
-            Chọn sách áp dụng chiến dịch
+            {!form.startDate || !form.endDate
+              ? "Vui lòng chọn ngày bắt đầu và kết thúc trước"
+              : "Chọn sách áp dụng chiến dịch"}
           </Typography>
         </BookSelectionButton>
 
+        {/* Display selected books */}
         {form.books.length > 0 && (
           <SelectedBooksDisplay sx={{ mt: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
@@ -336,6 +388,7 @@ const CampaignFormPage = () => {
                   <Chip
                     key={bookId}
                     label={book?.title || bookId}
+                    onDelete={() => handleRemoveBook(bookId)}
                     color="primary"
                     variant="outlined"
                     size="small"
