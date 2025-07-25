@@ -51,7 +51,17 @@ const orderSchema = new mongoose.Schema(
     },
     shippingStatus: {
       type: String,
-      default: "Chưa lấy hàng",
+      default: "pending",
+      enum: [
+        "pending",
+        "processing",
+        "delivering",
+        "delivered",
+        "returned",
+        "cancelled",
+        "waiting_to_return",
+        "lost",
+      ],
     },
 
     shippingInfo: {

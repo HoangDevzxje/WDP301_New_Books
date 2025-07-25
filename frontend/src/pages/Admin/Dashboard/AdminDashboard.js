@@ -184,6 +184,9 @@ const AdminDashboard = () => {
             <Typography variant="h6" className="statTitle">
               Tổng Doanh Thu
             </Typography>
+            <Typography variant="h7" className="statTitle">
+              (Chưa tính thuế)
+            </Typography>
             <Typography variant="h5" className="statValue revenue">
               {formatCurrency(stats.totalRevenue)}
             </Typography>

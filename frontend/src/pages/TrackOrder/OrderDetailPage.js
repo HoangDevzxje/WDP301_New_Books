@@ -91,12 +91,27 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
   const getStatusText = (status) => {
     const map = {
       ready_to_pick: "Đã tạo đơn, chờ lấy hàng",
-      picking: "Shipper đang đến lấy hàng",
+      picking: "Đang đến lấy hàng",
+      money_collect_picking: "Shipper đang tương tác với người gửi",
       picked: "Đã lấy hàng",
-      transporting: "Đang luân chuyển",
+      storing: "Chuyển đến kho GHN",
+      transporting: "Đang vận chuyển",
+      sorting: "Phân loại tại kho",
       delivering: "Đang giao hàng",
+      money_collect_delivering: "Shipper đang tương tác với người nhận",
       delivered: "Giao hàng thành công",
-      cancel: "Đơn đã hủy",
+      delivery_fail: "Giao hàng thất bại",
+      waiting_to_return: "Chờ trả hàng",
+      return: "Chờ trả về người gửi",
+      return_transporting: "Đang hoàn hàng",
+      return_sorting: "Đang phân loại để hoàn hàng",
+      returning: "Đang hoàn hàng về",
+      return_fail: "Hoàn hàng thất bại",
+      returned: "Hoàn hàng thành công",
+      cancel: "Đơn đã huỷ",
+      exception: "Đơn ngoại lệ",
+      damage: "Hư hỏng hàng",
+      lost: "Thất lạc hàng",
     };
     return map[status] || "Đang xử lý";
   };

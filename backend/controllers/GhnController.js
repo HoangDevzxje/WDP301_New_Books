@@ -284,6 +284,22 @@ const returnOrder = async (req, res) => {
     });
   }
 };
+const getGhnTracking = async (trackingNumber) => {
+  const response = await axios.get(
+    "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail",
+    {
+      headers: {
+        Token: process.env.GHN_TOKEN,
+        ShopId: process.env.GHN_SHOP_ID,
+      },
+      params: {
+        order_code: trackingNumber,
+      },
+    }
+  );
+
+  return response.data.data;
+};
 
 const ghnController = {
   getProvince,
@@ -293,5 +309,6 @@ const ghnController = {
   confirmOrder,
   getTrackingDetails,
   returnOrder,
+  getGhnTracking,
 };
 module.exports = ghnController;

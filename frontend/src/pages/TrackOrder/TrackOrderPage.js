@@ -17,32 +17,39 @@ const TrackOrderPage = () => {
   const [ghnTrackingMap, setGhnTrackingMap] = useState({});
   const [notifications, setNotifications] = useState([]);
   const [showCancelModal, setShowCancelModal] = useState(false);
-const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
 
   const canReturnOrder = (tracking) => {
     if (!tracking) return false;
 
     const status = tracking.status?.toLowerCase() || "";
-    const deliveredAt = tracking.delivered_time
-      ? dayjs(tracking.delivered_time)
-      : null;
-
     const now = dayjs();
 
-    if (status === "delivered" && deliveredAt) {
-      // GHN: không hoàn sau 30 ngày kể từ giao hàng
-      return now.diff(deliveredAt, "day") <= 30;
+    if (status === "delivered") {
+      const deliveredAt = tracking.delivered_time
+        ? dayjs(tracking.delivered_time)
+        : null;
+
+      // Nếu có ngày giao hàng: chỉ không cho hoàn nếu đã quá 30 ngày
+      if (deliveredAt) {
+        return now.diff(deliveredAt, "day") <= 30;
+      }
+
+      // Nếu chưa có delivered_time (vừa giao xong, API chưa cập nhật), vẫn cho hoàn
+      return true;
     }
 
     if (status === "waiting_to_return") {
-      // GHN: không hoàn nếu quá 72h sau khi chuyển sang chờ trả hàng
-      const waitingAt = dayjs(tracking.updated_at);
+      const waitingAt = tracking.waiting_to_return_at
+        ? dayjs(tracking.waiting_to_return_at)
+        : dayjs(tracking.updated_at); // fallback
       return now.diff(waitingAt, "hour") <= 72;
     }
 
     return false;
   };
+
   const handleReturnGHN = async (orderId) => {
     if (!window.confirm("Xác nhận hoàn đơn hàng này?")) return;
 
@@ -247,7 +254,7 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
                   <td>
                     {o.paymentStatus === "Pending" &&
                     o.orderStatus === "Pending" ? (
-                     <button
+                      <button
                         className="cancel-order-button2"
                         onClick={() => {
                           setSelectedOrderId(o._id);
@@ -267,13 +274,13 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
                         <h3>Xác nhận hủy đơn hàng</h3>
                         <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
                         <div className="modal-actions">
-                          <button 
+                          <button
                             className="cancel-btn"
                             onClick={() => setShowCancelModal(false)}
                           >
                             Quay lại
                           </button>
-                          <button 
+                          <button
                             className="confirm-btn"
                             onClick={async () => {
                               setShowCancelModal(false);
@@ -285,7 +292,7 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
                                     id: Date.now(),
                                     message: "Đơn hàng đã được hủy thành công.",
                                     severity: "success",
-                                  }
+                                  },
                                 ]);
                                 window.location.reload();
                               } catch (err) {
@@ -295,7 +302,7 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
                                     id: Date.now(),
                                     message: "Không thể hủy đơn hàng.",
                                     severity: "error",
-                                  }
+                                  },
                                 ]);
                               }
                             }}
@@ -322,25 +329,29 @@ const [selectedOrderId, setSelectedOrderId] = useState(null);
         </div>
       )}
       {notifications.map((notification) => (
-              <Snackbar
-                key={notification.id}
-                open
-                autoHideDuration={3000}
-                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-                onClose={() => setNotifications(prev =>
-                  prev.filter(n => n.id !== notification.id)
-                )}
-              >
-                <Alert
-                  severity={notification.severity || 'info'}
-                  onClose={() => setNotifications(prev =>
-                    prev.filter(n => n.id !== notification.id)
-                  )}
-                >
-                  {notification.message}
-                </Alert>
-              </Snackbar>
-            ))}
+        <Snackbar
+          key={notification.id}
+          open
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          onClose={() =>
+            setNotifications((prev) =>
+              prev.filter((n) => n.id !== notification.id)
+            )
+          }
+        >
+          <Alert
+            severity={notification.severity || "info"}
+            onClose={() =>
+              setNotifications((prev) =>
+                prev.filter((n) => n.id !== notification.id)
+              )
+            }
+          >
+            {notification.message}
+          </Alert>
+        </Snackbar>
+      ))}
     </div>
   );
 };
