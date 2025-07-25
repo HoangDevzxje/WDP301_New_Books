@@ -1,6 +1,7 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const bookSchema = new mongoose.Schema({
+const bookSchema = new mongoose.Schema(
+  {
     title: String,
     author: String,
     genre: String,
@@ -15,29 +16,38 @@ const bookSchema = new mongoose.Schema({
     isActivated: Boolean,
     isNewRelease: Boolean,
     images: [String],
-    categories:[{
+    categories: [
+      {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
-    }],
+        ref: "Category",
+      },
+    ],
     cover: {
-        type: String,
-        enum: ['hard','soft']
+      type: String,
+      enum: ["hard", "soft"],
     },
     weight: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     dimensions: {
-        type: String,
+      type: String,
     },
     totalPage: {
-        type: Number,
-        default: 0
+      type: Number,
+      default: 0,
     },
     minAge: {
-        type: Number,
-        default: 0
-    }
-}, { timestamps: true });
+      type: Number,
+      default: 0,
+    },
+    //sale
+    campaign: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "DiscountCampaign",
+    },
+  },
+  { timestamps: true }
+);
 
-module.exports = mongoose.model('Book', bookSchema);
+module.exports = mongoose.model("Book", bookSchema);

@@ -1,0 +1,344 @@
+.feedback-panel {
+  padding: 24px;
+  background-color: rgb(255, 251, 243);
+  min-height: 400px;
+  border-radius: 16px;
+}
+
+.no-reviews-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 16px;
+  border: 2px dashed #e0e0e0;
+  text-align: center;
+}
+
+.no-reviews-icon {
+  font-size: 60px;
+  color: #e0e0e0;
+  margin-bottom: 16px;
+}
+
+.no-reviews-title {
+  color: #666;
+  margin-bottom: 8px;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.no-reviews-subtitle {
+  color: #888;
+  max-width: 400px;
+}
+
+.styled-card {
+  border-radius: 16px !important;
+  border:none !important;
+}
+
+.styled-rating{
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 16px !important; 
+}
+
+.rating-overview-content {
+  padding: 24px !important;
+}
+
+.overview-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px !important;
+  text-align: center;
+  position: relative;
+}
+
+.overview-title:after {
+  content: "";
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: #C49A6C;
+  border-radius: 2px;
+}
+
+.average-rating-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.average-rating-number {
+  font-size: 3.5rem !important;
+  font-weight: 700 !important;
+  line-height: 1;
+  margin-bottom: 8px !important;
+  background: #C49A6C;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.average-rating-stars {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.rating-stars .MuiRating-iconFilled {
+  color: #FFD700;
+}
+
+.rating-stars .MuiRating-iconHover {
+  color: #FFC107;
+}
+
+.total-reviews {
+  font-size: 0.9rem !important;
+  color: #666;
+  text-align: center;
+}
+
+.gradient-divider {
+  height: 2px;
+  margin: 24px 0 !important;
+  background: #C49A6C;
+}
+
+.rating-distribution {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.rating-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-row-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 30px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.star-icon {
+  color: #FFD700;
+}
+
+.rating-progress-container {
+  flex: 1;
+}
+
+.rating-progress {
+  height: 8px !important;
+  border-radius: 4px;
+  background-color: #f0f0f0 !important;
+}
+
+.rating-progress .MuiLinearProgress-bar {
+  border-radius: 4px;
+  background: linear-gradient(90deg, #FFD700 0%, #FFC107 100%);
+}
+
+.rating-count {
+  min-width: 20px;
+  text-align: right;
+  font-size: 0.9rem !important;
+  color: #666;
+}
+
+.reviews-section {
+  background-color: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.reviews-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24px !important;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.review-card-content {
+  padding: 20px !important;
+  border: none !important
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.review-user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #C49A6C !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.review-user-name {
+  font-weight: 600 !important;
+  font-size: 1rem !important;
+  color: #333;
+  margin-bottom: 2px !important;
+}
+
+.review-date {
+  color: #888;
+  font-size: 0.8rem !important;
+}
+
+.review-menu-button {
+  padding: 4px !important;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.review-menu-button:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.review-rating-wrapper {
+  margin: 8px 0;
+}
+
+.review-comment {
+  padding: 12px;
+  font-size: 0.95rem !important;
+  color: #444;
+  line-height: 1.6;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.review-form-container {
+  background: white;
+  padding: 24px;
+  margin-top: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+}
+
+.form-title {
+  margin-bottom: 24px !important;
+  font-weight: 600 !important;
+  font-size: 1.2rem !important;
+  color: #333;
+  position: relative;
+  padding-bottom: 8px;
+}
+
+.form-title:after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100px;
+  height: 3px;
+  background: #C49A6C;
+  border-radius: 2px;
+}
+
+.form-field {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px !important;
+  font-size: 0.95rem !important;
+  color: #333333a1;
+  font-weight: 600 !important;
+
+}
+
+.review-textarea{
+  border-radius: 12px;
+}
+
+.review-textarea .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #C49A6C; 
+}
+
+.form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.cancel-button {
+  text-transform: none !important;
+  border-color: #e0e0e0 !important;
+  color: #666 !important;
+  padding: 10px 24px !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.cancel-button:hover {
+  background-color: #f5f5f5 !important;
+  border-color: #ccc !important;
+}
+
+.review-button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.review-button {
+  background: #C49A6C !important;
+  color: white !important;
+  font-weight: 600 !important;
+  padding: 12px 32px !important;
+  border-radius: 50px !important;
+  transition: all 0.3s ease !important;
+  text-transform: none !important;
+}
