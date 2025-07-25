@@ -36,4 +36,4 @@ const discountCampaignSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("DiscountCampaign", discountCampaignSchema);
+module.exports = mongoose.model("DiscountCampaign", discountCampaignSchema, "salecampaigns");
