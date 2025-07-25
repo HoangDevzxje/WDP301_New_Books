@@ -6,7 +6,6 @@ import {
   TextField,
   Button,
   Avatar,
-  Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -19,12 +18,9 @@ import {
 import {
   MoreVert,
   Reply,
-  ThumbUp,
   ThumbUpOutlined,
   Edit,
   Delete,
-  ExpandMore,
-  ExpandLess
 } from '@mui/icons-material';
 
 // Import ReviewService đã có sẵn
@@ -56,7 +52,7 @@ const Comments = ({ reviewId }) => {
     try {
       setLoading(true);
       const response = await ReviewService.getCommentsByReviewId(reviewId);
-      
+
       // ✅ FIX: Xử lý response data đúng cách
       if (response.data) {
         setComments(response.data);
@@ -82,11 +78,11 @@ const Comments = ({ reviewId }) => {
     try {
       setLoading(true);
       const response = await ReviewService.postComment(reviewId, newComment);
-      
+
       if (response.status === 201) {
         setNewComment('');
         // Refresh comments sau khi tạo thành công
-        await fetchComments(); 
+        await fetchComments();
       }
     } catch (error) {
       console.error('Error posting comment:', error);
@@ -186,7 +182,7 @@ const Comments = ({ reviewId }) => {
 
   const canModifyComment = (comment) => {
     return currentUser && (
-      currentUser._id === comment.userId?._id || 
+      currentUser._id === comment.userId?._id ||
       currentUser.role === 'admin'
     );
   };
@@ -270,7 +266,7 @@ const Comments = ({ reviewId }) => {
                   </Typography>
                 </Box>
               </Box>
-              
+
               {canModifyComment(comment) && (
                 <IconButton
                   size="small"
@@ -353,8 +349,8 @@ const Comments = ({ reviewId }) => {
                   <Button size="small" variant="contained" sx={{ bgcolor: '#c49a6c' }}>
                     Trả lời
                   </Button>
-                  <Button 
-                    size="small" 
+                  <Button
+                    size="small"
                     variant="outlined"
                     onClick={() => {
                       setReplyingTo(null);
@@ -404,9 +400,9 @@ const Comments = ({ reviewId }) => {
           <Button onClick={() => setDeleteDialog(false)} disabled={loading}>
             Hủy
           </Button>
-          <Button 
-            onClick={handleDeleteComment} 
-            color="error" 
+          <Button
+            onClick={handleDeleteComment}
+            color="error"
             variant="contained"
             disabled={loading}
           >

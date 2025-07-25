@@ -8,7 +8,6 @@ import {
   Grid,
   Button,
   Chip,
-  Rating,
   Avatar,
   IconButton,
   Skeleton,
@@ -37,7 +36,6 @@ const ReviewDetail = ({ updateWishlistCount, updateCartData }) => {
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // States for BookCard functionality (similar to HomePage)
   const [notifications, setNotifications] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [hoveredId, setHoveredId] = useState(null);

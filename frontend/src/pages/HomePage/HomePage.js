@@ -5,14 +5,9 @@ import {
   Box,
   Snackbar,
   Alert,
-  Card,
-  CardMedia,
-  CardContent,
   IconButton,
   Grid,
-  Container,
   Button,
-  CardActions,
 } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import "slick-carousel/slick/slick.css";
@@ -245,7 +240,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <Typography className="loading-text">Đang tải...</Typography>
           ) : (
             <Grid container spacing={4}>
-              {books.slice(5, 10).map((book) => (
+              {newBooks.slice(0, 5).map((book) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
                   <BookCard
                     book={book}
@@ -290,7 +285,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <Typography className="loading-text">Đang tải...</Typography>
           ) : (
             <Grid container spacing={4}>
-              {saleBooks.slice(0, 5).map((book) => (
+              {saleBooks.slice(0, 10).map((book) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4, xl: 2.4 }} key={book._id}>
                   <BookCard
                     book={book}
@@ -328,9 +323,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
         </Snackbar>
       ))}
 
-
-
-      <Box className="blog-section">
+      <Box className="blog-section" sx={{ mt: 8, mb: 8 }}>
         <Box className="blog-image-container">
           <img
             src="https://i.pinimg.com/736x/cc/24/07/cc2407d15782f286ce11973e25c3a848.jpg"
@@ -351,13 +344,14 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             luận sôi động và tích cực.
           </Typography>
 
-          <Button variant="contained" className="blog-button">
+          <Button variant="contained" className="blog-button" component={Link}
+                        to="/blog">
             Khám phá ngay
           </Button>
         </Box>
       </Box>
 
-      <Box className="categories-section">
+      {/* <Box className="categories-section">
         <Box className="bestseller-container">
           <Typography
             variant="h3"
@@ -409,7 +403,7 @@ const HomePage = ({ updateWishlistCount, updateCartData }) => {
             <ArrowForwardIos />
           </IconButton>
         </Box>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

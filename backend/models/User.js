@@ -27,8 +27,8 @@ const userSchema = new mongoose.Schema(
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Book" }],
     role: { type: String, enum: ["user", "admin"], default: "user" },
     isActivated: { type: Boolean, default: true },
-    accessToken: { type: String, default: null, select: false },
-    refreshToken: { type: String, default: null, select: false },
+    accessToken: { type: String, default: null, select: true },
+    refreshToken: { type: String, default: null, select: true },
   },
   { timestamps: true }
 );

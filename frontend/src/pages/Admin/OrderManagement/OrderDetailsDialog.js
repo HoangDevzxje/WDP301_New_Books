@@ -1,295 +1,333 @@
-import React, { Component } from "react";
-import "./OrderDetailsDialog.css";
+import React from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Box,
+  Typography,
+  Grid,
+  Chip,
+  TableContainer,
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Divider,
+} from "@mui/material";
 
 const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  if (!dateString) return "N/A";
+  try {
+    return new Date(dateString).toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch (error) {
+    return "N/A";
+  }
 };
 
-class OrderDetailsDialog extends Component {
-  calculateSubtotal = () => {
-    const { order } = this.props;
-    return order.items.reduce(
-      (acc, item) => acc + item.price * item.quantity,
-      0
-    );
-  };
+const formatCurrency = (amount) => {
+  if (!amount && amount !== 0) return "0";
+  return amount.toLocaleString("vi-VN");
+};
 
-  calculateTotal = () => {
-    const { order } = this.props;
-    const subtotal = this.calculateSubtotal();
-    let discount = 0;
+const InfoRow = ({ label, value }) => (
+  <Box display="flex" justifyContent="space-between" py={1}>
+    <Typography variant="body2" color="text.secondary">
+      {label}:
+    </Typography>
+    <Typography variant="body2" fontWeight="500">
+      {value || "Hà Nội"}
+    </Typography>
+  </Box>
+);
 
-    // Discount code
-    if (order.discountUsed) {
-      if (order.discountUsed.type === "fixed") {
-        discount += order.discountUsed.value;
-      } else if (order.discountUsed.type === "percentage") {
-        discount += (subtotal * order.discountUsed.value) / 100;
-      }
+export default function OrderDetailsDialog({ open, order, onClose }) {
+  if (!open || !order) return null;
+
+  // Safe calculation with fallbacks
+  const subtotal = Array.isArray(order.items)
+    ? order.items.reduce((sum, item) => {
+        const price = item.price || 0;
+        const quantity = item.quantity || 0;
+        return sum + price * quantity;
+      }, 0)
+    : 0;
+
+  const discountAmount = order.discountUsed
+    ? order.discountUsed.type === "fixed"
+      ? order.discountUsed.value || 0
+      : (subtotal * (order.discountUsed.value || 0)) / 100
+    : 0;
+
+  const shippingFee = order.shippingInfo?.fee || 0;
+  const pointsUsed = order.pointUsed || 0;
+
+  const total = subtotal - discountAmount - pointsUsed + shippingFee;
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Pending":
+        return "warning";
+      case "Processing":
+        return "info";
+      case "Shipped":
+        return "secondary";
+      case "Delivered":
+        return "success";
+      case "Cancelled":
+        return "error";
+      default:
+        return "default";
     }
+  };
 
-    // Points used
-    if (order.pointUsed) {
-      discount += order.pointUsed;
+  const getPaymentMethodText = (method) => {
+    switch (method) {
+      case "COD":
+        return "Thanh toán khi nhận hàng";
+      case "ONLINE":
+        return "Thanh toán trực tuyến";
+      case "BANK_TRANSFER":
+        return "Chuyển khoản ngân hàng";
+      default:
+        return method || "N/A";
     }
-
-    const shippingFee = order.shippingInfo.fee || 0;
-    return subtotal - discount + shippingFee;
   };
 
-  getDiscountAmount = () => {
-    const { order } = this.props;
-    if (!order.discountUsed) return 0;
-    const subtotal = this.calculateSubtotal();
-    return order.discountUsed.type === "fixed"
-      ? order.discountUsed.value
-      : (subtotal * order.discountUsed.value) / 100;
+  const getPaymentStatusText = (status) => {
+    switch (status) {
+      case "Pending":
+        return "Chưa thanh toán";
+      case "Paid":
+      case "Completed":
+        return "Đã thanh toán";
+      case "Failed":
+        return "Thanh toán thất bại";
+      default:
+        return status || "N/A";
+    }
   };
 
-  getPaymentStatusClass = (status) => {
-    return status === "Pending" ? "chip chip-warning" : "chip chip-success";
-  };
+  // Safe access to shipping info
+  const shippingInfo = order.shippingInfo || {};
 
-  getOrderStatusClass = (status) => {
-    if (status === "Pending") return "chip chip-warning";
-    if (status === "Processing") return "chip chip-info";
-    return "chip chip-error";
-  };
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+      <DialogTitle>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Typography variant="h6">
+            Chi tiết đơn hàng{" "}
+            <Typography
+              component="span"
+              variant="h6"
+              color="primary"
+              fontWeight="600"
+            >
+              #{order.id || order._id || ""}
+            </Typography>
+          </Typography>
+          <Box display="flex" gap={1}>
+            <Chip
+              label={order.orderStatus || "N/A"}
+              color={getStatusColor(order.orderStatus)}
+              size="small"
+            />
+            <Chip
+              label={getPaymentStatusText(order.paymentStatus)}
+              color={order.paymentStatus === "Pending" ? "warning" : "success"}
+              size="small"
+            />
+          </Box>
+        </Box>
+      </DialogTitle>
 
-  render() {
-    const { open, order, onClose } = this.props;
+      <DialogContent>
+        <Grid container spacing={3}>
+          {/* Thông tin khách hàng */}
+          <Grid item size={{xs: 12, md: 6}}>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+                Thông tin khách hàng
+              </Typography>
+              <InfoRow 
+                label="Tên khách hàng"
+                value={order.user?.name || order.customerName}
+              />
+              <InfoRow
+                label="Email"
+                value={order.user?.email || order.customerEmail}
+              />
+              <InfoRow
+                label="Ngày đặt hàng"
+                value={formatDate(order.createdAt || order.orderDate)}
+              />
+              {order.trackingNumber && (
+                <InfoRow label="Mã vận đơn" value={order.trackingNumber} />
+              )}
+              <InfoRow
+                label="Phương thức thanh toán"
+                value={getPaymentMethodText(order.paymentMethod)}
+              />
+            </Paper>
+          </Grid>
 
-    if (!open || !order) return null;
+          {/* Thông tin giao hàng */}
+          <Grid item size={{xs: 12, md: 6}}>
+            <Paper sx={{ p: 2 }}>
+              <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+                Thông tin giao hàng
+              </Typography>
+              <InfoRow 
+                label="Địa chỉ "
+                value={shippingInfo.address || shippingInfo.fullAddress}
+              />
+              <InfoRow
+                label="Phường/Xã"
+                value={shippingInfo.wardName || shippingInfo.ward}
+              />
+              <InfoRow
+                label="Quận/Huyện"
+                value={shippingInfo.districtName || shippingInfo.district}
+              />
+              <InfoRow
+                label="Tỉnh/TP"
+                value={
+                  shippingInfo.provinceName ||
+                  shippingInfo.province ||
+                  shippingInfo.city
+                }
+              />
+              <InfoRow
+                label="Số điện thoại"
+                value={shippingInfo.phoneNumber || shippingInfo.phone}
+              />
+              {shippingInfo.note && (
+                <InfoRow label="Ghi chú" value={shippingInfo.note} />
+              )}
+            </Paper>
+          </Grid>
+        </Grid>
 
-    return (
-      <div className="dialog-overlay">
-        <div className="dialog">
-          <div className="dialog-header">
-            <h2 className="dialog-title">Chi tiết đơn hàng</h2>
-          </div>
+        {/* Danh sách sản phẩm */}
+        <Box mt={3}>
+          <Paper>
+            <Box p={2} bgcolor="grey.50">
+              <Typography variant="subtitle1" fontWeight="600">
+                Sản phẩm ({Array.isArray(order.items) ? order.items.length : 0}{" "}
+                sản phẩm)
+              </Typography>
+            </Box>
 
-          <div className="dialog-content">
-            <div className="grid">
-              {/* Thông tin khách hàng */}
-              <div className="grid-item">
-                <h3 className="section-title">Thông tin khách hàng</h3>
-                <div className="info-item">
-                  <strong>Tên:</strong> {order.user?.name || "N/A"}
-                </div>
-                <div className="info-item">
-                  <strong>Email:</strong> {order.user?.email || "N/A"}
-                </div>
-              </div>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Tên sản phẩm</TableCell>
+                    <TableCell align="center" width="100px">
+                      Số lượng
+                    </TableCell>
+                    <TableCell align="right" width="120px">
+                      Đơn giá
+                    </TableCell>
+                    <TableCell align="right" width="120px">
+                      Thành tiền
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {Array.isArray(order.items) && order.items.length > 0 ? (
+                    order.items.map((item, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          {item.book?.title ||
+                            item.productName ||
+                            item.name ||
+                            "N/A"}
+                        </TableCell>
+                        <TableCell align="center">
+                          {item.quantity || 0}
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(item.price || 0)} VNĐ
+                        </TableCell>
+                        <TableCell align="right">
+                          {formatCurrency(
+                            (item.price || 0) * (item.quantity || 0)
+                          )}{" "}
+                          VNĐ
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={4} align="center">
+                        <Typography color="text.secondary">
+                          Không có sản phẩm nào
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-              {/* Thông tin vận chuyển */}
-              <div className="grid-item">
-                <h3 className="section-title">Thông tin vận chuyển</h3>
-                {order.trackingNumber && (
-                  <div className="info-item">
-                    <strong>Mã vận đơn:</strong> {order.trackingNumber}
-                  </div>
-                )}
-                <div className="info-item">
-                  <strong>Địa chỉ:</strong> {order.shippingInfo.address}
-                </div>
-                <div className="info-item">
-                  <strong>Tỉnh/TP:</strong> {order.shippingInfo.provineName}
-                </div>
-                <div className="info-item">
-                  <strong>Quận/Huyện:</strong> {order.shippingInfo.districtName}
-                </div>
-                <div className="info-item">
-                  <strong>Phường/Xã:</strong> {order.shippingInfo.wardName}
-                </div>
-                <div className="info-item">
-                  <strong>SĐT:</strong> {order.shippingInfo.phoneNumber}
-                </div>
-                {order.shippingInfo.note && (
-                  <div className="info-item">
-                    <strong>Ghi chú:</strong> {order.shippingInfo.note}
-                  </div>
-                )}
-                <div className="info-item">
-                  <strong>Phí ship:</strong>{" "}
-                  {(order.shippingInfo.fee || 0).toLocaleString("vi-VN")} VNĐ
-                </div>
-              </div>
+            {/* Tổng kết đơn hàng */}
+            <Box p={2} bgcolor="grey.50">
+              <Typography variant="subtitle1" fontWeight="600" gutterBottom>
+                Tổng kết đơn hàng
+              </Typography>
 
-              {/* Thông tin thanh toán */}
-              <div className="grid-item">
-                <h3 className="section-title">Thông tin thanh toán</h3>
-                <div className="info-item">
-                  <strong>Phương thức:</strong>{" "}
-                  {order.paymentMethod === "COD" ? "COD" : "Online"}
-                </div>
-                <div className="info-item">
-                  <strong>Trạng thái thanh toán:</strong>{" "}
-                  <span
-                    className={this.getPaymentStatusClass(order.paymentStatus)}
-                  >
-                    {order.paymentStatus === "Pending"
-                      ? "Chưa thanh toán"
-                      : "Đã thanh toán"}
-                  </span>
-                </div>
-                <div className="info-item">
-                  <strong>Trạng thái đơn hàng:</strong>{" "}
-                  <span className={this.getOrderStatusClass(order.orderStatus)}>
-                    {order.orderStatus}
-                  </span>
-                </div>
-              </div>
+              <InfoRow
+                label="Tạm tính"
+                value={`${formatCurrency(subtotal)} VNĐ`}
+              />
+              <InfoRow
+                label="Phí vận chuyển"
+                value={`${formatCurrency(shippingFee)} VNĐ`}
+              />
 
-              {/* Thông tin đơn hàng */}
-              <div className="grid-item">
-                <h3 className="section-title">Thông tin đơn hàng</h3>
-                <div className="info-item">
-                  <strong>Ngày đặt:</strong> {formatDate(order.createdAt)}
-                </div>
-                <div className="info-item">
-                  <strong>Tổng tiền:</strong>{" "}
-                  {this.calculateTotal().toLocaleString("vi-VN")} VNĐ
-                </div>
-                {order.boxInfo && (
-                  <>
-                    <div className="info-item">
-                      <strong>Kích thước (L×W×H):</strong>{" "}
-                      {order.boxInfo.length}×{order.boxInfo.width}×
-                      {order.boxInfo.height} cm
-                    </div>
-                    <div className="info-item">
-                      <strong>Cân nặng:</strong> {order.boxInfo.weight} gram
-                    </div>
-                  </>
-                )}
-              </div>
+              {discountAmount > 0 && (
+                <InfoRow
+                  label="Giảm giá"
+                  value={`-${formatCurrency(discountAmount)} VNĐ`}
+                />
+              )}
 
-              {/* Danh sách sản phẩm */}
-              <div className="grid-item full-width">
-                <h3 className="section-title">Danh sách sản phẩm</h3>
-                <div className="table-container">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>Tên sản phẩm</th>
-                        <th>Số lượng</th>
-                        <th>Đơn giá</th>
-                        <th>Thành tiền</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {order.items.map((item, idx) => (
-                        <tr key={idx}>
-                          <td>{item.book?.title || "N/A"}</td>
-                          <td>{item.quantity}</td>
-                          <td>{item.price.toLocaleString("vi-VN")} VNĐ</td>
-                          <td>
-                            {(item.price * item.quantity).toLocaleString(
-                              "vi-VN"
-                            )}{" "}
-                            VNĐ
-                          </td>
-                        </tr>
-                      ))}
+              {pointsUsed > 0 && (
+                <InfoRow
+                  label="Điểm tích lũy"
+                  value={`-${formatCurrency(pointsUsed)} VNĐ`}
+                />
+              )}
 
-                      {/* Tổng tiền sản phẩm */}
-                      <tr className="summary-row">
-                        <td colSpan="3" className="text-right">
-                          <strong>Tổng tiền sản phẩm:</strong>
-                        </td>
-                        <td>
-                          <strong>
-                            {this.calculateSubtotal().toLocaleString("vi-VN")}{" "}
-                            VNĐ
-                          </strong>
-                        </td>
-                      </tr>
+              <Divider sx={{ my: 1 }} />
+              <Box display="flex" justifyContent="space-between" pt={1}>
+                <Typography variant="h6" fontWeight="600">
+                  Tổng cộng:
+                </Typography>
+                <Typography variant="h6" fontWeight="600" color="primary">
+                  {formatCurrency(total)} VNĐ
+                </Typography>
+              </Box>
+            </Box>
+          </Paper>
+        </Box>
+      </DialogContent>
 
-                      {/* Phí ship */}
-                      <tr className="summary-row">
-                        <td colSpan="3" className="text-right">
-                          <strong>Phí vận chuyển:</strong>
-                        </td>
-                        <td>
-                          <strong>
-                            {(order.shippingInfo.fee || 0).toLocaleString(
-                              "vi-VN"
-                            )}{" "}
-                            VNĐ
-                          </strong>
-                        </td>
-                      </tr>
-
-                      {/* Giảm giá mã */}
-                      {order.discountUsed && this.getDiscountAmount() > 0 && (
-                        <tr className="summary-row">
-                          <td colSpan="3" className="text-right">
-                            <strong>
-                              Giảm giá mã{" "}
-                              {order.discountUsed.type === "percentage"
-                                ? `(${order.discountUsed.value}%)`
-                                : ""}
-                              :
-                            </strong>
-                          </td>
-                          <td className="discount-amount">
-                            <strong>
-                              -
-                              {this.getDiscountAmount().toLocaleString("vi-VN")}{" "}
-                              VNĐ
-                            </strong>
-                          </td>
-                        </tr>
-                      )}
-
-                      {/* Điểm sử dụng */}
-                      {order.pointUsed > 0 && (
-                        <tr className="summary-row">
-                          <td colSpan="3" className="text-right">
-                            <strong>Điểm sử dụng:</strong>
-                          </td>
-                          <td className="discount-amount">
-                            <strong>
-                              -{order.pointUsed.toLocaleString("vi-VN")} VNĐ
-                            </strong>
-                          </td>
-                        </tr>
-                      )}
-
-                      {/* Tổng cộng */}
-                      <tr className="total-row">
-                        <td colSpan="3" className="text-right">
-                          <strong>Tổng cộng:</strong>
-                        </td>
-                        <td>
-                          <strong className="total-amount">
-                            {this.calculateTotal().toLocaleString("vi-VN")} VNĐ
-                          </strong>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="dialog-actions">
-            <button className="btn btn-primary" onClick={onClose}>
-              Đóng
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={onClose} variant="contained">
+          Đóng
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 }
-
-export default OrderDetailsDialog;

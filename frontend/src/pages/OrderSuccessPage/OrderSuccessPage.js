@@ -15,14 +15,13 @@ import {
   CircularProgress,
   Snackbar,
 } from "@mui/material";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
 import ErrorIcon from "@mui/icons-material/Error";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PaymentIcon from "@mui/icons-material/Payment";
 import PersonIcon from "@mui/icons-material/Person";
 import ReceiptIcon from "@mui/icons-material/Receipt";
-import axios from "axios";
 import "./OrderSuccessPage.css";
 import * as OrderService from "../../services/OrderService";
 function OrderSuccessPage({ updateCartData }) {

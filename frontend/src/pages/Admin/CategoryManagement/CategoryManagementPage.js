@@ -2,26 +2,23 @@ import React, { useState, useEffect } from "react";
 import {
   Box,
   Typography,
+  Button,
+  TableContainer,
   Table,
   TableHead,
   TableRow,
   TableCell,
   TableBody,
-  TableContainer,
   Paper,
   IconButton,
-  Button,
-  Snackbar,
-  Alert,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
-  InputLabel,
+  Snackbar,
+  Alert,
+  TablePagination,
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import {
@@ -31,263 +28,210 @@ import {
   updateCategory,
 } from "../../../services/AdminService/categoryService";
 
-export default function CategoryManagementPage() {
+export default function CategoryManagement() {
   const [categories, setCategories] = useState([]);
   const [alert, setAlert] = useState({
     open: false,
     message: "",
     severity: "info",
   });
-  const [openDialog, setOpenDialog] = useState(false);
-  const [mode, setMode] = useState("add");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [categoryName, setCategoryName] = useState("");
-  const [editedName, setEditedName] = useState("");
-  const [nameError, setNameError] = useState("");
+  const [dialog, setDialog] = useState({ open: false, mode: "add", id: "" });
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const fetchCategories = async () => {
+  const fetchAll = async () => {
     try {
       const data = await getCategories();
       setCategories(data);
     } catch {
-      handleAlert("Lỗi tải danh mục", "error");
+      showAlert("Lỗi tải danh mục", "error");
     }
   };
 
+  // Sửa ở đây: bọc fetchAll vào callback, không để useEffect trả về Promise
   useEffect(() => {
-    fetchCategories();
+    fetchAll();
   }, []);
 
-  const handleAlert = (message, severity = "info") => {
-    setAlert({ open: true, message, severity });
-  };
+  const showAlert = (msg, sev = "info") =>
+    setAlert({ open: true, message: msg, severity: sev });
   const closeAlert = () => setAlert((a) => ({ ...a, open: false }));
 
-  const openMode = (m, id = "") => {
-    setMode(m);
-    setSelectedCategory(id);
-    setOpenDialog(true);
-    setCategoryName("");
-    setEditedName("");
-    setNameError("");
-  };
-
-  const closeDialog = () => {
-    setOpenDialog(false);
-    setNameError("");
-  };
-
-  const checkDuplicate = (name) =>
-    categories.some(
-      (c) =>
-        c.name.toLowerCase() === name.toLowerCase() &&
-        (mode !== "edit" || c._id !== selectedCategory)
+  const open = (mode, id = "") => {
+    setDialog({ open: true, mode, id });
+    setName(
+      mode === "edit" ? categories.find((c) => c._id === id)?.name || "" : ""
     );
+    setError("");
+  };
+  const closeDialog = () => setDialog((d) => ({ ...d, open: false }));
 
-  const validate = (name) => {
-    if (!name.trim()) return "Tên không được để trống";
-    if (name.trim().length < 2) return "Phải ít nhất 2 ký tự";
-    if (name.trim().length > 50) return "Không quá 50 ký tự";
-    if (checkDuplicate(name)) return "Tên đã tồn tại";
+  const validate = (v) => {
+    if (!v.trim()) return "Trống không hợp lệ";
+    if (v.trim().length < 2) return "Phải ≥2 ký tự";
+    if (v.trim().length > 50) return "≤50 ký tự";
+    if (
+      categories.some(
+        (c) =>
+          c.name.toLowerCase() === v.trim().toLowerCase() &&
+          !(dialog.mode === "edit" && c._id === dialog.id)
+      )
+    )
+      return "Đã tồn tại";
     return "";
   };
 
-  const handleAdd = async () => {
-    const err = validate(categoryName);
-    if (err) return setNameError(err);
+  const handleSave = async () => {
+    const err = validate(name);
+    if (err) return setError(err);
     try {
-      await createCategory(categoryName.trim());
-      handleAlert("Thêm thành công", "success");
-      fetchCategories();
-      closeDialog();
-    } catch {
-      handleAlert("Lỗi thêm danh mục", "error");
-    }
-  };
+      if (dialog.mode === "add") await createCategory(name.trim());
+      else if (dialog.mode === "edit")
+        await updateCategory(dialog.id, name.trim());
+      else if (dialog.mode === "delete") await deleteCategory(dialog.id);
 
-  const handleEdit = async () => {
-    if (!selectedCategory) return handleAlert("Chọn danh mục trước", "warning");
-    const err = validate(editedName);
-    if (err) return setNameError(err);
-    try {
-      await updateCategory(selectedCategory, editedName.trim());
-      handleAlert("Cập nhật thành công", "success");
-      fetchCategories();
+      showAlert(
+        dialog.mode === "add"
+          ? "Thêm thành công"
+          : dialog.mode === "edit"
+          ? "Cập nhật thành công"
+          : "Xóa thành công",
+        "success"
+      );
+      fetchAll();
       closeDialog();
     } catch {
-      handleAlert("Lỗi cập nhật", "error");
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!selectedCategory) return handleAlert("Chọn danh mục trước", "warning");
-    try {
-      await deleteCategory(selectedCategory);
-      handleAlert("Xóa thành công", "success");
-      fetchCategories();
-      closeDialog();
-    } catch {
-      handleAlert("Lỗi xóa", "error");
+      showAlert("Lỗi thao tác", "error");
     }
   };
 
   return (
-    <Box p={3}>
-      <Box display="flex" justifyContent="space-between" mb={2}>
+    <Box maxWidth={1200} mx="auto" p={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <Typography variant="h4">Quản lý danh mục</Typography>
-        <Button variant="contained" onClick={() => openMode("add")}>
+        <Button variant="contained" onClick={() => open("add")}>
           Thêm danh mục
         </Button>
       </Box>
 
-      <TableContainer component={Paper}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}
+      >
         <Table>
-          <TableHead>
-            <TableRow
-              sx={{
-                background: "#313E4E",
-              }}
-            >
-              <TableCell sx={{ color: "white" }}>Tên</TableCell>
-              <TableCell align="right" sx={{ color: "white" }}>
+          <TableHead sx={{ backgroundColor: "#2c3e50" }}>
+            <TableRow>
+              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>Tên</TableCell>
+              <TableCell align="right" sx={{ color: "#fff", fontWeight: 700 }}>
                 Hành động
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {categories.map((c) => (
-              <TableRow key={c._id}>
-                <TableCell>{c.name}</TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    size="small"
-                    onClick={() => openMode("edit", c._id)}
-                  >
-                    <Edit fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => openMode("delete", c._id)}
-                  >
-                    <Delete fontSize="small" />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {categories
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((c) => (
+                <TableRow
+                  key={c._id}
+                  sx={{
+                    "&:nth-of-type(odd)": { backgroundColor: "#f9f9f9" },
+                    "&:hover": { backgroundColor: "#f0f0f0" },
+                  }}
+                >
+                  <TableCell>{c.name}</TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      onClick={() => open("edit", c._id)}
+                    >
+                      <Edit fontSize="small" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => open("delete", c._id)}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
+
+        <TablePagination
+          component="div"
+          count={categories.length}
+          page={page}
+          rowsPerPage={rowsPerPage}
+          onPageChange={(_, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(+e.target.value);
+            setPage(0);
+          }}
+          rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: "1px solid #e0e0e0",
+            "& .MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+              { fontWeight: 500 },
+          }}
+        />
       </TableContainer>
 
-      <Dialog open={openDialog} onClose={closeDialog} fullWidth maxWidth="sm">
+      <Dialog open={dialog.open} onClose={closeDialog} fullWidth maxWidth="sm">
         <DialogTitle>
-          {mode === "add"
+          {dialog.mode === "add"
             ? "Thêm danh mục"
-            : mode === "edit"
+            : dialog.mode === "edit"
             ? "Sửa danh mục"
             : "Xóa danh mục"}
         </DialogTitle>
         <DialogContent>
-          {mode === "add" && (
+          {(dialog.mode === "add" || dialog.mode === "edit") && (
             <TextField
               fullWidth
-              label="Tên danh mục"
-              value={categoryName}
+              label="Tên"
+              value={name}
               onChange={(e) => {
-                setCategoryName(e.target.value);
-                setNameError(validate(e.target.value));
+                setName(e.target.value);
+                setError(validate(e.target.value));
               }}
               margin="dense"
-              error={!!nameError}
-              helperText={nameError}
+              error={!!error}
+              helperText={error}
             />
           )}
-
-          {mode === "edit" && (
-            <>
-              <FormControl fullWidth margin="dense">
-                <InputLabel>Chọn danh mục</InputLabel>
-                <Select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  label="Chọn danh mục"
-                >
-                  {categories.map((c) => (
-                    <MenuItem key={c._id} value={c._id}>
-                      {c.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <TextField
-                fullWidth
-                label="Tên mới"
-                value={editedName}
-                onChange={(e) => {
-                  setEditedName(e.target.value);
-                  setNameError(validate(e.target.value));
-                }}
-                margin="dense"
-                error={!!nameError}
-                helperText={nameError}
-                disabled={!selectedCategory}
-              />
-            </>
-          )}
-
-          {mode === "delete" && (
-            <FormControl fullWidth margin="dense">
-              <InputLabel>Chọn để xóa</InputLabel>
-              <Select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                label="Chọn để xóa"
-              >
-                {categories.map((c) => (
-                  <MenuItem key={c._id} value={c._id}>
-                    {c.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+          {dialog.mode === "delete" && (
+            <Typography>Bạn có chắc muốn xóa mục này không?</Typography>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeDialog}>Hủy</Button>
-          {mode === "add" && (
-            <Button
-              variant="contained"
-              onClick={handleAdd}
-              disabled={!categoryName.trim() || !!nameError}
-            >
-              Thêm
-            </Button>
-          )}
-          {mode === "edit" && (
-            <Button
-              variant="contained"
-              onClick={handleEdit}
-              disabled={!selectedCategory || !editedName.trim() || !!nameError}
-            >
-              Cập nhật
-            </Button>
-          )}
-          {mode === "delete" && (
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleDelete}
-              disabled={!selectedCategory}
-            >
-              Xóa
-            </Button>
-          )}
+          <Button
+            variant="contained"
+            color={dialog.mode === "delete" ? "error" : "primary"}
+            onClick={handleSave}
+            disabled={dialog.mode !== "delete" && (!name.trim() || !!error)}
+          >
+            {dialog.mode === "add"
+              ? "Thêm"
+              : dialog.mode === "edit"
+              ? "Cập nhật"
+              : "Xóa"}
+          </Button>
         </DialogActions>
       </Dialog>
 
       <Snackbar
         open={alert.open}
-        autoHideDuration={4000}
+        autoHideDuration={3000}
         onClose={closeAlert}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
       >

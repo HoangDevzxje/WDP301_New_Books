@@ -21,7 +21,7 @@ import {
     Collapse,
     IconButton,
 } from "@mui/material";
-import { ExpandMore, ExpandLess, Search } from "@mui/icons-material";
+import { ExpandMore, ExpandLess } from "@mui/icons-material";
 import CloseIcon from '@mui/icons-material/Close';
 import "./ShopAll.css";
 import BookCard from "../../components/BookCard/BookCard";
@@ -47,17 +47,17 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
     const loadBooks = 8;
     const [hoveredId, setHoveredId] = useState(null);
     const [selectedFilter, setSelectedFilter] = useState("");
-    
+
     const [priceRange, setPriceRange] = useState([0, 1000000]);
     const [tempPriceRange, setTempPriceRange] = useState([0, 1000000]);
     const [minPrice, setMinPrice] = useState(0);
     const [maxPrice, setMaxPrice] = useState(1000000);
-    
+
     const [authors, setAuthors] = useState([]);
     const [selectedAuthors, setSelectedAuthors] = useState([]);
     const [authorSearchTerm, setAuthorSearchTerm] = useState("");
     const [showAllAuthors, setShowAllAuthors] = useState(false);
-    
+
     const [expandedSections, setExpandedSections] = useState({
         categories: true,
         price: true,
@@ -96,7 +96,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
         }
         setDisplayedBooks(sortedBooks);
     }, [sortOption]);
-    
+
     const fetchCategories = async () => {
         try {
             const response = await CategoryService.getCategories();
@@ -115,14 +115,14 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
             const response = await BookService.getBooks();
             setBooks(response.data);
             setFilteredBooks(response.data);
-            
+
             const uniqueAuthors = [...new Set(response.data.map(book => book.author).filter(Boolean))];
             setAuthors(uniqueAuthors.sort());
-            
+
             const prices = response.data.map(book => book.price).filter(price => price !== undefined);
             const minBookPrice = Math.min(...prices);
             const maxBookPrice = Math.max(...prices);
-            
+
             setMinPrice(minBookPrice);
             setMaxPrice(maxBookPrice);
             setPriceRange([minBookPrice, maxBookPrice]);
@@ -161,10 +161,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
             setBooks(response.data);
             setFilteredBooks(response.data);
             setSelectedFilter(type);
-            
+
             const uniqueAuthors = [...new Set(response.data.map(book => book.author).filter(Boolean))];
             setAuthors(uniqueAuthors.sort());
-            
+
             const prices = response.data.map(book => book.price).filter(price => price !== undefined);
             if (prices.length > 0) {
                 const minBookPrice = Math.min(...prices);
@@ -186,7 +186,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
         }
     };
 
-    const fetchWishlist = async() => {
+    const fetchWishlist = async () => {
         try {
             const response = await WishlistService.getWishlist();
             const wishlistIds = response.data.wishlist.map(item => item._id);
@@ -200,7 +200,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
     useEffect(() => {
         fetchCategories();
         fetchWishlist();
-        
+
         // Kiểm tra nếu có filter từ navigation
         const filterFromState = location.state?.selectedFilter;
         if (filterFromState) {
@@ -220,7 +220,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
     // Xử lý khi location.state có selectedCategoryId
     useEffect(() => {
         if (location.state?.selectedCategoryId) {
-            setSelectedCategories([location.state.selectedCategoryId]); 
+            setSelectedCategories([location.state.selectedCategoryId]);
         }
     }, [location.state?.selectedCategoryId]);
 
@@ -239,7 +239,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
             );
         }
 
-        filtered = filtered.filter(book => 
+        filtered = filtered.filter(book =>
             book.price >= priceRange[0] && book.price <= priceRange[1]
         );
 
@@ -312,10 +312,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
         setTempPriceRange([minPrice, maxPrice]);
         setAuthorSearchTerm("");
         setSortOption("default");
-        setNotifications(prev => [...prev, { 
-            id: Date.now(), 
-            message: "Đã bỏ chọn tất cả bộ lọc", 
-            severity: "success" 
+        setNotifications(prev => [...prev, {
+            id: Date.now(),
+            message: "Đã bỏ chọn tất cả bộ lọc",
+            severity: "success"
         }]);
     };
 
@@ -357,8 +357,8 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
         setHoveredId(null);
     };
 
-    const hasActiveFilters = selectedCategories.length > 0 || selectedAuthors.length > 0 || 
-                           priceRange[0] !== minPrice || priceRange[1] !== maxPrice;
+    const hasActiveFilters = selectedCategories.length > 0 || selectedAuthors.length > 0 ||
+        priceRange[0] !== minPrice || priceRange[1] !== maxPrice;
 
     return (
         <>
@@ -370,13 +370,13 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             <Typography variant="h4" className="search-results-title">
                                 Lọc Sản Phẩm
                             </Typography>
-                        
+
                             <Divider className="categories-divider" />
 
                             {hasActiveFilters && (
-                                <Button 
-                                    variant="outlined" 
-                                    size="small" 
+                                <Button
+                                    variant="outlined"
+                                    size="small"
                                     onClick={clearAllFilters}
                                     sx={{ mb: 2, width: '100%' }}
                                 >
@@ -385,10 +385,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             )}
 
                             <Box>
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'space-between',
                                         cursor: 'pointer',
                                         mb: 1
@@ -438,10 +438,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             <Divider className="categories-divider" />
 
                             <Box>
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'space-between',
                                         cursor: 'pointer',
                                         mb: 1
@@ -476,7 +476,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                                                 InputProps={{
                                                     endAdornment: <InputAdornment position="end">đ</InputAdornment>,
                                                 }}
-                                                sx={{ 
+                                                sx={{
                                                     flex: 1,
                                                     '& .MuiInputLabel-root': {
                                                         fontSize: '0.75rem'
@@ -495,7 +495,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                                                 InputProps={{
                                                     endAdornment: <InputAdornment position="end">đ</InputAdornment>,
                                                 }}
-                                                sx={{ 
+                                                sx={{
                                                     flex: 1,
                                                     '& .MuiInputLabel-root': {
                                                         fontSize: '0.75rem'
@@ -513,10 +513,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             <Divider className="categories-divider" />
 
                             <Box>
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'space-between',
                                         cursor: 'pointer',
                                         mb: 1
@@ -532,32 +532,32 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                                 <Collapse in={expandedSections.authors}>
                                     <Box>
                                         <TextField
-                                        size="small"
-                                        placeholder="Tìm tác giả..."
-                                        value={authorSearchTerm}
-                                        onChange={(e) => setAuthorSearchTerm(e.target.value)}
-                                        InputProps={{
-                                            startAdornment: (
-                                            <InputAdornment position="start">
-                                                <SearchIcon fontSize="small" />
-                                            </InputAdornment>
-                                            ),
-                                            endAdornment: authorSearchTerm && (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                size="small"
-                                                onClick={() => setAuthorSearchTerm("")}
-                                                edge="end"
-                                                >
-                                                <CloseIcon fontSize="small" />
-                                                </IconButton>
-                                            </InputAdornment>
-                                            ),
-                                        }}
-                                        sx={{ width: '100%', mb: 1 }}
+                                            size="small"
+                                            placeholder="Tìm tác giả..."
+                                            value={authorSearchTerm}
+                                            onChange={(e) => setAuthorSearchTerm(e.target.value)}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <SearchIcon fontSize="small" />
+                                                    </InputAdornment>
+                                                ),
+                                                endAdornment: authorSearchTerm && (
+                                                    <InputAdornment position="end">
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => setAuthorSearchTerm("")}
+                                                            edge="end"
+                                                        >
+                                                            <CloseIcon fontSize="small" />
+                                                        </IconButton>
+                                                    </InputAdornment>
+                                                ),
+                                            }}
+                                            sx={{ width: '100%', mb: 1 }}
                                         />
 
-                                        
+
                                         <FormGroup className="categories-form-group">
                                             {displayedAuthors.map((author) => (
                                                 <FormControlLabel
@@ -578,15 +578,15 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                                                 />
                                             ))}
                                         </FormGroup>
-                                        
+
                                         {filteredAuthors.length > 10 && (
                                             <Button
                                                 size="small"
                                                 onClick={() => setShowAllAuthors(!showAllAuthors)}
-                                                sx={{ fontSize: '0.75rem', color: '#c2894cff' , textTransform: 'none' }}
+                                                sx={{ fontSize: '0.75rem', color: '#c2894cff', textTransform: 'none' }}
                                             >
-                                                {showAllAuthors ? 
-                                                    `Hiển thị ít hơn` : 
+                                                {showAllAuthors ?
+                                                    `Hiển thị ít hơn` :
                                                     `Hiển thị thêm ${filteredAuthors.length - 10} tác giả`
                                                 }
                                             </Button>
@@ -598,10 +598,10 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             <Divider className="categories-divider" />
 
                             <Box>
-                                <Box 
-                                    sx={{ 
-                                        display: 'flex', 
-                                        alignItems: 'center', 
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
                                         justifyContent: 'space-between',
                                         cursor: 'pointer',
                                         mb: 1
@@ -662,7 +662,7 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                             )}
                         </Typography>
 
-                        <Divider className="books-divider"/>
+                        <Divider className="books-divider" />
                         <Box className="books-filters">
                             <Box>
                                 <Button
@@ -757,15 +757,15 @@ const ShopAll = ({ updateWishlistCount, updateCartData }) => {
                         prev.filter(n => n.id !== notification.id)
                     )}
                 >
-                    <Alert                
-                        severity={notification.severity || 'info'}                
-                        onClose={() => setNotifications(prev =>                
+                    <Alert
+                        severity={notification.severity || 'info'}
+                        onClose={() => setNotifications(prev =>
                             prev.filter(n => n.id !== notification.id)
-                        )}                   
+                        )}
                     >
                         {notification.message}
                     </Alert>
-                </Snackbar>          
+                </Snackbar>
             ))}
         </>
     );
