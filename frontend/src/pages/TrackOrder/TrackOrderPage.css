@@ -22,6 +22,15 @@
   font-size: 1rem;
   color: #7f8c8d;
 }
+.cod-label {
+  color: #444;
+  font-weight: 500;
+}
+
+.paid-label {
+  color: green;
+  font-weight: 500;
+}
 
 /* Loading */
 .loading-spinner {
@@ -42,7 +51,7 @@
   margin-bottom: 1rem;
 }
 .pay-now-button2 {
-  background-color:  #1084ff;
+  background-color: #1084ff;
   color: white;
   border: none;
   width: 100%;
@@ -61,17 +70,16 @@
   background-color: #f50018;
   color: white;
   width: 100%;
-   border: none;
+  border: none;
   padding: 12px;
   cursor: pointer;
   border-radius: 8px;
   font-size: 0.9rem;
   transition: all 0.3s ease;
-} 
+}
 
 .cancel-order-button2:hover {
   background-color: #9c0010;
-  
 }
 
 @keyframes spin {

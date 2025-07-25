@@ -100,8 +100,8 @@
   font-size: 0.95rem;
 }
 .reviews-table-header {
-  background: linear-gradient(135deg, #495057, #343a40);
-  color: #fff;
+  background: #eef2f6;
+  color: rgba(0, 0, 0, 0.87);
   font-weight: 600;
 }
 .reviews-table-header th {

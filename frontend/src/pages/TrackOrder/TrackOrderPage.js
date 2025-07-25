@@ -20,47 +20,61 @@ const TrackOrderPage = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
 
-  const canReturnOrder = (tracking) => {
-    if (!tracking) return false;
+  const handleReturnGHN = async (orderId, trackingStatus) => {
+    const status = trackingStatus?.status?.toLowerCase?.();
+    const returnableStatuses = ["storing", "ready_to_pick", "ready_to_deliver"];
 
-    const status = tracking.status?.toLowerCase() || "";
-    const now = dayjs();
-
-    if (status === "delivered") {
-      const deliveredAt = tracking.delivered_time
-        ? dayjs(tracking.delivered_time)
-        : null;
-
-      // Nếu có ngày giao hàng: chỉ không cho hoàn nếu đã quá 30 ngày
-      if (deliveredAt) {
-        return now.diff(deliveredAt, "day") <= 30;
+    if (returnableStatuses.includes(status)) {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: "Đang gửi yêu cầu hoàn đơn...",
+          severity: "info",
+        },
+      ]);
+      try {
+        await returnOrder(orderId);
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            message: "Đã gửi yêu cầu hoàn hàng thành công.",
+            severity: "success",
+          },
+        ]);
+      } catch (err) {
+        setNotifications((prev) => [
+          ...prev,
+          {
+            id: Date.now(),
+            message: err.response?.data?.message || "Không thể hoàn đơn.",
+            severity: "error",
+          },
+        ]);
       }
-
-      // Nếu chưa có delivered_time (vừa giao xong, API chưa cập nhật), vẫn cho hoàn
-      return true;
-    }
-
-    if (status === "waiting_to_return") {
-      const waitingAt = tracking.waiting_to_return_at
-        ? dayjs(tracking.waiting_to_return_at)
-        : dayjs(tracking.updated_at); // fallback
-      return now.diff(waitingAt, "hour") <= 72;
-    }
-
-    return false;
-  };
-
-  const handleReturnGHN = async (orderId) => {
-    if (!window.confirm("Xác nhận hoàn đơn hàng này?")) return;
-
-    try {
-      const res = await returnOrder(orderId);
-      alert("Đã gửi yêu cầu hoàn hàng thành công.");
-      // Có thể gọi lại tracking để cập nhật UI
-    } catch (err) {
-      alert(err.response?.data?.message || "Không thể hoàn đơn.");
+    } else if (status === "delivered") {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message:
+            "Đơn hàng đã được giao. Vui lòng liên hệ +84 866 052 283 để được hỗ trợ hoàn đơn.",
+          severity: "warning",
+        },
+      ]);
+    } else {
+      setNotifications((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          message: `Không thể hoàn đơn ở trạng thái hiện tại: ${status}`,
+          severity: "warning",
+        },
+      ]);
     }
   };
+
   useEffect(() => {
     (async () => {
       try {
@@ -214,22 +228,46 @@ const TrackOrderPage = () => {
                     )}
                   </td>
                   <td>
-                    {canReturnOrder(ghnTrackingMap[o._id]) ? (
-                      <button
-                        className="return-button"
-                        onClick={() => handleReturnGHN(o._id)}
-                      >
-                        Hoàn đơn
-                      </button>
-                    ) : (
-                      <span className="disabled-return">Không thể hoàn</span>
-                    )}
+                    {(() => {
+                      const tracking = ghnTrackingMap[o._id];
+                      const status = tracking?.status?.toLowerCase();
+                      const allowReturn = [
+                        "storing",
+                        "ready_to_pick",
+                        "ready_to_deliver",
+                        "delivered",
+                      ].includes(status);
+
+                      if (!status || !allowReturn) {
+                        return (
+                          <span className="disabled-return">
+                            Không thể hoàn
+                          </span>
+                        );
+                      }
+
+                      return (
+                        <button
+                          className="return-button"
+                          onClick={() => handleReturnGHN(o._id, tracking)}
+                        >
+                          Hoàn đơn
+                        </button>
+                      );
+                    })()}
                   </td>
+
                   <td>
-                    {o.paymentMethod === "Online" &&
-                    o.paymentStatus === "Pending" &&
-                    o.orderStatus === "Pending" &&
-                    new Date(o.expireAt) > new Date() ? (
+                    {o.paymentMethod === "COD" ? (
+                      <span className="cod-label">
+                        Thanh toán khi nhận hàng
+                      </span>
+                    ) : o.paymentStatus === "Completed" ? (
+                      <span className="paid-label">Đã thanh toán</span>
+                    ) : o.paymentMethod === "Online" &&
+                      o.paymentStatus === "Pending" &&
+                      o.orderStatus === "Pending" &&
+                      new Date(o.expireAt) > new Date() ? (
                       <button
                         className="pay-now-button2"
                         onClick={async () => {
@@ -240,7 +278,14 @@ const TrackOrderPage = () => {
                               window.location.href = res.data.paymentUrl;
                             }
                           } catch (err) {
-                            alert("Không thể tạo thanh toán.");
+                            setNotifications((prev) => [
+                              ...prev,
+                              {
+                                id: Date.now(),
+                                message: "Không thể tạo thanh toán.",
+                                severity: "error",
+                              },
+                            ]);
                           }
                         }}
                       >
