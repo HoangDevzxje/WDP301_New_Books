@@ -78,7 +78,7 @@ const createOrder = async (req, res) => {
       paymentMethod,
       discountUsed,
       pointUsed,
-      paymentStatus: paymentMethod === "COD" ? "Pending" : "Completed",
+      paymentStatus: "Pending",
       orderStatus: "Pending",
     });
 
@@ -155,9 +155,29 @@ async function getOrderDetails(req, res) {
     return res.status(500).json({ message: error.message });
   }
 }
+async function cancelOrder(req, res) {
+  try {
+    const order = await Order.findById(req.params.id);
+    if (!order)
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+
+    if (order.paymentStatus !== "Pending" || order.orderStatus !== "Pending") {
+      return res.status(400).json({ message: "Đơn hàng không thể hủy" });
+    }
+
+    order.orderStatus = "Cancelled";
+    await order.save();
+
+    res.json({ message: "Đã hủy đơn hàng" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 
 module.exports = {
   createOrder,
   getMyOrders,
   getOrderDetails,
+  cancelOrder,
 };

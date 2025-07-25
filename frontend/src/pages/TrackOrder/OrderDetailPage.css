@@ -57,6 +57,15 @@
   padding-bottom: 0.5rem;
   border-bottom: 1px solid #eee;
 }
+.order-warning-banner {
+  background-color: #fff3cd;
+  border: 1px solid #ffeeba;
+  color: #856404;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
 .order-info-card,
 .tracking-status-card,
 .shipping-info-card,
@@ -297,4 +306,23 @@
     justify-self: start;
     text-align: left;
   }
+}
+.pay-now-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 4px;
+}
+
+.cancel-order-button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin: 4px;
 }

@@ -20,6 +20,11 @@ export const createPayment = async (orderId) => {
   return response;
 };
 
+export const cancelOrder = async (orderId) => {
+  const res = await axiosInstance.put(`/order/cancel/${orderId}`);
+  return res;
+};
+
 export const getPaymentReturn = async (queryString = "") => {
   const params = Object.fromEntries(new URLSearchParams(queryString));
   const response = await axiosInstance.get("/payment/return", {
@@ -30,5 +35,5 @@ export const getPaymentReturn = async (queryString = "") => {
 // Lấy chi tiết trạng thái GHN cho 1 đơn
 export const getGhnTracking = async (orderId) => {
   const response = await axiosInstance.get(`/ghn/tracking/${orderId}`);
-  return response.data.data; 
+  return response.data.data;
 };

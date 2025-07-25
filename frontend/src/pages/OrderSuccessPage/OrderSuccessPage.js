@@ -1,7 +1,19 @@
 import React, { useState, useEffect } from "react";
 import {
-  Container, Typography, Button, Box, Paper, Grid, Divider, Card, CardContent,
-  Avatar, Chip, Alert, CircularProgress, Snackbar
+  Container,
+  Typography,
+  Button,
+  Box,
+  Paper,
+  Grid,
+  Divider,
+  Card,
+  CardContent,
+  Avatar,
+  Chip,
+  Alert,
+  CircularProgress,
+  Snackbar,
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
@@ -17,13 +29,26 @@ function OrderSuccessPage({ updateCartData }) {
   const [paymentStatus, setPaymentStatus] = useState({
     isProcessing: true,
     success: false,
-    message: ""
+    message: "",
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
-    const loadOrderDetails = () => {
+    const loadOrderDetails = async () => {
+      const queryParams = new URLSearchParams(location.search);
+      const orderId = queryParams.get("vnp_OrderInfo");
+
+      if (orderId) {
+        try {
+          const res = await OrderService.getOrderDetails(orderId);
+          setOrderDetails(res.data?.data);
+          return res.data?.data;
+        } catch (err) {
+          console.error("Không tìm thấy đơn từ vnp_OrderInfo:", err);
+        }
+      }
+
       const storedOrder = localStorage.getItem("latestOrder");
       if (storedOrder) {
         try {
@@ -31,9 +56,10 @@ function OrderSuccessPage({ updateCartData }) {
           setOrderDetails(parsedOrder);
           return parsedOrder;
         } catch (err) {
-          console.error("Error parsing stored order:", err);
+          console.error("Lỗi khi đọc localStorage.latestOrder:", err);
         }
       }
+
       return null;
     };
 
@@ -46,7 +72,11 @@ function OrderSuccessPage({ updateCartData }) {
         const orderData = loadOrderDetails();
         if (vnpResponseCode) {
           if (orderId) {
-            await confirmPaymentWithBackend(vnpResponseCode, orderId, queryParams);
+            await confirmPaymentWithBackend(
+              vnpResponseCode,
+              orderId,
+              queryParams
+            );
           } else {
             await handlePaymentResponse(vnpResponseCode);
           }
@@ -54,14 +84,14 @@ function OrderSuccessPage({ updateCartData }) {
           setPaymentStatus({
             isProcessing: false,
             success: true,
-            message: "Đơn hàng của bạn đã được đặt thành công!"
+            message: "Đơn hàng của bạn đã được đặt thành công!",
           });
           setSnackbarOpen(true);
         } else {
           setPaymentStatus({
             isProcessing: false,
             success: false,
-            message: "Không tìm thấy thông tin đơn hàng."
+            message: "Không tìm thấy thông tin đơn hàng.",
           });
           setSnackbarOpen(true);
         }
@@ -70,7 +100,7 @@ function OrderSuccessPage({ updateCartData }) {
         setPaymentStatus({
           isProcessing: false,
           success: false,
-          message: "Đã xảy ra lỗi khi xử lý thông tin thanh toán."
+          message: "Đã xảy ra lỗi khi xử lý thông tin thanh toán.",
         });
         setSnackbarOpen(true);
       }
@@ -83,9 +113,15 @@ function OrderSuccessPage({ updateCartData }) {
     processPaymentResponse();
   }, [location.search, updateCartData]);
 
-  const confirmPaymentWithBackend = async (responseCode, orderId, queryParams) => {
+  const confirmPaymentWithBackend = async (
+    responseCode,
+    orderId,
+    queryParams
+  ) => {
     try {
-      const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
+      const access_token =
+        localStorage.getItem("access_token") ||
+        sessionStorage.getItem("access_token");
 
       if (access_token && orderId) {
         // const response = await axios.get(
@@ -95,8 +131,7 @@ function OrderSuccessPage({ updateCartData }) {
         //   }
         // );
 
-        const response = OrderService.getPaymentReturn(location.search);
-
+        const response = await OrderService.getPaymentReturn(location.search);
 
         if (response.data.status === "success") {
           try {
@@ -104,7 +139,10 @@ function OrderSuccessPage({ updateCartData }) {
 
             if (orderResponse.data) {
               setOrderDetails(orderResponse.data);
-              localStorage.setItem("latestOrder", JSON.stringify(orderResponse.data));
+              localStorage.setItem(
+                "latestOrder",
+                JSON.stringify(orderResponse.data)
+              );
             }
           } catch (orderError) {
             console.error("Error fetching order details:", orderError);
@@ -113,13 +151,14 @@ function OrderSuccessPage({ updateCartData }) {
           setPaymentStatus({
             isProcessing: false,
             success: true,
-            message: "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận."
+            message:
+              "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.",
           });
         } else {
           setPaymentStatus({
             isProcessing: false,
             success: false,
-            message: response.data.message || "Thanh toán không thành công."
+            message: response.data.message || "Thanh toán không thành công.",
           });
         }
         setSnackbarOpen(true);
@@ -127,7 +166,6 @@ function OrderSuccessPage({ updateCartData }) {
       }
 
       handlePaymentResponse(responseCode);
-
     } catch (error) {
       console.error("Error confirming payment with backend:", error);
       handlePaymentResponse(responseCode);
@@ -136,26 +174,29 @@ function OrderSuccessPage({ updateCartData }) {
 
   const handlePaymentResponse = async (responseCode) => {
     try {
-
       if (responseCode === "00") {
         setPaymentStatus({
           isProcessing: false,
           success: true,
-          message: "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận."
+          message: "Thanh toán thành công! Đơn hàng của bạn đã được xác nhận.",
         });
         setSnackbarOpen(true);
       } else {
-        let errorMessage = "Thanh toán không thành công. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.";
+        let errorMessage =
+          "Thanh toán không thành công. Vui lòng thử lại hoặc chọn phương thức thanh toán khác.";
 
         switch (responseCode) {
           case "24":
-            errorMessage = "Giao dịch không thành công do khách hàng hủy giao dịch";
+            errorMessage =
+              "Giao dịch không thành công do khách hàng hủy giao dịch";
             break;
           case "09":
-            errorMessage = "Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking";
+            errorMessage =
+              "Thẻ/Tài khoản của khách hàng chưa đăng ký dịch vụ InternetBanking";
             break;
           case "10":
-            errorMessage = "Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần";
+            errorMessage =
+              "Khách hàng xác thực thông tin thẻ/tài khoản không đúng quá 3 lần";
             break;
           case "11":
             errorMessage = "Đã hết hạn chờ thanh toán";
@@ -170,7 +211,7 @@ function OrderSuccessPage({ updateCartData }) {
         setPaymentStatus({
           isProcessing: false,
           success: false,
-          message: errorMessage
+          message: errorMessage,
         });
         setSnackbarOpen(true);
       }
@@ -179,7 +220,7 @@ function OrderSuccessPage({ updateCartData }) {
       setPaymentStatus({
         isProcessing: false,
         success: false,
-        message: "Đã xảy ra lỗi khi xác minh trạng thái thanh toán."
+        message: "Đã xảy ra lỗi khi xác minh trạng thái thanh toán.",
       });
       setSnackbarOpen(true);
     }
@@ -206,7 +247,12 @@ function OrderSuccessPage({ updateCartData }) {
         <Typography variant="h6" className="not-found-text">
           Không tìm thấy thông tin đơn hàng.
         </Typography>
-        <Button component={Link} to="/" variant="contained" className="continue-shopping-button">
+        <Button
+          component={Link}
+          to="/"
+          variant="contained"
+          className="continue-shopping-button"
+        >
           Quay về trang chủ
         </Button>
       </Container>
@@ -214,7 +260,12 @@ function OrderSuccessPage({ updateCartData }) {
   }
 
   // Calculate subtotal
-  const subtotal = orderDetails.items.reduce((acc, item) => acc + item.book.price * item.quantity, 0);
+  const subtotal = Array.isArray(orderDetails?.items)
+    ? orderDetails.items.reduce(
+        (acc, item) => acc + (item.book?.price || 0) * item.quantity,
+        0
+      )
+    : 0;
 
   return (
     <Box className="order-success-container">
@@ -228,7 +279,9 @@ function OrderSuccessPage({ updateCartData }) {
         <Alert
           onClose={handleSnackbarClose}
           severity={paymentStatus.success ? "success" : "error"}
-          className={`snackbar-alert ${paymentStatus.success ? "success" : "error"}`}
+          className={`snackbar-alert ${
+            paymentStatus.success ? "success" : "error"
+          }`}
         >
           {paymentStatus.message}
         </Alert>
@@ -237,7 +290,11 @@ function OrderSuccessPage({ updateCartData }) {
       <Paper elevation={3} className="order-success-paper">
         {/* Success Header */}
         <Box className="order-success-header">
-          <Avatar className={`order-success-avatar ${paymentStatus.success ? 'success' : 'error'}`}>
+          <Avatar
+            className={`order-success-avatar ${
+              paymentStatus.success ? "success" : "error"
+            }`}
+          >
             {paymentStatus.success ? (
               <CheckIcon sx={{ color: "white", fontSize: 40 }} />
             ) : (
@@ -245,195 +302,18 @@ function OrderSuccessPage({ updateCartData }) {
             )}
           </Avatar>
           <Typography variant="h5" className="order-success-title">
-            {paymentStatus.success ? 'Đặt hàng thành công!' : 'Xác nhận đơn hàng'}
+            {paymentStatus.success
+              ? "Đặt hàng thành công!"
+              : "Xác nhận đơn hàng"}
           </Typography>
           <Typography variant="subtitle1" className="order-success-subtitle">
             {paymentStatus.success
-              ? 'Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ với bạn sớm để xác nhận.'
-              : 'Đơn hàng của bạn thanh toán chưa hoàn tất. Vui lòng thử lại.'}
+              ? "Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ liên hệ với bạn sớm để xác nhận."
+              : "Đơn hàng của bạn vẫn đang chờ thanh toán. Hãy hoàn tất thanh toán trong vòng 3 ngày kể từ ngày đặt hàng để tránh hủy đơn."}
           </Typography>
         </Box>
 
         {/* Main Content - Two Column Layout */}
-        <Grid container spacing={3}>
-          {/* Left Column - Customer & Shipping Information */}
-          <Grid size={{ xs: 12, md: 5 }}>
-            <Card elevation={1} className="order-info-card">
-              <Box className="order-info-header">
-                <PersonIcon className="icon" />
-                <Typography variant="subtitle1">Thông tin đơn hàng</Typography>
-              </Box>
-              <CardContent className="order-info-content">
-                {/* Customer Info */}
-                <Box className="order-info-field">
-                  <Typography variant="body2" className="order-info-label">
-                    Người nhận:
-                  </Typography>
-                  <Typography variant="body1" className="order-info-value">
-                    {orderDetails.shippingInfo.name}
-                  </Typography>
-                </Box>
-
-                <Box className="order-info-field">
-                  <Typography variant="body2" className="order-info-label">
-                    Số điện thoại:
-                  </Typography>
-                  <Typography variant="body1" className="order-info-value">
-                    {orderDetails.shippingInfo.phoneNumber}
-                  </Typography>
-                </Box>
-
-                <Box className="order-info-field">
-                  <Typography variant="body2" className="order-info-label">
-                    Địa chỉ giao hàng:
-                  </Typography>
-                  <Typography variant="body1" className="order-info-value">
-                    {orderDetails.shippingInfo.address}, {orderDetails.shippingInfo.ward}, {orderDetails.shippingInfo.district}, {orderDetails.shippingInfo.province}
-                  </Typography>
-                </Box>
-
-                <Divider className="order-info-divider" />
-
-                {/* Payment & Shipping Method */}
-                <Grid container spacing={2}>
-                  <Grid>
-                    <Box className="payment-method-section">
-                      <PaymentIcon className="payment-method-icon" />
-                      <Typography variant="body2" className="order-info-label">
-                        Phương thức thanh toán:
-                      </Typography>
-                    </Box>
-                    <Box className="payment-method-content">
-                      <Typography variant="body1" className="order-info-value">
-                        {orderDetails.paymentMethod === "Online"
-                          ? "Thanh toán trực tuyến"
-                          : "COD (Thanh toán khi nhận hàng)"}
-                      </Typography>
-                      {orderDetails.paymentMethod === "Online" && (
-                        <Chip
-                          label={paymentStatus.success ? "Đã thanh toán" : "Chưa thanh toán"}
-                          className={`payment-status-chip ${paymentStatus.success ? "success" : "error"}`}
-                        />
-                      )}
-                    </Box>
-                  </Grid>
-
-                  <Grid >
-                    <Box className="shipping-method-section">
-                      <LocalShippingIcon className="shipping-method-icon" />
-                      <Typography variant="body2" className="order-info-label">
-                        Phí vận chuyển:
-                      </Typography>
-                    </Box>
-                    <Box className="shipping-method-content">
-                      <Typography variant="body1" className="order-info-value">
-                        {orderDetails.shippingInfo.fee > 0
-                          ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫`
-                          : "Miễn phí"}
-                      </Typography>
-                    </Box>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </Card>
-          </Grid>
-
-          {/* Right Column - Order Summary with Products */}
-          <Grid size={{ xs: 12, md: 7 }}>
-            <Card elevation={1} className="order-summary-card">
-              <Box className="order-summary-header">
-                <ReceiptIcon className="icon" />
-                <Typography variant="subtitle1">Tổng kết đơn hàng</Typography>
-              </Box>
-              <CardContent sx={{ p: 0 }}>
-                {/* Products List */}
-                <Box className="products-section">
-                  <Typography variant="body2" className="products-label">
-                    Sản phẩm đã đặt:
-                  </Typography>
-                  {orderDetails.items && orderDetails.items.map((item, index) => (
-                    <Box key={index} className="product-item">
-                      <Box className="product-image2">
-                        <img
-                          src={item.book.images}
-                          alt={item.book.title}
-                        />
-                      </Box>
-                      <Box className="product-content">
-                        <Box className="product-details">
-                          <Typography
-                            variant="body2"
-                            className="product-title"
-                            sx={{
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                              textOverflow: "ellipsis",
-                            }}
-                          >
-                            {item.book.title}
-                          </Typography>
-
-                          <Box className="product-quantity-chip">
-                            Số lượng: {item.quantity}
-                          </Box>
-                        </Box>
-                        <Typography variant="body2" className="product-price">
-                          {item.book.price.toLocaleString()}₫
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-
-                {/* Price Summary */}
-                <Box className="price-summary">
-                  <div className="price-row">
-                    <Typography variant="body2" className="price-label">Tạm tính:</Typography>
-                    <Typography variant="body1" className="price-value">
-                      {subtotal.toLocaleString()}₫
-                    </Typography>
-                  </div>
-
-                  <div className="price-row">
-                    <Typography variant="body2" className="price-label">Phí vận chuyển:</Typography>
-                    <Typography variant="body1" className="price-value">
-                      {orderDetails.shippingInfo.fee > 0
-                        ? `${orderDetails.shippingInfo.fee.toLocaleString()}₫`
-                        : "Miễn phí"}
-                    </Typography>
-                  </div>
-
-                  {orderDetails.totalDiscount > 0 && (
-                    <div className="price-row">
-                      <Typography variant="body2" className="price-label">Giảm giá:</Typography>
-                      <Typography variant="body1" className="price-value discount">
-                        -{orderDetails.totalDiscount.toLocaleString()}₫
-                      </Typography>
-                    </div>
-                  )}
-
-                  {orderDetails.pointUsed > 0 && (
-                    <div className="price-row">
-                      <Typography variant="body2" className="price-label">Điểm thưởng:</Typography>
-                      <Typography variant="body1" className="price-value discount">
-                        -{orderDetails.pointUsed.toLocaleString()}₫
-                      </Typography>
-                    </div>
-                  )}
-
-                  <div className="total-row">
-                    <Typography variant="subtitle1" className="total-label">Tổng cộng:</Typography>
-                    <Typography variant="h5" className="total-amount">
-                      {orderDetails.totalAmount.toLocaleString()}₫
-                    </Typography>
-                  </div>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        </Grid>
 
         {/* Action Button - Centered */}
         <Box className="action-button-container">
