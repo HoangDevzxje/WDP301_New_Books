@@ -105,12 +105,11 @@ const BookDetail = ({ updateWishlistCount, updateCartData }) => {
         if (token) {
           FeedbackService.getUserFeedbackForBook(id).then((userReviewResponse) => {
             if (userReviewResponse.data && typeof userReviewResponse.data === 'object') {
-              // Nếu review của user tồn tại, cập nhật state
               const userReview = userReviewResponse.data.book === id ? userReviewResponse.data : null;
               setUserReview(userReview);
               setHasReviewed(userReview ? true : false);
             } else {
-              console.error("Dữ liệu userReview không phải là đối tượng:", userReviewResponse.data);
+              // console.error("Dữ liệu userReview không phải là đối tượng:", userReviewResponse.data);
               setHasReviewed(false);
             }
           })

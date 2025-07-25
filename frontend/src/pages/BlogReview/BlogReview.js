@@ -24,14 +24,12 @@ const BlogReview = () => {
         const extractedBookIds = sortedReviews
           .map(review => review.bookId)
           .filter(bookId => bookId);
-
         const uniqueBookIds = extractedBookIds.filter((bookId, index, arr) => {
           const bookIdValue = bookId._id || bookId;
           return arr.findIndex(item => (item._id || item) === bookIdValue) === index;
         });
 
         setBookIds(uniqueBookIds);
-        console.log('Book IDs extracted:', uniqueBookIds);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -53,9 +51,7 @@ const BlogReview = () => {
           .filter(response => response.status === 'fulfilled')
           .map(response => response.value.data)
           .filter(book => book);
-
         setReviewedBooks(reviewedBooks);
-        console.log('Reviewed books fetched:', reviewedBooks);
 
         const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
         if (access_token) {

@@ -9,12 +9,15 @@ import {
 } from "../../services/OrderService";
 import "./TrackOrderPage.css";
 import { returnOrder } from "../../services/GHNService";
+import { Alert, Snackbar } from "@mui/material";
 
 const TrackOrderPage = () => {
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [ghnTrackingMap, setGhnTrackingMap] = useState({});
-
+  const [notifications, setNotifications] = useState([]);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+const [selectedOrderId, setSelectedOrderId] = useState(null);
   const navigate = useNavigate();
 
   const canReturnOrder = (tracking) => {
@@ -113,7 +116,6 @@ const TrackOrderPage = () => {
               <tr>
                 <th>STT</th>
                 <th>Ngày đặt</th>
-
                 <th>Sản phẩm</th>
                 <th>Tổng giá (₫)</th>
                 <th>Mã vận đơn</th>
@@ -201,7 +203,7 @@ const TrackOrderPage = () => {
                         <span className="external-icon">↗</span>
                       </a>
                     ) : (
-                      <span className="no-tracking">Chưa có mã</span>
+                      <span className="no-tracking2">Chưa có mã</span>
                     )}
                   </td>
                   <td>
@@ -222,7 +224,7 @@ const TrackOrderPage = () => {
                     o.orderStatus === "Pending" &&
                     new Date(o.expireAt) > new Date() ? (
                       <button
-                        className="pay-now-button"
+                        className="pay-now-button2"
                         onClick={async () => {
                           try {
                             localStorage.setItem("latestOrderId", o._id);
@@ -245,20 +247,11 @@ const TrackOrderPage = () => {
                   <td>
                     {o.paymentStatus === "Pending" &&
                     o.orderStatus === "Pending" ? (
-                      <button
-                        className="cancel-order-button"
-                        onClick={async () => {
-                          if (
-                            !window.confirm("Bạn chắc chắn muốn hủy đơn hàng?")
-                          )
-                            return;
-                          try {
-                            await cancelOrder(o._id);
-                            alert("Đã hủy đơn hàng.");
-                            window.location.reload();
-                          } catch (err) {
-                            alert("Không thể hủy đơn.");
-                          }
+                     <button
+                        className="cancel-order-button2"
+                        onClick={() => {
+                          setSelectedOrderId(o._id);
+                          setShowCancelModal(true);
                         }}
                       >
                         Hủy
@@ -267,6 +260,52 @@ const TrackOrderPage = () => {
                       "-"
                     )}
                   </td>
+
+                  {showCancelModal && (
+                    <div className="custom-modal-overlay">
+                      <div className="custom-modal">
+                        <h3>Xác nhận hủy đơn hàng</h3>
+                        <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
+                        <div className="modal-actions">
+                          <button 
+                            className="cancel-btn"
+                            onClick={() => setShowCancelModal(false)}
+                          >
+                            Quay lại
+                          </button>
+                          <button 
+                            className="confirm-btn"
+                            onClick={async () => {
+                              setShowCancelModal(false);
+                              try {
+                                await cancelOrder(selectedOrderId);
+                                setNotifications((prev) => [
+                                  ...prev,
+                                  {
+                                    id: Date.now(),
+                                    message: "Đơn hàng đã được hủy thành công.",
+                                    severity: "success",
+                                  }
+                                ]);
+                                window.location.reload();
+                              } catch (err) {
+                                setNotifications((prev) => [
+                                  ...prev,
+                                  {
+                                    id: Date.now(),
+                                    message: "Không thể hủy đơn hàng.",
+                                    severity: "error",
+                                  }
+                                ]);
+                              }
+                            }}
+                          >
+                            Xác nhận hủy
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <td>
                     <button
@@ -282,6 +321,26 @@ const TrackOrderPage = () => {
           </table>
         </div>
       )}
+      {notifications.map((notification) => (
+              <Snackbar
+                key={notification.id}
+                open
+                autoHideDuration={3000}
+                anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+                onClose={() => setNotifications(prev =>
+                  prev.filter(n => n.id !== notification.id)
+                )}
+              >
+                <Alert
+                  severity={notification.severity || 'info'}
+                  onClose={() => setNotifications(prev =>
+                    prev.filter(n => n.id !== notification.id)
+                  )}
+                >
+                  {notification.message}
+                </Alert>
+              </Snackbar>
+            ))}
     </div>
   );
 };
