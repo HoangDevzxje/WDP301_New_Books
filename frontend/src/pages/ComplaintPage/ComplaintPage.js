@@ -5,7 +5,6 @@ import {
   Send,
   Cancel,
   Login,
-  Feedback,
 } from "@mui/icons-material";
 import { useNavigate, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";

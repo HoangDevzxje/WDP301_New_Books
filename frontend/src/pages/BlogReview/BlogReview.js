@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Typography, Paper, Box, Grid, Avatar, Stack } from '@mui/material';
+import { Typography, Paper, Box, Grid } from '@mui/material';
 import './BlogReview.css';
 import * as ReviewService from '../../services/ReviewService';
-import * as BookService from '../../services/BookService';
 import { useNavigate } from 'react-router-dom';
 
 const BlogReview = () => {

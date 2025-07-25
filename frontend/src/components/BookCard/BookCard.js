@@ -6,7 +6,6 @@ import {
   Typography,
   IconButton,
   Rating,
-  Skeleton,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -50,8 +49,8 @@ const BookCard = ({
   const discountPercent = hasCampaign
     ? book.discountPercentage
     : book.originalPrice > book.price
-    ? Math.round((1 - book.price / book.originalPrice) * 100)
-    : 0;
+      ? Math.round((1 - book.price / book.originalPrice) * 100)
+      : 0;
 
   useEffect(() => {
     fetchRating();
@@ -73,11 +72,10 @@ const BookCard = ({
 
         {(hoveredId === book._id || wishlist.includes(book._id)) && (
           <Box
-            className={`book-wishlist-btn ${
-              hoveredId === book._id && !wishlist.includes(book._id)
+            className={`book-wishlist-btn ${hoveredId === book._id && !wishlist.includes(book._id)
                 ? "animate-in"
                 : ""
-            }`}
+              }`}
           >
             <IconButton onClick={() => toggleWishlist(book._id)} size="small">
               {wishlist.includes(book._id) ? (

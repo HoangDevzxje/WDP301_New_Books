@@ -39,7 +39,8 @@ import CampaignListPage from "./pages/Admin/DiscountCampaign/CampaignListPage.js
 import CampaignFormPage from "./pages/Admin/DiscountCampaign/CampaignFormPage.js";
 import BlogReview from "./pages/BlogReview/BlogReview.js";
 import ReviewDetail from "./pages/ReviewDetail/ReviewDetail.js";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const AdminRoute = ({ children }) => {
   const userRole =
     localStorage.getItem("userRole") || sessionStorage.getItem("userRole");
@@ -154,7 +155,7 @@ function App() {
       )}
 
       <ScrollToTop />
-
+      <ToastContainer />
       <Routes>
         <Route
           path="/admin"

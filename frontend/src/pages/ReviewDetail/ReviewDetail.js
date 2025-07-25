@@ -8,7 +8,6 @@ import {
   Grid,
   Button,
   Chip,
-  Rating,
   Avatar,
   IconButton,
   Skeleton,

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import AuthService from "../services/AuthService";
-
+import { toast } from "react-toastify";
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_URL_BACKEND,
 });
@@ -38,8 +38,10 @@ axiosInstance.interceptors.request.use(
           storage.setItem("access_token", token);
         } catch (error) {
           console.error("Refresh token failed:", error);
-          storage.clear();
-          window.location.href = "/account/login";
+          setTimeout(() => {
+            storage.clear();
+            window.location.href = "/account/login";
+          }, 3000);
           throw error;
         }
       }
@@ -73,8 +75,13 @@ axiosInstance.interceptors.response.use(
           return axiosInstance(originalRequest);
         }
       } catch (err) {
-        storage.clear();
-        window.location.href = "/account/login";
+        console.error("Refresh token thất bại hoặc đã hết hạn");
+
+        toast.error("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        setTimeout(() => {
+          storage.clear();
+          window.location.href = "/account/login";
+        }, 2000);
         return Promise.reject(err);
       }
     }
