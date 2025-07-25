@@ -23,6 +23,10 @@ import {
   TablePagination,
   Snackbar,
   Alert,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   EventAvailable as StartDateIcon,
@@ -50,6 +54,10 @@ export default function DiscountListPage() {
     open: false,
     message: "",
     severity: "success",
+  });
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    discountId: null,
   });
 
   useEffect(() => {
@@ -110,14 +118,23 @@ export default function DiscountListPage() {
     setFiltered(res);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa mã này không?")) return;
+  const openDeleteConfirm = (discountId) => {
+    setDeleteDialog({ open: true, discountId });
+  };
+
+  const closeDeleteConfirm = () => {
+    setDeleteDialog({ open: false, discountId: null });
+  };
+
+  const handleDelete = async () => {
     try {
-      await deleteDiscount(id);
+      await deleteDiscount(deleteDialog.discountId);
       openSnackbar("Xóa thành công", "success");
       fetchDiscounts();
     } catch {
       openSnackbar("Lỗi khi xóa", "error");
+    } finally {
+      closeDeleteConfirm();
     }
   };
 
@@ -294,7 +311,7 @@ export default function DiscountListPage() {
                       <IconButton onClick={() => navigate(`${d._id}/edit`)}>
                         <Edit />
                       </IconButton>
-                      <IconButton onClick={() => handleDelete(d._id)}>
+                      <IconButton onClick={() => openDeleteConfirm(d._id)}>
                         <DeleteForever />
                       </IconButton>
                     </TableCell>
@@ -324,6 +341,20 @@ export default function DiscountListPage() {
           }}
         />
       </TableContainer>
+
+      {/* Dialog xác nhận xóa */}
+      <Dialog open={deleteDialog.open} onClose={closeDeleteConfirm}>
+        <DialogTitle>Xác nhận xóa mã giảm giá</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa mã giảm giá này không?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeDeleteConfirm}>Hủy</Button>
+          <Button onClick={handleDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={snackbar.open}

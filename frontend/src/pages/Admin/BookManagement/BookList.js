@@ -21,6 +21,10 @@ import {
   Snackbar,
   Alert,
   Chip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -47,6 +51,8 @@ export default function BookList() {
     message: "",
     severity: "",
   });
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedBookId, setSelectedBookId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,14 +76,21 @@ export default function BookList() {
       );
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Xác nhận xóa sách này?")) return;
+  const confirmDelete = (id) => {
+    setSelectedBookId(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
     try {
-      await deleteBook(id);
-      setBooks((prev) => prev.filter((b) => b._id !== id));
+      await deleteBook(selectedBookId);
+      setBooks((prev) => prev.filter((b) => b._id !== selectedBookId));
       setAlert({ open: true, message: "Xóa thành công", severity: "success" });
     } catch {
       setAlert({ open: true, message: "Xóa thất bại", severity: "error" });
+    } finally {
+      setDeleteDialogOpen(false);
+      setSelectedBookId(null);
     }
   };
 
@@ -238,7 +251,7 @@ export default function BookList() {
                   <Tooltip title="Xóa">
                     <IconButton
                       color="error"
-                      onClick={() => handleDelete(book._id)}
+                      onClick={() => confirmDelete(book._id)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -269,6 +282,20 @@ export default function BookList() {
           }}
         />
       </TableContainer>
+
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Xác nhận xóa sách</DialogTitle>
+        <DialogContent>Bạn có chắc chắn muốn xóa sách này không?</DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>Hủy</Button>
+          <Button color="error" onClick={handleDelete}>
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={alert.open}

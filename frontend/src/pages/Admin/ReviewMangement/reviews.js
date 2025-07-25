@@ -26,6 +26,20 @@ export default function AdminReviews() {
   const [expanded, setExpanded] = useState({});
   const [fullScreenContent, setFullScreenContent] = useState(null);
 
+  // Delete dialog state
+  const [deleteDialog, setDeleteDialog] = useState({
+    open: false,
+    reviewId: null,
+    reviewTitle: "",
+  });
+
+  // Snackbar/notification state
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success", // success, error, warning, info
+  });
+
   const quillModules = {
     toolbar: [
       [{ font: [] }, { header: [1, 2, 3, false] }],
@@ -63,7 +77,7 @@ export default function AdminReviews() {
       const data = await getBooks();
       setBooks(data);
     } catch {
-      alert("Không thể tải sách.");
+      showSnackbar("Không thể tải sách.", "error");
     }
   };
 
@@ -72,7 +86,7 @@ export default function AdminReviews() {
       const data = await getAllReviews();
       setReviews(data);
     } catch {
-      alert("Không thể tải reviews.");
+      showSnackbar("Không thể tải reviews.", "error");
     }
   };
 
@@ -81,6 +95,36 @@ export default function AdminReviews() {
     books.forEach((b) => (m[b._id] = b.title));
     return m;
   }, [books]);
+
+  // Snackbar functions
+  const showSnackbar = (message, severity = "success") => {
+    setSnackbar({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
+  const closeSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  // Delete dialog functions
+  const openDeleteDialog = (reviewId, reviewTitle) => {
+    setDeleteDialog({
+      open: true,
+      reviewId,
+      reviewTitle,
+    });
+  };
+
+  const closeDeleteDialog = () => {
+    setDeleteDialog({
+      open: false,
+      reviewId: null,
+      reviewTitle: "",
+    });
+  };
 
   const handleFormChange = (field) => (eOrHtml) => {
     if (field === "content") {
@@ -119,8 +163,9 @@ export default function AdminReviews() {
       setForm({ title: "", bookId: "", content: "", images: [] });
       setShowCreateForm(false);
       fetchReviews();
+      showSnackbar("Tạo bài viết thành công!", "success");
     } catch {
-      alert("Tạo thất bại.");
+      showSnackbar("Tạo bài viết thất bại.", "error");
     }
   };
 
@@ -139,15 +184,22 @@ export default function AdminReviews() {
       });
       setEditingId(null);
       fetchReviews();
+      showSnackbar("Cập nhật bài viết thành công!", "success");
     } catch {
-      alert("Cập nhật thất bại.");
+      showSnackbar("Cập nhật bài viết thất bại.", "error");
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Chắc chắn xoá?")) return;
-    await deleteReview(id);
-    setReviews((p) => p.filter((r) => r._id !== id));
+  const handleDelete = async () => {
+    try {
+      await deleteReview(deleteDialog.reviewId);
+      setReviews((p) => p.filter((r) => r._id !== deleteDialog.reviewId));
+      closeDeleteDialog();
+      showSnackbar("Xóa bài viết thành công!", "success");
+    } catch {
+      showSnackbar("Xóa bài viết thất bại.", "error");
+      closeDeleteDialog();
+    }
   };
 
   const toggleExpand = (id) =>
@@ -303,6 +355,43 @@ export default function AdminReviews() {
         </div>
       )}
 
+      {/* Delete Confirmation Dialog */}
+      {deleteDialog.open && (
+        <div className="delete-dialog-overlay">
+          <div className="delete-dialog">
+            <div className="delete-dialog-header">
+              <h3>Xác nhận xóa bài viết</h3>
+            </div>
+            <div className="delete-dialog-content">
+              <p>
+                Bạn có chắc chắn muốn xóa bài viết{" "}
+                <strong>"{deleteDialog.reviewTitle}"</strong> không?
+              </p>
+            </div>
+            <div className="delete-dialog-actions">
+              <button className="btn-cancel" onClick={closeDeleteDialog}>
+                Hủy
+              </button>
+              <button className="btn-delete-confirm" onClick={handleDelete}>
+                Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Snackbar Notification */}
+      {snackbar.open && (
+        <div className={`snackbar snackbar-${snackbar.severity}`}>
+          <div className="snackbar-content">
+            <span className="snackbar-message">{snackbar.message}</span>
+            <button className="snackbar-close" onClick={closeSnackbar}>
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="reviews-table-container">
         <table className="reviews-table">
           <thead className="reviews-table-header">
@@ -388,7 +477,7 @@ export default function AdminReviews() {
                       </button>
                       <button
                         className="action-btn btn-delete"
-                        onClick={() => handleDelete(r._id)}
+                        onClick={() => openDeleteDialog(r._id, r.title)}
                       >
                         Xóa
                       </button>

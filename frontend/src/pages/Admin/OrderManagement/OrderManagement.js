@@ -19,6 +19,11 @@ import {
   Alert,
   Tooltip,
   TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Visibility as VisibilityIcon,
@@ -66,7 +71,12 @@ export default function OrderManagement() {
     message: "",
     severity: "info",
   });
-  const [dialogs, setDialogs] = useState({ view: null, edit: null });
+  const [dialogs, setDialogs] = useState({
+    view: null,
+    edit: null,
+    delete: null, // Thêm dialog xóa
+  });
+  const [selectedOrder, setSelectedOrder] = useState(null); // Thêm state lưu đơn hàng được chọn
 
   const showAlert = (msg, sev = "info") =>
     setAlert({ open: true, message: msg, severity: sev });
@@ -130,7 +140,20 @@ export default function OrderManagement() {
     } catch {
       showAlert("Lỗi thao tác", "error");
     } finally {
-      setDialogs({ view: null, edit: null });
+      setDialogs({ view: null, edit: null, delete: null });
+    }
+  };
+
+  const openDeleteDialog = (order) => {
+    setSelectedOrder(order);
+    setDialogs((prev) => ({ ...prev, delete: true }));
+  };
+
+  const handleCancelOrder = async () => {
+    if (selectedOrder) {
+      await handleAction("cancel", selectedOrder);
+      setDialogs((prev) => ({ ...prev, delete: false }));
+      setSelectedOrder(null);
     }
   };
 
@@ -147,6 +170,7 @@ export default function OrderManagement() {
         <Typography variant="h4">Quản lý Đơn hàng</Typography>
       </Box>
 
+      {/* Tìm kiếm + lọc */}
       <Box
         sx={{
           display: "flex",
@@ -288,12 +312,7 @@ export default function OrderManagement() {
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Hủy">
-                          <IconButton
-                            onClick={() =>
-                              window.confirm("Xác nhận hủy?") &&
-                              handleAction("cancel", order)
-                            }
-                          >
+                          <IconButton onClick={() => openDeleteDialog(order)}>
                             <CloseIcon />
                           </IconButton>
                         </Tooltip>
@@ -330,6 +349,27 @@ export default function OrderManagement() {
         onClose={() => setDialogs((d) => ({ ...d, edit: null }))}
         onSave={(info) => handleAction("saveBox", dialogs.edit, info)}
       />
+
+      {/* Dialog xác nhận hủy đơn hàng */}
+      <Dialog
+        open={!!dialogs.delete}
+        onClose={() => setDialogs((prev) => ({ ...prev, delete: false }))}
+      >
+        <DialogTitle>Xác nhận hủy đơn hàng</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn hủy đơn hàng này không?
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setDialogs((prev) => ({ ...prev, delete: false }))}
+          >
+            Hủy
+          </Button>
+          <Button color="error" onClick={handleCancelOrder}>
+            Xác nhận hủy
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Snackbar
         open={alert.open}
