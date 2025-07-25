@@ -133,7 +133,7 @@
 }
 
 .quantity-container{
-    max-width: 100% !important;
+    max-width: 80% !important;
     gap: 16px;
 }
 
@@ -182,7 +182,7 @@
     background-color: #000 !important;
     border-radius: 8px !important;
     box-shadow: none !important;
-    width: 500px !important;
+    width: 300px !important;
 }
 
 .add-to-cart-btn:hover {
