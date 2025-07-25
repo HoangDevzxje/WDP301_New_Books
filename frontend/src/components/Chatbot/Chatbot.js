@@ -3,7 +3,7 @@ import './Chatbot.css';
 import * as ChatBotService from '../../services/ChatbotService';
 import { Box, Button, IconButton, Paper, TextField, Typography, Card, CardMedia, CardContent, CardActions } from '@mui/material';
 import { Send, Mic, PhotoCamera, Delete, Close, ChatBubbleOutline } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom'; // Thêm để điều hướng
+import { useNavigate } from 'react-router-dom';
 
 const Chatbot = () => {
     const [messages, setMessages] = useState([]);
@@ -11,16 +11,14 @@ const Chatbot = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
     const chatBoxRef = useRef(null);
-    const navigate = useNavigate(); // Hook để điều hướng
+    const navigate = useNavigate();
 
-    // Scroll to bottom when messages change
     useEffect(() => {
         if (chatBoxRef.current) {
             chatBoxRef.current.scrollTop = chatBoxRef.current.scrollHeight;
         }
     }, [messages]);
 
-    // Add welcome message when chat opens
     useEffect(() => {
         if (isOpen && messages.length === 0) {
             const welcomeMessage = "Xin chào! Tôi là trợ lí ảo NewBooks với AI thông minh. Tôi có thể gợi ý sản phẩm phù hợp với mong muốn của bạn. Bạn cần tôi giúp gì không?";
@@ -31,7 +29,6 @@ const Chatbot = () => {
     const handleSend = async () => {
         if (!input.trim() && !selectedImage) return;
 
-        // Text message
         if (input.trim()) {
             setMessages(prev => [...prev, { sender: 'user', text: input }]);
 
@@ -39,14 +36,13 @@ const Chatbot = () => {
                 const data = { query: input };
                 const res = await ChatBotService.chatBot(data);
                 const botReply = res.reply || "Bot không trả lời được.";
-                const books = res.books || []; // Lấy danh sách sách từ response
+                const books = res.books || [];
                 setMessages(prev => [...prev, { sender: 'bot', text: botReply, books }]);
             } catch {
                 setMessages(prev => [...prev, { sender: 'bot', text: 'Lỗi khi gọi API.' }]);
             }
         }
 
-        // Image message
         if (selectedImage) {
             const imageUrl = URL.createObjectURL(selectedImage);
             setMessages(prev => [...prev, { sender: 'user', type: 'image', imageUrl }]);
@@ -56,13 +52,14 @@ const Chatbot = () => {
 
             try {
                 const res = await ChatBotService.upLoadImage(formData);
-                const reply = res.reply || "Không tìm thấy sản phẩm phù hợp.";
-                setMessages(prev => [...prev, { sender: 'bot', text: reply }]);
+                const botReply = res.reply || "Không tìm thấy sản phẩm phù hợp.";
+                const books = res.books || [];
+                setMessages(prev => [...prev, { sender: 'bot', text: botReply, books }]);
             } catch {
                 setMessages(prev => [...prev, { sender: 'bot', text: 'Lỗi xử lý ảnh.' }]);
             }
 
-            setSelectedImage(null); // Clear image after sending
+            setSelectedImage(null);
         }
 
         setInput('');
@@ -101,7 +98,7 @@ const Chatbot = () => {
     };
 
     const handleBookClick = (bookId) => {
-        navigate(`/book/${bookId}`); // Điều hướng đến trang chi tiết
+        navigate(`/book/${bookId}`);
     };
 
     return (
@@ -148,7 +145,7 @@ const Chatbot = () => {
                                             style={{ maxWidth: '100%', borderRadius: '8px' }}
                                         />
                                     ) : (
-                                        <Typography variant="body1">{msg.text}</Typography>
+                                        <ReactMarkdown>{msg.text}</ReactMarkdown> // Sử dụng ReactMarkdown để render liên kết
                                     )}
                                     {msg.books && msg.books.length > 0 && (
                                         <Box sx={{ mt: 1 }}>
