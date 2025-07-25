@@ -81,9 +81,9 @@ const getUserFeedback = async (req, res) => {
         // Tìm đánh giá của người dùng cho sách này
         const feedback = await Feedback.findOne({ book: bookId, user: userId });
 
-        if (!feedback) {
-            return res.status(404).json({ message: "Không tìm thấy đánh giá của người dùng này" });
-        }
+        // if (!feedback) {
+        //     return res.status(404).json({ message: "Không tìm thấy đánh giá của người dùng này" });
+        // }
 
         return res.status(200).json(feedback);
     } catch (error) {

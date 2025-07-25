@@ -30,7 +30,6 @@ const BlogReview = () => {
         });
 
         setBookIds(uniqueBookIds);
-        console.log('Book IDs extracted:', uniqueBookIds);
       } catch (error) {
         console.error('Error fetching reviews:', error);
       }
@@ -53,7 +52,6 @@ const BlogReview = () => {
           .map(response => response.value.data)
           .filter(book => book);
         setReviewedBooks(reviewedBooks);
-        console.log('Reviewed books fetched:', reviewedBooks);
 
         const access_token = localStorage.getItem("access_token") || sessionStorage.getItem("access_token");
         if (access_token) {
