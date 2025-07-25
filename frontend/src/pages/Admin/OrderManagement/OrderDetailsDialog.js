@@ -117,7 +117,6 @@ export default function OrderDetailsDialog({ open, order, onClose }) {
     }
   };
 
-  // Safe access to shipping info
   const shippingInfo = order.shippingInfo || {};
 
   return (
@@ -152,13 +151,12 @@ export default function OrderDetailsDialog({ open, order, onClose }) {
 
       <DialogContent>
         <Grid container spacing={3}>
-          {/* Thông tin khách hàng */}
-          <Grid item size={{xs: 12, md: 6}}>
+          <Grid item size={{ xs: 12, md: 6 }}>
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" fontWeight="600" gutterBottom>
                 Thông tin khách hàng
               </Typography>
-              <InfoRow 
+              <InfoRow
                 label="Tên khách hàng"
                 value={order.user?.name || order.customerName}
               />
@@ -180,13 +178,12 @@ export default function OrderDetailsDialog({ open, order, onClose }) {
             </Paper>
           </Grid>
 
-          {/* Thông tin giao hàng */}
-          <Grid item size={{xs: 12, md: 6}}>
+          <Grid item size={{ xs: 12, md: 6 }}>
             <Paper sx={{ p: 2 }}>
               <Typography variant="subtitle1" fontWeight="600" gutterBottom>
                 Thông tin giao hàng
               </Typography>
-              <InfoRow 
+              <InfoRow
                 label="Địa chỉ "
                 value={shippingInfo.address || shippingInfo.fullAddress}
               />
@@ -217,7 +214,6 @@ export default function OrderDetailsDialog({ open, order, onClose }) {
           </Grid>
         </Grid>
 
-        {/* Danh sách sản phẩm */}
         <Box mt={3}>
           <Paper>
             <Box p={2} bgcolor="grey.50">
@@ -280,7 +276,6 @@ export default function OrderDetailsDialog({ open, order, onClose }) {
               </Table>
             </TableContainer>
 
-            {/* Tổng kết đơn hàng */}
             <Box p={2} bgcolor="grey.50">
               <Typography variant="subtitle1" fontWeight="600" gutterBottom>
                 Tổng kết đơn hàng
