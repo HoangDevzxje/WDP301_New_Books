@@ -1,57 +1,63 @@
 import React, { useState, useEffect } from "react";
 import {
   Container,
+  Box,
   Typography,
-  Table,
+  TextField,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
   Button,
-  TableBody,
-  TableCell,
   TableContainer,
+  Paper,
+  Table,
   TableHead,
   TableRow,
-  Paper,
+  TableCell,
+  TableBody,
   IconButton,
+  Chip,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
-  MenuItem,
-  Select,
-  InputLabel,
-  FormControl,
-  Box,
-  Chip,
   TablePagination,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
-  Person as PersonIcon,
-  Description as DescriptionIcon,
-  Report as ReportIcon,
-  EventNote as DateIcon,
   Feedback as FeedbackIcon,
+  Person as PersonIcon,
+  Report as ReportIcon,
+  Description as DescriptionIcon,
+  EventNote as DateIcon,
+  Edit as EditIcon,
 } from "@mui/icons-material";
-import { Edit as EditIcon } from "@mui/icons-material";
 import {
   getComplaints,
   updateComplaintStatus,
 } from "../../../services/AdminService/complaintService";
-import "./ComplaintManagement.css";
 
-const ComplaintManagement = () => {
+export default function ComplaintManagement() {
   const [complaints, setComplaints] = useState([]);
-  const [filteredComplaints, setFilteredComplaints] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [currentComplaint, setCurrentComplaint] = useState({
-    _id: "",
+  const [filtered, setFiltered] = useState([]);
+  const [filters, setFilters] = useState({
+    customer: "",
+    type: "",
     status: "",
   });
-
-  const [customerFilter, setCustomerFilter] = useState("");
-  const [typeFilter, setTypeFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [current, setCurrent] = useState({ _id: "", status: "" });
+
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "info",
+  });
 
   useEffect(() => {
     fetchComplaints();
@@ -59,61 +65,66 @@ const ComplaintManagement = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [complaints, customerFilter, typeFilter, statusFilter]);
+  }, [complaints, filters]);
 
   const fetchComplaints = async () => {
     try {
       const data = await getComplaints();
-      const sortedData = data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setComplaints(sortedData);
-      setFilteredComplaints(sortedData);
-    } catch (error) {
-      console.error("Error fetching complaints", error);
+      // sort descending by createdAt
+      data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setComplaints(data);
+    } catch {
+      openSnackbar("Lỗi tải khiếu nại", "error");
     }
   };
 
   const applyFilters = () => {
     let result = [...complaints];
-    if (customerFilter) {
+    if (filters.customer) {
       result = result.filter((c) =>
-        c.user.email.toLowerCase().includes(customerFilter.toLowerCase())
+        c.user.email.toLowerCase().includes(filters.customer.toLowerCase())
       );
     }
-    if (typeFilter) {
-      result = result.filter((c) => c.type === typeFilter);
+    if (filters.type) {
+      result = result.filter((c) => c.type === filters.type);
     }
-    if (statusFilter) {
-      result = result.filter((c) => c.status === statusFilter);
+    if (filters.status) {
+      result = result.filter((c) => c.status === filters.status);
     }
-    result = result.sort(
-      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-    );
-    setFilteredComplaints(result);
+    setFiltered(result);
   };
 
-  const handleOpenEditDialog = (complaint) => {
-    setCurrentComplaint({ _id: complaint._id, status: complaint.status });
-    setOpen(true);
+  const openSnackbar = (msg, sev = "info") =>
+    setSnackbar({ open: true, message: msg, severity: sev });
+  const closeSnackbar = () => setSnackbar((s) => ({ ...s, open: false }));
+
+  const handleFilterChange = (field) => (e) => {
+    setFilters((f) => ({ ...f, [field]: e.target.value }));
+    setPage(0);
   };
 
-  const handleClose = () => setOpen(false);
+  const resetFilters = () => {
+    setFilters({ customer: "", type: "", status: "" });
+  };
+
+  const handleOpenDialog = (c) => {
+    setCurrent({ _id: c._id, status: c.status });
+    setDialogOpen(true);
+  };
+  const handleCloseDialog = () => setDialogOpen(false);
 
   const handleStatusChange = (e) => {
-    setCurrentComplaint((prev) => ({ ...prev, status: e.target.value }));
+    setCurrent((cur) => ({ ...cur, status: e.target.value }));
   };
 
   const handleUpdateStatus = async () => {
     try {
-      await updateComplaintStatus(
-        currentComplaint._id,
-        currentComplaint.status
-      );
+      await updateComplaintStatus(current._id, current.status);
+      openSnackbar("Cập nhật trạng thái thành công", "success");
       fetchComplaints();
-      handleClose();
-    } catch (error) {
-      console.error("Error updating complaint status", error);
+      handleCloseDialog();
+    } catch {
+      openSnackbar("Lỗi cập nhật", "error");
     }
   };
 
@@ -132,86 +143,70 @@ const ComplaintManagement = () => {
     }
   };
 
-  const resetFilters = () => {
-    setCustomerFilter("");
-    setTypeFilter("");
-    setStatusFilter("");
-  };
-
-  const handleChangePage = (_, newPage) => setPage(newPage);
-  const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
-    setPage(0);
-  };
-
   return (
     <Container maxWidth="lg" sx={{ py: 2 }}>
-      <Box sx={{ display: "flex", alignItems: "center", mb: 3, gap: 2 }}>
+      <Box display="flex" alignItems="center" mb={3} gap={2}>
         <FeedbackIcon sx={{ fontSize: 40, color: "#2c3e50" }} />
-        <Typography
-          variant="h4"
-          sx={{ fontWeight: 700, color: "#2c3e50", letterSpacing: 0.5 }}
-        >
+        <Typography variant="h4" sx={{ fontWeight: 700, color: "#2c3e50" }}>
           Quản lý khiếu nại
         </Typography>
       </Box>
 
-      <div className="cm-filter-section">
-        <button className="cm-button" onClick={resetFilters}>
+      {/* Filters */}
+      <Box display="flex" gap={2} flexWrap="wrap" mb={2}>
+        <TextField
+          label="Khách hàng"
+          value={filters.customer}
+          onChange={handleFilterChange("customer")}
+          size="small"
+        />
+        <FormControl size="small" sx={{ minWidth: 150 }}>
+          <InputLabel>Loại</InputLabel>
+          <Select
+            label="Loại"
+            value={filters.type}
+            onChange={handleFilterChange("type")}
+          >
+            <MenuItem value="">Tất cả</MenuItem>
+            <MenuItem value="Web">Web</MenuItem>
+            <MenuItem value="Đơn hàng">Đơn hàng</MenuItem>
+            <MenuItem value="Khác">Khác</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel>Trạng thái</InputLabel>
+          <Select
+            label="Trạng thái"
+            value={filters.status}
+            onChange={handleFilterChange("status")}
+          >
+            <MenuItem value="">Tất cả</MenuItem>
+            <MenuItem value="Đang chờ xử lý">Đang chờ xử lý</MenuItem>
+            <MenuItem value="Đã tiếp nhận">Đã tiếp nhận</MenuItem>
+            <MenuItem value="Đã giải quyết">Đã giải quyết</MenuItem>
+            <MenuItem value="Đã hủy">Đã hủy</MenuItem>
+          </Select>
+        </FormControl>
+        <Button variant="outlined" onClick={resetFilters}>
           Đặt lại bộ lọc
-        </button>
-        <div className="cm-filters">
-          <input
-            type="text"
-            placeholder="Tìm theo khách hàng"
-            className="cm-input"
-            value={customerFilter}
-            onChange={(e) => setCustomerFilter(e.target.value)}
-          />
-          <select
-            className="cm-select"
-            value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value)}
-          >
-            <option value="">Tất cả loại khiếu nại</option>
-            <option value="Web">Web</option>
-            <option value="Đơn hàng">Đơn hàng</option>
-            <option value="Khác">Khác</option>
-          </select>
-          <select
-            className="cm-select"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">Tất cả trạng thái</option>
-            <option value="Đang chờ xử lý">Đang chờ xử lý</option>
-            <option value="Đã tiếp nhận">Đã tiếp nhận</option>
-            <option value="Đã giải quyết">Đã giải quyết</option>
-            <option value="Đã hủy">Đã hủy</option>
-          </select>
-        </div>
-      </div>
+        </Button>
+      </Box>
 
-      <TableContainer
-        component={Paper}
-        sx={{ mt: 2, borderRadius: 2, boxShadow: 3 }}
-      >
+      {/* Table */}
+      <TableContainer component={Paper} sx={{ borderRadius: 2, boxShadow: 3 }}>
         <Table>
-          <TableHead>
-            <TableRow sx={{ backgroundColor: "#2c3e50" }}>
+          <TableHead sx={{ backgroundColor: "#2c3e50" }}>
+            <TableRow>
               {[
                 { icon: <PersonIcon />, label: "Khách hàng" },
-                { icon: <ReportIcon />, label: "Khiếu nại" },
+                { icon: <ReportIcon />, label: "Loại" },
                 { icon: <DescriptionIcon />, label: "Mô tả" },
                 { icon: null, label: "Trạng thái" },
                 { icon: <DateIcon />, label: "Ngày tạo" },
-                { icon: null, label: "Thao tác" },
-              ].map((col, idx) => (
-                <TableCell
-                  key={idx}
-                  sx={{ fontWeight: "bold", color: "white" }}
-                >
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                { icon: null, label: "Hành động" },
+              ].map((col, i) => (
+                <TableCell key={i} sx={{ color: "#fff", fontWeight: 700 }}>
+                  <Box display="flex" alignItems="center" gap={1}>
                     {col.icon}
                     {col.label}
                   </Box>
@@ -219,26 +214,27 @@ const ComplaintManagement = () => {
               ))}
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {filteredComplaints
+            {filtered
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((complaint) => (
-                <TableRow key={complaint._id} hover>
-                  <TableCell>{complaint.user.email}</TableCell>
-                  <TableCell>{complaint.type}</TableCell>
-                  <TableCell>{complaint.description}</TableCell>
+              .map((c) => (
+                <TableRow key={c._id} hover>
+                  <TableCell>{c.user.email}</TableCell>
+                  <TableCell>{c.type}</TableCell>
+                  <TableCell>{c.description}</TableCell>
                   <TableCell>
                     <Chip
-                      label={complaint.status}
-                      color={getStatusColor(complaint.status)}
+                      label={c.status}
+                      color={getStatusColor(c.status)}
                       size="small"
                     />
                   </TableCell>
                   <TableCell>
-                    {new Date(complaint.createdAt).toLocaleDateString("vi-VN")}
+                    {new Date(c.createdAt).toLocaleDateString("vi-VN")}
                   </TableCell>
                   <TableCell>
-                    <IconButton onClick={() => handleOpenEditDialog(complaint)}>
+                    <IconButton onClick={() => handleOpenDialog(c)}>
                       <EditIcon />
                     </IconButton>
                   </TableCell>
@@ -249,43 +245,61 @@ const ComplaintManagement = () => {
 
         <TablePagination
           component="div"
-          count={filteredComplaints.length}
+          count={filtered.length}
           page={page}
           rowsPerPage={rowsPerPage}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPageChange={(_, p) => setPage(p)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(+e.target.value);
+            setPage(0);
+          }}
           rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: "1px solid #e0e0e0",
+            "& .MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+              {
+                fontWeight: 500,
+              },
+          }}
         />
       </TableContainer>
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Cập nhật trạng thái khiếu nại</DialogTitle>
+
+      {/* Status Edit Dialog */}
+      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+        <DialogTitle>Cập nhật trạng thái</DialogTitle>
         <DialogContent>
-          <Box sx={{ minWidth: 300, mt: 2 }}>
-            <FormControl fullWidth>
-              <InputLabel>Trạng thái</InputLabel>
-              <Select
-                value={currentComplaint.status}
-                onChange={handleStatusChange}
-                label="Trạng thái"
-              >
-                <MenuItem value="Đã tiếp nhận">Đã tiếp nhận</MenuItem>
-                <MenuItem value="Đã giải quyết">Đã giải quyết</MenuItem>
-                <MenuItem value="Đã hủy">Đã hủy</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
+          <FormControl fullWidth sx={{ mt: 1 }}>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select
+              label="Trạng thái"
+              value={current.status}
+              onChange={handleStatusChange}
+            >
+              <MenuItem value="Đã tiếp nhận">Đã tiếp nhận</MenuItem>
+              <MenuItem value="Đã giải quyết">Đã giải quyết</MenuItem>
+              <MenuItem value="Đã hủy">Đã hủy</MenuItem>
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Hủy
-          </Button>
-          <Button onClick={handleUpdateStatus} color="primary">
+          <Button onClick={handleCloseDialog}>Hủy</Button>
+          <Button onClick={handleUpdateStatus} variant="contained">
             Cập nhật
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity={snackbar.severity} onClose={closeSnackbar}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
-};
-
-export default ComplaintManagement;
+}

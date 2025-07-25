@@ -2,33 +2,34 @@ import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Paper,
+  FormControl,
+  InputLabel,
   Select,
   MenuItem,
   TextField,
-  TablePagination,
-  IconButton,
   InputAdornment,
-  FormControl,
-  InputLabel,
+  IconButton,
   Tooltip,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TablePagination,
+  Snackbar,
+  Alert,
   Rating,
 } from "@mui/material";
 import {
-  Delete as DeleteIcon,
+  Search as SearchIcon,
+  FilterList as FilterIcon,
   Book as BookIcon,
   Person as PersonIcon,
   RateReview as ReviewIcon,
-  Search as SearchIcon,
-  FilterList as FilterIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
-
 import {
   fetchAllFeedbacks,
   deleteFeedback,
@@ -42,6 +43,12 @@ export default function FeedbackManagement() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
+
   useEffect(() => {
     loadFeedbacks();
   }, []);
@@ -51,19 +58,24 @@ export default function FeedbackManagement() {
       const data = await fetchAllFeedbacks();
       setOriginalFeedbacks(data);
       setFeedbacks(data);
-    } catch (err) {
-      console.error("Lỗi khi tải feedback:", err);
+    } catch {
+      openSnackbar("Lỗi khi tải feedback", "error");
     }
   };
+
+  const openSnackbar = (msg, sev = "success") =>
+    setSnackbar({ open: true, message: msg, severity: sev });
+  const closeSnackbar = () => setSnackbar((prev) => ({ ...prev, open: false }));
 
   const handleSearch = () => {
     let filtered = originalFeedbacks;
     if (filterType === "book" && filterQuery.trim()) {
-      filtered = originalFeedbacks.filter((f) =>
+      filtered = filtered.filter((f) =>
         f.book?.title?.toLowerCase().includes(filterQuery.trim().toLowerCase())
       );
-    } else if (filterType === "user" && filterQuery.trim()) {
-      filtered = originalFeedbacks.filter((f) =>
+    }
+    if (filterType === "user" && filterQuery.trim()) {
+      filtered = filtered.filter((f) =>
         f.user?.name?.toLowerCase().includes(filterQuery.trim().toLowerCase())
       );
     }
@@ -75,29 +87,25 @@ export default function FeedbackManagement() {
     if (!window.confirm("Bạn có chắc muốn xóa phản hồi này?")) return;
     try {
       await deleteFeedback(id);
-      setOriginalFeedbacks((prev) => prev.filter((f) => f._id !== id));
-      setFeedbacks((prev) => prev.filter((f) => f._id !== id));
-    } catch (err) {
-      console.error("Lỗi khi xóa feedback:", err);
+      openSnackbar("Xóa thành công", "success");
+      loadFeedbacks();
+    } catch {
+      openSnackbar("Lỗi khi xóa feedback", "error");
     }
   };
 
-  const handleChangePage = (_, newPage) => {
-    setPage(newPage);
-  };
-
+  const handleChangePage = (_, newPage) => setPage(newPage);
   const handleChangeRowsPerPage = (e) => {
-    setRowsPerPage(parseInt(e.target.value, 10));
+    setRowsPerPage(+e.target.value);
     setPage(0);
   };
 
   return (
-    <Box p={3}>
+    <Box maxWidth={1200} mx="auto" p={2}>
       <Typography variant="h4" gutterBottom>
         Quản lý đánh giá
       </Typography>
 
-      {/* Filter/Search Bar */}
       <Box
         mb={3}
         p={2}
@@ -105,12 +113,12 @@ export default function FeedbackManagement() {
           display: "flex",
           gap: 2,
           alignItems: "center",
-          background: "#fff",
+          backgroundColor: "#fff",
           borderRadius: 1,
           boxShadow: 1,
         }}
       >
-        <FormControl variant="outlined" sx={{ minWidth: 150 }}>
+        <FormControl size="small" sx={{ minWidth: 150 }}>
           <InputLabel>Filter theo</InputLabel>
           <Select
             value={filterType}
@@ -130,10 +138,13 @@ export default function FeedbackManagement() {
         {(filterType === "book" || filterType === "user") && (
           <TextField
             label={filterType === "book" ? "Tên sách" : "Tên người dùng"}
-            variant="outlined"
+            size="small"
+            sx={{ flexGrow: 1 }}
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            sx={{ flexGrow: 1 }}
+            onKeyPress={(e) => {
+              if (e.key === "Enter") handleSearch();
+            }}
             InputProps={{
               endAdornment: (
                 <InputAdornment position="end">
@@ -143,50 +154,42 @@ export default function FeedbackManagement() {
                 </InputAdornment>
               ),
             }}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") handleSearch();
-            }}
           />
         )}
 
         {filterType === "all" && (
           <Tooltip title="Tải lại">
-            <IconButton
-              onClick={() => {
-                setFilterQuery("");
-                loadFeedbacks();
-              }}
-            >
+            <IconButton onClick={loadFeedbacks}>
               <SearchIcon />
             </IconButton>
           </Tooltip>
         )}
       </Box>
 
-      {/* Table */}
-      <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 1 }}>
+      <TableContainer
+        component={Paper}
+        sx={{ borderRadius: 2, boxShadow: 3, overflow: "hidden" }}
+      >
         <Table>
-          <TableHead sx={{ background: "#2c3e50" }}>
+          <TableHead sx={{ backgroundColor: "#2c3e50" }}>
             <TableRow>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>STT</TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                <BookIcon fontSize="small" /> Sách
-              </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                <PersonIcon fontSize="small" /> Người dùng
-              </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                <ReviewIcon fontSize="small" /> Đánh giá
-              </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                Bình luận
-              </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                Thời gian
-              </TableCell>
-              <TableCell sx={{ color: "#fff", fontWeight: 700 }}>
-                Hành động
-              </TableCell>
+              {[
+                "STT",
+                <BookIcon key="b" fontSize="small" />,
+                <PersonIcon key="u" fontSize="small" />,
+                <ReviewIcon key="r" fontSize="small" />,
+                "Bình luận",
+                "Thời gian",
+                "Hành động",
+              ].map((h, i) => (
+                <TableCell
+                  key={i}
+                  sx={{ color: "#fff", fontWeight: 700 }}
+                  align={i === 0 ? "center" : "left"}
+                >
+                  {h}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
 
@@ -197,60 +200,70 @@ export default function FeedbackManagement() {
                 <TableRow
                   key={fb._id}
                   sx={{
-                    "&:nth-of-type(odd)": { background: "#fafafa" },
-                    "&:hover": { background: "#f0f0f0" },
+                    "&:nth-of-type(odd)": { backgroundColor: "#fafafa" },
+                    "&:hover": { backgroundColor: "#f0f0f0" },
                   }}
                 >
-                  <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                  <TableCell>{fb.book?.title || "Sách đã bị xóa"}</TableCell>
-                  <TableCell>
-                    {fb.user?.name || "Người dùng đã bị xóa"}
+                  <TableCell align="center">
+                    {page * rowsPerPage + idx + 1}
                   </TableCell>
-
-                  {/* Hiển thị sao */}
+                  <TableCell>{fb.book?.title || "—"}</TableCell>
+                  <TableCell>{fb.user?.name || "—"}</TableCell>
                   <TableCell>
                     <Rating
-                      name="read-only"
                       value={fb.rating || 0}
                       readOnly
                       size="small"
                       precision={1}
                     />
                   </TableCell>
-
-                  <TableCell>{fb.comment || "Không có bình luận"}</TableCell>
+                  <TableCell>{fb.comment || "—"}</TableCell>
                   <TableCell>
                     {fb.createdAt
                       ? new Date(fb.createdAt).toLocaleString("vi-VN")
-                      : "Không xác định"}
+                      : "—"}
                   </TableCell>
                   <TableCell>
-                    <Tooltip title="Xóa phản hồi">
-                      <IconButton
-                        color="error"
-                        onClick={() => handleDelete(fb._id)}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Tooltip>
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDelete(fb._id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))}
           </TableBody>
         </Table>
 
-        {/* Phân trang */}
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
           component="div"
           count={feedbacks.length}
-          rowsPerPage={rowsPerPage}
           page={page}
+          rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          sx={{ borderTop: "1px solid #e0e0e0" }}
+          rowsPerPageOptions={[5, 10, 25]}
+          sx={{
+            borderTop: "1px solid #e0e0e0",
+            "& .MuiTablePagination-selectLabel, .MuiTablePagination-displayedRows":
+              {
+                fontWeight: 500,
+              },
+          }}
         />
       </TableContainer>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={3000}
+        onClose={closeSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert severity={snackbar.severity} onClose={closeSnackbar}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
