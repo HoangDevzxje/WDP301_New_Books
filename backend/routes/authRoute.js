@@ -396,4 +396,5 @@ router.post("/google-auth", authController.googleLogin);
  */
 router.post("/facebook-auth", authController.facebookLogin);
 
+router.post("/logout", authController.logoutUser);
 module.exports = router;

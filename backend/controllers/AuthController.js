@@ -405,6 +405,21 @@ const facebookLogin = async (req, res) => {
     res.status(500).json({ message: "Xác thực Facebook thất bại!" });
   }
 };
+
+const logoutUser = async (req, res) => {
+  try {
+    res.clearCookie('refresh_token')
+    return res.status(200).json({
+      status: 'OK',
+      message: 'Log out success'
+    });
+  } catch (e) {
+    return res.status(500).json({
+      status: 'ERR',
+      message: e.message
+    });
+  }
+}
 module.exports = {
   refreshToken,
   register,
@@ -415,4 +430,5 @@ module.exports = {
   changePassword,
   googleLogin,
   facebookLogin,
+  logoutUser
 };

@@ -22,10 +22,11 @@ const AuthService = {
     return response.data;
   },
 
-  logout: () => {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.href = "/account/login";
+  logout: async () => {
+    const res = await axios.post(`${BASE_URL}/auth/logout`, {}, {
+      withCredentials: true
+    })
+    return res.data;
   },
 };
 

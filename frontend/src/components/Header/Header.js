@@ -31,6 +31,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import { styled } from "@mui/material/styles";
 import * as CategoryService from "../../services/CategoryService";
 import * as BookService from "../../services/BookService";
+import AuthService from "../../services/AuthService";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -210,30 +211,39 @@ const Header = ({
       .replace("₫", "đ");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("userEmail");
-    localStorage.removeItem("userRole");
+  const handleLogout = async () => {
+    try {
+      // Gọi API để logout trên backend (xóa refresh_token ở cookie)
+      await AuthService.logout();
 
-    sessionStorage.removeItem("access_token");
-    sessionStorage.removeItem("userEmail");
-    sessionStorage.removeItem("userRole");
+      // Xóa dữ liệu ở localStorage và sessionStorage
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("userEmail");
+      localStorage.removeItem("userRole");
 
-    updateUserEmail(null);
+      sessionStorage.removeItem("access_token");
+      sessionStorage.removeItem("userEmail");
+      sessionStorage.removeItem("userRole");
 
-    if (typeof updateCartCount === "function") {
-      updateCartCount(0);
+      updateUserEmail(null);
+
+      if (typeof updateCartCount === "function") {
+        updateCartCount(0);
+      }
+      if (typeof updateCartTotal === "function") {
+        updateCartTotal(0);
+      }
+      if (typeof updateWishlistCount === "function") {
+        updateWishlistCount(0);
+      }
+
+      setUserMenuAnchorEl(null);
+
+      // Chuyển hướng về trang đăng nhập
+      navigate("/account/login");
+    } catch (error) {
+      console.error("Lỗi khi logout:", error);
     }
-    if (typeof updateCartTotal === "function") {
-      updateCartTotal(0);
-    }
-    if (typeof updateWishlistCount === "function") {
-      updateWishlistCount(0);
-    }
-
-    setUserMenuAnchorEl(null);
-
-    navigate("/account/login");
   };
 
   const handleCategoryMouseEnter = (event) => {
@@ -521,9 +531,9 @@ const Header = ({
                               onClick={() => handleCategoryClick2(category._id)}
                               onMouseEnter={() => handleCategoryHover(category)}
                               className={`category-menu-item ${activeCategory &&
-                                  activeCategory._id === category._id
-                                  ? "active"
-                                  : ""
+                                activeCategory._id === category._id
+                                ? "active"
+                                : ""
                                 }`}
                             >
                               {category.name}
