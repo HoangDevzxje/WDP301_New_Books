@@ -1030,7 +1030,7 @@ function OrderPage() {
                         <Box key={item.book._id} className="order-item2">
                           <Box className="order-item-image">
                             <img
-                              src={item.book.images}
+                              src={item.book.images[0]}
                               alt={item.book.title}
                             />
                           </Box>

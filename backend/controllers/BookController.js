@@ -95,68 +95,33 @@ const getBookByPublisher = async (req, res) => {
 const getBestSellers = async (req, res) => {
   try {
     const topSellingBooks = await Order.aggregate([
-      // Lọc các đơn hàng đã hoàn tất
-      {
-        $match: {
-          paymentStatus: "Completed",
-          orderStatus: { $ne: "Cancelled" },
-        },
-      },
-
-      // Tách từng sách trong đơn
+      { $match: { paymentStatus: "Completed", orderStatus: { $ne: "Cancelled" } } },
       { $unwind: "$items" },
-
-      // Gom theo sách để tính tổng số lượng bán
-      {
-        $group: {
-          _id: "$items.book",
-          totalQuantity: { $sum: "$items.quantity" },
-        },
-      },
-
-      // Sắp xếp giảm dần theo số lượng bán
+      { $group: { _id: "$items.book", totalQuantity: { $sum: "$items.quantity" } } },
       { $sort: { totalQuantity: -1 } },
-
-      // Lấy thông tin sách từ collection books
-      {
+      { 
         $lookup: {
           from: "books",
           localField: "_id",
           foreignField: "_id",
           as: "bookDetails",
-        },
+        }
       },
-
-      // Lấy object thay vì mảng
       { $unwind: "$bookDetails" },
-
-      // Gộp lại tất cả thông tin sách + thêm totalQuantity
-      {
+      { 
         $replaceRoot: {
-          newRoot: {
-            $mergeObjects: [
-              "$bookDetails",
-              { totalQuantity: "$totalQuantity" },
-            ],
-          },
-        },
+          newRoot: { $mergeObjects: ["$bookDetails", { totalQuantity: "$totalQuantity" }] }
+        }
       },
-
-      // Giới hạn 20 kết quả
-      { $limit: 20 },
+      { $limit: 10 },
     ]);
 
-    const booksWithDiscount = await applyDiscountCampaignsToBooks(
-      topSellingBooks
-    );
-    return res.status(200).json(booksWithDiscount);
+    res.status(200).json(topSellingBooks);
   } catch (error) {
-    return res.status(500).json({
-      message: "Lỗi khi lấy sách",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Lỗi khi lấy sách", error: error.message });
   }
 };
+
 
 module.exports = {
   getAllBooks,
