@@ -173,10 +173,6 @@ const AdminDashboard = () => {
 
   return (
     <Box className="dashboardContainer">
-      <Typography variant="h4" className="dashboardTitle">
-        Admin Dashboard
-      </Typography>
-
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 4 }}>
           <Paper className="statCard">
