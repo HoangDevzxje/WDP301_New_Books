@@ -169,6 +169,7 @@ const AdminDashboard = () => {
     "Chờ xác nhận": <HourglassEmpty className="statusIcon pending" />,
     "Đã xác nhận": <CheckCircle className="statusIcon confirmed" />,
     "Đã hủy": <Cancel className="statusIcon cancelled" />,
+    "Đã hoàn thành": <CheckCircle className="statusIcon completed" />,
   };
 
   return (

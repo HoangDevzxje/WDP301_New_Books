@@ -13,6 +13,7 @@ const getAdminDashboardStats = async (req, res) => {
       Pending: "Chờ xác nhận",
       Processing: "Đã xác nhận",
       Cancelled: "Đã hủy",
+      Completed: "Đã hoàn thành",
     };
 
     const formattedOrderStatus = orderStatusCount.map((item) => ({

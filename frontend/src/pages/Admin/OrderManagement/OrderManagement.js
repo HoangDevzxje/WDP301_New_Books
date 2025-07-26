@@ -43,6 +43,7 @@ import EditBoxDialog from "./EditBoxDialog";
 const statusLabels = {
   Pending: "Chờ xác nhận",
   Processing: "Đã xác nhận",
+  Completed: "Đã hoàn thành",
   Shipped: "Đã gửi",
   Delivered: "Đã giao",
   Cancelled: "Đã hủy",
@@ -56,6 +57,7 @@ const statusColors = {
   Processing: "#1E90FF",
   Shipped: "#9370DB",
   Delivered: "#32CD32",
+  Completed: "#008000",
   Cancelled: "#DC143C",
 };
 

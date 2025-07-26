@@ -231,12 +231,7 @@ const TrackOrderPage = () => {
                     {(() => {
                       const tracking = ghnTrackingMap[o._id];
                       const status = tracking?.status?.toLowerCase();
-                      const allowReturn = [
-                        "storing",
-                        "ready_to_pick",
-                        "ready_to_deliver",
-                        "delivered",
-                      ].includes(status);
+                      const allowReturn = ["delivered"].includes(status);
 
                       if (!status || !allowReturn) {
                         return (

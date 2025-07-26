@@ -329,41 +329,6 @@ export default function DiscountFormPage() {
         </div>
       </div>
 
-      <div className="discount-book-section">
-        <h3 className="discount-book-title">
-          Sách áp dụng giảm giá ({selectedBooks.length} sách)
-        </h3>
-        <button className="discount-btn-outline" onClick={handleOpenBookDialog}>
-          <AddIcon className="discount-btn-icon" />
-          Chọn sách
-        </button>
-      </div>
-
-      {selectedBooks.length === 0 ? (
-        <p className="discount-empty-text">
-          Chưa chọn sách nào. Mã giảm giá sẽ áp dụng cho toàn bộ sản phẩm.
-        </p>
-      ) : (
-        <div className="discount-chip-wrapper">
-          {selectedBooks.map((b) => (
-            <div key={b._id} className="discount-chip">
-              <div className="discount-chip-avatar">
-                <BookIcon />
-              </div>
-              <span className="discount-chip-label">
-                {b.title} - {b.author}
-              </span>
-              <button
-                className="discount-chip-delete"
-                onClick={() => handleRemoveBook(b)}
-              >
-                <DeleteIcon />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
       <div className="discount-actions">
         <button className="discount-btn-secondary" onClick={() => navigate(-1)}>
           Hủy

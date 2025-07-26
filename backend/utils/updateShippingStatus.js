@@ -41,23 +41,34 @@ const syncShippingStatuses = async () => {
     console.log(`Bắt đầu đồng bộ ${pendingOrders.length} đơn hàng từ GHN...`);
 
     for (const order of pendingOrders) {
-        console.log(order.trackingNumber);
+      console.log(order.trackingNumber);
       try {
-        const ghn = await getGhnTracking(order.trackingNumber); 
+        const ghn = await getGhnTracking(order.trackingNumber);
         const status = ghn?.status?.toLowerCase?.() || "unknown";
         const statusDesc = ghnStatusDescriptions[status] || "Không xác định";
-        console.log(ghn);
 
-        const update = {
-          shippingStatus: status,
-        };
+        order.shippingStatus = status;
 
-        // Nếu trạng thái là 'delivered' → lưu delivered_time
-        if (status === "delivered" && ghn.updated_at) {
-          update.delivered_time = new Date(ghn.updated_at);
+        // console.log("→ Trước khi cập nhật:", {
+        //   shippingStatus: order.shippingStatus,
+        //   orderStatus: order.orderStatus,
+        //   delivered_time: order.delivered_time,
+        // });
+
+        order.shippingStatus = status;
+
+        if (status === "delivered") {
+          order.delivered_time = new Date(ghn.updated_at);
+          order.orderStatus = "Completed"; // Câu lệnh này đang không hoạt động
         }
 
-        await Order.findByIdAndUpdate(order._id, update);
+        // console.log("→ Sau khi cập nhật:", {
+        //   shippingStatus: order.shippingStatus,
+        //   orderStatus: order.orderStatus,
+        //   delivered_time: order.delivered_time,
+        // });
+
+        await order.save();
 
         console.log(`Order ${order._id} ➜ ${status} (${statusDesc})`);
         if (

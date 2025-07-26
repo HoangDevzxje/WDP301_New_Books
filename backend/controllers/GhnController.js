@@ -252,7 +252,8 @@ const returnOrder = async (req, res) => {
         .json({ message: "Đơn hàng không hợp lệ hoặc chưa có mã GHN." });
     }
 
-    const ghn = await getGhnOrderDetail(order.trackingNumber);
+    const ghn = await getGhnTracking(order.trackingNumber);
+    
     const status = ghn.status?.toLowerCase();
 
     const ALLOWED_RETURN_STATUSES = [
@@ -270,18 +271,18 @@ const returnOrder = async (req, res) => {
     const response = await axios.post(
       "https://online-gateway.ghn.vn/shiip/public-api/v2/switch-status/return",
       {
-        order_codes: [order.trackingNumber],
+        order_codes: ["GYU3NHHQ"],
       },
       {
         headers: {
-          Token: process.env.GHN_TOKEN,
-          ShopId: process.env.GHN_SHOP_ID,
+          token: "cf17cac7-54cd-11f0-928a-1a690f81b498", // 
+          shop_id: 5863644, // 
           "Content-Type": "application/json",
         },
       }
     );
 
-    order.shippingStatus = "Đã gửi yêu cầu hoàn";
+    
     order.isReturned = true;
     await order.save();
 
@@ -291,7 +292,11 @@ const returnOrder = async (req, res) => {
       data: response.data,
     });
   } catch (error) {
-    console.error("GHN return error:", error.response?.data || error.message);
+    console.error("GHN return error:");
+    console.error("→ error.code:", error.code); // ECONNREFUSED, ETIMEDOUT, etc
+
+    console.error("→ full message:", error.message);
+
     return res.status(500).json({
       success: false,
       message:
@@ -299,6 +304,7 @@ const returnOrder = async (req, res) => {
     });
   }
 };
+
 const getGhnTracking = async (trackingNumber) => {
   const response = await axios.get(
     "https://online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail",
