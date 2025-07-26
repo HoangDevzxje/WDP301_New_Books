@@ -70,7 +70,6 @@ export default function ComplaintManagement() {
   const fetchComplaints = async () => {
     try {
       const data = await getComplaints();
-      // sort descending by createdAt
       data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setComplaints(data);
     } catch {
