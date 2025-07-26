@@ -107,13 +107,41 @@ export default function BookFormPage() {
     ["title", "author", "genre", "description", "publisher"].forEach((f) => {
       if (!form[f]?.toString().trim()) err[f] = "Bắt buộc";
     });
-    if (!form.publishDate) err.publishDate = "Bắt buộc";
-    if (form.price === "" || form.price < 0) err.price = "Sai giá";
+
+    if (!form.publishDate) {
+      err.publishDate = "Bắt buộc";
+    } else {
+      const today = new Date();
+      const publishDate = new Date(form.publishDate);
+      if (publishDate > today) {
+        err.publishDate = "Ngày xuất bản không được lớn hơn ngày hiện tại";
+      }
+    }
+
+    if (form.price === "" || form.price < 0) {
+      err.price = "Sai giá";
+    }
+
+    if (form.originalPrice === "" || form.originalPrice < 0) {
+      err.originalPrice = "Sai giá gốc";
+    }
+
+    if (
+      form.price !== "" &&
+      form.originalPrice !== "" &&
+      Number(form.price) > Number(form.originalPrice)
+    ) {
+      err.price = "Giá bán phải nhỏ hơn hoặc bằng giá gốc";
+    }
+
     if (form.stock === "" || form.stock < 0) err.stock = "Sai số lượng";
+
     if (!form.categories.length) err.categories = "Chọn ít nhất 1 danh mục";
+
     ["weight", "totalPage", "minAge"].forEach((f) => {
       if (form[f] !== "" && form[f] < 0) err[f] = "Không được âm";
     });
+
     setErrors(err);
     return !Object.keys(err).length;
   };
@@ -461,14 +489,14 @@ export default function BookFormPage() {
         </div>
 
         <div className="form-actions">
-          <button className="btn btn-primary" onClick={handleSubmit}>
-            Lưu
-          </button>
           <button
             className="btn btn-secondary"
             onClick={() => navigate("/admin/books")}
           >
             Hủy
+          </button>
+          <button className="btn btn-primary" onClick={handleSubmit}>
+            Lưu
           </button>
         </div>
 

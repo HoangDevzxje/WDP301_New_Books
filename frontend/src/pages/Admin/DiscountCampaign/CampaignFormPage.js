@@ -159,6 +159,21 @@ const CampaignFormPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    const start = new Date(form.startDate);
+    const end = new Date(form.endDate);
+
+    if (start < now) {
+      alert("Ngày bắt đầu không được nhỏ hơn ngày hôm nay.");
+      return;
+    }
+
+    if (start > end) {
+      alert("Ngày bắt đầu không được lớn hơn ngày kết thúc.");
+      return;
+    }
 
     const conflictRes = await checkBookConflicts({
       books: form.books,
@@ -311,8 +326,12 @@ const CampaignFormPage = () => {
               value={form.startDate?.slice(0, 10)}
               onChange={handleChange}
               InputLabelProps={{ shrink: true }}
+              inputProps={{
+                min: new Date().toISOString().split("T")[0],
+              }}
               required
             />
+
             {form.startDate && (
               <Typography
                 variant="caption"
